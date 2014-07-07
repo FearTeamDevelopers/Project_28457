@@ -1,0 +1,73 @@
+<div class="box grid_12">
+    <div class="box-head"><h2>Add new client</h2></div>
+    <div class="box-content">
+        <form class="form" action="#" method="post">
+            <input type="hidden" name="tk" value="{echo $token}" />
+            <div class="form-row">
+                <p class="form-label">Contact Person*</p>
+                <div class="form-item">
+                    <input type="text" name="contperson" value="{echo isset($client) ? $client->contactPerson : ""}" />
+                </div>
+                {if isset($errors["contactPerson"])}
+                <p class="form-label-error">{echo join("<br/>", $errors["contactPerson"])}</p>
+                {/if}
+            </div>
+            <div class="form-row">
+                <p class="form-label">E-mail*</p>
+                <div class="form-item">
+                    <input type="email" name="contemail" value="{echo isset($client) ? $client->contactEmail : ""}" />
+                </div>
+                {if isset($errors["contactEmail"])}
+                <p class="form-label-error">{echo join("<br/>", $errors["contactEmail"])}</p>
+                {/if}
+            </div>
+            <div class="form-row">
+                <p class="form-label">Company name*</p>
+                <div class="form-item">
+                    <input type="text" name="compname" value="{echo isset($client) ? $client->companyName : ""}" />
+                </div>
+                {if isset($errors["companyName"])}
+                <p class="form-label-error">{echo join("<br/>", $errors["companyName"])}</p>
+                {/if}
+            </div>
+            <div class="form-row">
+                <p class="form-label">Company address*</p>
+                <div class="form-item">
+                    <textarea rows="5" name="compaddress">{echo isset($client) ? $client->companyAddress : ""}</textarea>
+                </div>
+                {if isset($errors["companyAddress"])}
+                <p class="form-label-error">{echo join("<br/>", $errors["companyAddress"])}</p>
+                {/if}
+            </div>
+            <div class="form-row">
+                <p class="form-label">Phone</p>
+                <div class="form-item">
+                    <input type="text" name="contphone" value="{echo isset($client) ? $client->contactPhone : ""}" />
+                </div>
+                {if isset($errors["contactPhone"])}
+                <p class="form-label-error">{echo join("<br/>", $errors["contactPhone"])}</p>
+                {/if}
+            </div>
+            <div class="form-row">
+                <p class="form-label">WWW</p>
+                <div class="form-item">
+                    <input type="text" name="www" value="{echo isset($client) ? $client->www : ""}" />
+                </div>
+                {if isset($errors["www"])}
+                <p class="form-label-error">{echo join("<br/>", $errors["www"])}</p>
+                {/if}
+            </div>
+            <div class="form-row">
+                <div class="form-item">
+                    <input type="button" class="button grey" onclick="history.back();" value="Back">
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-item">
+                    <input type="submit" class="button blue" name="submitAddClient" value="Create client"/>
+                </div>
+            </div>
+
+        </form>
+    </div>
+</div>

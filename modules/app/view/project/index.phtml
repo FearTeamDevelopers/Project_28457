@@ -1,0 +1,105 @@
+<div class="box grid_12">
+    {if $isPM}<a class="button big green" href="/project/add">Create new project</a>{/if}
+</div>
+
+<div class="box grid_12" id="filters">
+    <div class="box-head"><h2>Filter</h2></div>
+    <div class="box-content">
+        <form action="#" method="post">
+            <input type="hidden" name="tk" value="{echo $token}" />
+            <div class="box-filter"><span>Filter by state:</span><br/>
+            {if !empty($states)}
+                {foreach $state in $states}
+                    {if in_array($state->getId(), $authUser->unserializeProjectStateFilter())}
+                        {script $psf = "checked=checked"}
+                    {/if}{else}
+                        {script $psf = ""}
+                    {/else}
+                <input type="checkbox" name="projectStateFilterVal[]" {echo $psf}
+                           class="filterCheckbox" value="{echo $state->getId()}" />{echo $state->getTitle()}
+                {/foreach}
+            {/if}
+            </div>
+
+            <div class="box-filter"><span>Filter by priority:</span><br/>
+            {for $i=1 $i<=5 $i++}
+                {if in_array($i, $authUser->unserializeProjectPriorityFilter())}
+                    {script $pfc = "checked=checked"}
+                {/if}{else}
+                    {script $pfc = ""}
+                {/else}
+                
+                <input type="checkbox" name="projectPriorFilterVal[]" {echo $pfc} 
+                            class="filterCheckbox" value="{$i}" />{echo $i}
+            {/for}
+            </div>
+            <input class="button grey filterButton" type="submit" name="projectFilterSubmit" value="Apply Filter" />
+        </form>
+    </div>
+</div>
+
+<div class="box grid_12">
+    <div class="box-head"><h2>Projects</h2></div>
+    <div class="box-content no-pad">
+        <form method="post" class="massActionForm" action="/project/massAction">
+            <input type="hidden" name="tk" value="{echo $token}" />
+            <table class="stdtable display">
+                <thead>
+                    <tr>
+                        <th><input type="checkbox" class="checkall" /></th>
+                        <th>State</th><th>Name</th><th>Created</th><th>Manager</th>
+                        <th>Client</th><th>Planned start</th><th>Planned end</th>
+                        <th>Priority</th><th>&nbsp;</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {if !empty($projects)}
+                        {foreach $project in $projects}
+                            {script $class=""}
+                            {if $project->getPriority() > 3}
+                                {script $class.="row-high-priority"}
+                            {/if}
+                            {if $project->getActive() == false}
+                                {script $class.=" row-inactive"}
+                            {/if}
+                            <tr class="{echo $class}">
+                                <td class="center width100"><input type="checkbox"  name="projectsids[]" value="{echo $project->getId()}" /></td>
+                                <td>{echo $project->stateTitle}</td>
+                                <td>{echo $project->getTitle()}</td>
+                                <td>{echo $project->getCreated()}</td>
+                                <td>{echo $project->managerFname." ".$project->managerLname}</td>
+                                <td>{echo $project->companyName}</td>
+                                <td>{echo $project->getPlannedStart()}</td>
+                                <td>{echo $project->getPlannedEnd()}</td>
+                                <td>{echo $project->getPriority()}</td>
+                                <td>
+                                    <a class="button-detail" href="/project/{echo $project->getUrlKey()}/">Detail</a>
+
+                                {if $isPM && !in_array($project->getStateId(), array(1,2,7))}
+                                    <a class="button-task" href="/task/add/{echo $project->getId()}"
+                                       value="Create new Task in {echo $project->getTitle()}">Add Task</a>
+                                    <a class="button-edit" href="/project/edit/{echo $project->getId()}">Edit</a>
+                                    <a class="button-delete ajax-dialog" href="/project/delete/{echo $project->getId()}" value="Delete project">Delete</a>
+                                {/if}{elseif $isDeveloper && !in_array($project->getStateId(), array(1,2,7))}
+                                        <a class="button-task" href="/task/add/{echo $project->getId()}"
+                                            value="Create new Task in {echo $project->getTitle()}">Add Task</a>
+                                {/elseif}
+                                </td>
+                            </tr>
+                        {/foreach}
+                    {/if}
+                </tbody>
+            </table>
+            {if $isPM}
+                <div class="tableoptions">
+                    Selected:
+                    <select class="radius3" name="action">
+                        <option value="activate">Activate</option>
+                        <option value="deactivate">Deactivate</option>
+                    </select> &nbsp;
+                    <input class="button grey" type="submit" name="performProjectAction" value="Execute"/>
+                </div><!--tableoptions-->
+            {/if}
+        </form>
+    </div>
+</div>

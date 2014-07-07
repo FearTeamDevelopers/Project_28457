@@ -1,0 +1,42 @@
+<div class="box grid_12">
+    {if $isAdmin}
+        <a class="button big green" href="/user/add">Create user account</a><br/><br/>
+    {/if}
+    <div class="box-head"><h2>User list</h2></div>
+    <div class="box-content no-pad">
+        <table class="stdtable display">
+            <thead>
+                <tr>
+                    <th>Firstname</th><th>Lastname</th><th>E-mail</th>
+                    <th>Role</th><th>Created</th><th>Last login</th>
+                    <th>Pass expire</th><th>Manage</th>
+                </tr>
+            </thead>
+            <tbody>
+                {if !empty($users)}
+                    {foreach $user in $users}
+                        {if $user->active == 0}
+                            <tr class="inactive">
+                        {/if} 
+                        {else}
+                            <tr>
+                        {/else}
+                        <td>{echo $user->firstname}</td>
+                        <td>{echo $user->lastname}</td>
+                        <td>{echo $user->email}</td>
+                        <td>{echo $user->role}</td>
+                        <td>{echo $user->created}</td>
+                        <td>{echo $user->lastLogin}</td>
+                        <td>{echo $user->pwdExpire}</td>
+                        <td><a class="button-detail" href="/user/detail/{echo $user->id}">Detail</a>
+                        {if $isAdmin}
+                        <a class="button-edit" href="/user/edit/{echo $user->id}">Edit</a>
+                        <a class="button-delete ajax-dialog" href="/user/delete/{echo $user->id}" value="Delete account">Delete</a>
+                        {/if}
+                        </td></tr>
+                    {/foreach}
+                {/if}
+            </tbody>
+        </table>
+    </div>
+</div>

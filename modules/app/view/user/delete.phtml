@@ -1,0 +1,19 @@
+<div class="box-content">
+    <form class="form" action="/user/delete/{echo $user->getId()}" method="post">
+        <input type="hidden" name="tk" value="{echo $token}" />
+        <div class="form-row">
+            <p class="form-label">User name</p>
+            <div class="form-item">{echo $user->getFirstname()." ".$user->getLastname()}</div>
+        </div>
+        <div class="form-row">
+            <p class="form-label">Created</p>
+            <div class="form-item">{echo $user->getCreated()}</div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-item">
+                <input type="submit" class="button red" name="submitDeleteUser" value="Delete User"/>
+            </div>
+        </div>
+    </form>
+</div>

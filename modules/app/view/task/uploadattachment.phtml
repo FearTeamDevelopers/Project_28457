@@ -1,0 +1,47 @@
+<div class="box grid_12">
+    <div class="box-head"><h2>Upload task attachment</h2></div>
+    <div class="box-content">
+        <form class="form" action="#" method="post" enctype="multipart/form-data">
+            <input type="hidden" name="tk" value="{echo $token}" />
+            <input type="hidden" name="MAX_FILE_SIZE" value="5000000"/>
+            <div class="form-row">
+                <p class="form-label">Title*</p>
+                <div class="form-item">
+                    <input type="text" name="title" value="{echo isset($attachment)? $attachment->title: ""}" />
+                </div>
+                {if isset($errors["title"])}
+                    <p class="form-label-error">{echo join("<br/>", $errors["title"])}</p>
+                {/if}
+            </div>
+            <div class="form-row">
+                <p class="form-label">Description*</p>
+                <div class="form-item">
+                    <textarea cols="85" rows="5" name="description">{echo isset($attachment)? $attachment->description: ""}</textarea>
+                </div>
+                {if isset($errors["description"])}
+                    <p class="form-label-error">{echo join("<br/>", $errors["description"])}</p>
+                {/if}
+            </div>
+            <div class="form-row">
+                <p class="form-label">File</p>
+                <div class="form-item">
+                    <input type="file" name="file" />
+                </div>
+                {if isset($uploadErr)}
+                    <p class="form-label-error">{echo join("<br/>", $uploadErr["file"])}</p>
+                {/if}
+            </div>
+            
+            <div class="form-row">
+                <div class="form-item">
+                    <input type="button" class="button grey" onclick="history.back();" value="Back">
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-item">
+                    <input type="submit" class="button blue" name="uploadFile" value="Upload file"/>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

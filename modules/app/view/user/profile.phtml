@@ -1,0 +1,122 @@
+<div class="box grid_12">
+    <div class="static-header">
+        <h3 class="float-left-fixed">
+             {echo $user->getFirstname()." ".$user->getLastname()}
+
+            {if isset($user->companyName)}
+                 - account for client: 
+                 <a href="/client/profile">{echo $user->companyName}</a>
+            {/if}
+        </h3>
+        <span class="control-buttons float-right-fixed">
+            {if $authUser->getId() == $user->getId()}
+                <a class="controll-button-edit" href="/user/updateprofile">Edit account</a>
+            {/if}
+        </span>
+    </div>
+    <div class="clear-both"></div>
+
+    <div class="tab-nav">
+        <ul>
+            <li><a href="#info">Overview</a></li>
+            {if $isDeveloper}
+            <li><a href="#projects">Assigned to projects</a></li>
+            <li><a href="#tasks">Assigned to tasks</a></li>
+            {/if}
+        </ul>
+
+        <div id="info">
+            <div class="box-content">
+                <div class="form-row">
+                    <p class="form-label">Firstname</p>
+                    <div class="form-item">{echo $user->getFirstname()}</div>
+                </div>
+                <div class="form-row">
+                    <p class="form-label">Lastname</p>
+                    <div class="form-item">{echo $user->getLastname()}</div>
+                </div>
+                <div class="form-row">
+                    <p class="form-label">E-mail</p>
+                    <div class="form-item">{echo $user->getEmail()}</div>
+                </div>
+                <div class="form-row">
+                    <p class="form-label">Phone</p>
+                    <div class="form-item">{echo $user->getPhone()}</div>
+                </div>
+                
+               {if $user->companyName != ""}
+               <hr/>
+                    <div class="form-row">
+                        <p class="form-label">Client info</p>
+                        <div class="form-item"></div>
+                    </div>
+                    <div class="form-row">
+                        <p class="form-label">Company name</p>
+                        <div class="form-item">{echo $user->companyName}</div>
+                    </div>
+                    <div class="form-row">
+                        <p class="form-label">Contact person</p>
+                        <div class="form-item">{echo $user->contactPerson}</div>
+                    </div>
+                    <div class="form-row">
+                        <p class="form-label">Contact email</p>
+                        <div class="form-item">{echo $user->contactEmail}</div>
+                    </div>
+                {/if}
+                
+            </div>
+        </div>
+        {if $isDeveloper}
+        <div id="projects">
+            <div class="box-head"><h2>Projects</h2></div>
+            <div class="box-content no-pad">
+                <table class="display">
+                    <thead>
+                        <tr>
+                            <th>Title</th><th>Title</th>
+                            <th>Created</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {if !empty($assignedProjects)} 
+                            {foreach $project in $assignedProjects}
+                                <tr>
+                                    <td><a href="/project/{echo $project->pUrlKey}/">{echo $project->pTitle}</a></td>
+                                    <td>{echo $project->stateTitle}</td>
+                                    <td>{echo $project->pCreated}</td>
+                                </tr>
+                            {/foreach}
+                        {/if}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div id="tasks">
+            <div class="box-head"><h2>Tasks</h2></div>
+            <div class="box-content no-pad">
+                <table class="display">
+                    <thead>
+                        <tr>
+                            <th>Title</th><th>State</th><th>Project</th>
+                            <th>Created</th><th>Priority</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {if !empty($assignedTasks)}
+                            {foreach $task in $assignedTasks}
+                                <tr>
+                                    <td><a href="/task/{echo $task->getUrlKey()}/">{echo $task->getTitle()}</a></td>
+                                    <td>{echo $task->stateTitle}</td>
+                                    <td>{echo $task->pTitle}</td>
+                                    <td>{echo $task->getCreated()}</td>
+                                    <td>{echo $task->getPriority()}</td>
+                                </tr>
+                            {/foreach}
+                        {/if}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        {/if}
+    </div>
+</div>

@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <meta http-equiv="Content-Language" content="cs" />
+        <meta http-equiv="CACHE-CONTROL" content="public">
+        <meta name="viewport" content="width=device-width, maximum-scale=2.0, minimum-scale=1.0, initial-scale=1.0" />
+        <meta name="keywords" content="" />
+        <meta name="description" content="" />
+        <meta name="author" content="Tomas Hodan" />
+        <meta name="robots" content="NOINDEX,NOFOLLOW" />
+
+        <link href="/public/css/reset.css" media="screen" rel="stylesheet" type="text/css" />
+        <link href="/public/css/styles.css" media="screen" rel="stylesheet" type="text/css" />
+        <link href="/public/css/login.css" media="screen" rel="stylesheet" type="text/css" />
+        <!--[if IE]> <link href="/public/css/styles.css" media="screen" rel="stylesheet" type="text/css" /><![endif]-->
+
+        <!--[if lt IE 9]><script type="text/javascript" src="/public/js/plugins/html5.js"></script><![endif]-->
+        <script type="text/javascript" src="/public/js/plugins/jquery-1.11.1.min.js"></script>
+        <script type="text/javascript" src="/public/js/plugins/jquery-ui-1.10.4.custom.min.js"></script>
+
+        <title>Project Manager Login</title>
+    </head>
+    <body lang="cs">
+        <div class="header">
+
+        </div>
+
+        <div class="content container_12" id="loader"><img src="/public/images/loader6.gif" alt="" />Processing...</div>
+
+        <div class="content container_12">
+            <div class="wrapper">
+                <div class="logo">
+                    <h1>PROJECT MANAGER</h1>
+                </div>
+                <div class="lg-body">
+                    <div class="inner">
+                        <div id="lg-head">
+                            <p><span class="font-bold">Fear Team login</span></p>
+                            <div class="separator"></div>
+                        </div>
+                        <div class="login">
+                            <form id="lg-form" method="post" action="#">
+                                <fieldset>
+                                    <ul>
+                                        {if isset($account_error)}
+                                            <li><span class="label-error">{echo $account_error}</span></li>
+                                        {/if}
+                                        <li id="usr-field">
+                                            <input class="input required" name="email" type="text" size="20" placeholder="E-mail..." value=""/>
+                                        </li>
+                                        <li id="psw-field">
+                                            <input class="input required" name="password" type="password" size="20" placeholder="Password..." value=""/>
+                                        </li>
+                                        <li>
+                                            <input class="submit" name="submitLogin" type="submit" value="." />
+                                        </li>
+                                    </ul>
+                                </fieldset>
+                            </form>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="clear-both"></div>
+
+        <!-- JS scripts --> 
+        <script type="text/javascript" src="/public/js/custom/login.js"></script>
+        <!-- End JS scripts -->
+    </body>
+</html>

@@ -1,0 +1,301 @@
+<div class="box grid_12">
+    <div class="static-header">
+        <h3 class="float-left-fixed">{echo $task->getTitle()}</h3>
+        <span class="control-buttons float-right-fixed">
+            {if $isPM}
+                <a class="controll-button-edit" href="/task/edit/{echo $task->getId()}">Edit</a>
+                <a class="controll-button-delete ajax-dialog" href="/task/delete/{echo $task->getId()}">Delete</a>
+            {/if}
+        </span>
+    </div>
+    <div class="clear-both"></div>
+    <input type="hidden" id="tk" name="tk" value="{echo $token}" />
+    
+    {if $task->getStateId() == 8}
+        <div class="ad-notif-warn grid_12"><p>Task has not been approved yet</p></div>
+    {/if}
+    
+    {if $isDeveloper}
+        <div class="state-button-wrapper">
+            {foreach $nextstate in $nextstates}
+                <a href="/task/setstate/{echo $task->getId()}/{echo $nextstate->getId()}" class="button blue">
+                    {echo $nextstate->getNextStateTitle()}
+                </a>
+            {/foreach}
+            <a href="/task/assigntome/{echo $task->getId()}" class="button grey">Assign to me</a>
+            <a href="/task/assigntouser/{echo $task->getId()}" class="button grey ajax-dialog" 
+               value="Assign to user">Assign to user</a>
+            <a href="/task/logtime/{echo $task->getId()}" class="button grey ajax-dialog" 
+               value="Log time">Log time</a>
+
+            {if !in_array($task->getStateId(), array(8,10,15))}
+                <a class="button grey" href="/task/uploadattachment/{echo $task->getId()}">Attach file</a>
+            {/if}
+        </div>
+    {/if}{elseif $isClient}
+        {if !in_array($task->getStateId(), array(8,10,15)) && $task->getTaskType() != 'task'}
+            <div class="state-button-wrapper">
+                <a class="button grey" href="/task/uploadattachment/{echo $task->getId()}">Attach file</a>
+            </div>
+        {/if}
+    {/elseif}
+
+    <div class="tab-nav grid_7">
+        <ul>
+            <li><a href="#info">Overview</a></li>
+            <li><a href="#chat">Chat</a></li>
+            <li><a href="#files">Files</a></li>
+            <li><a href="#timelog">Time log</a></li>
+        </ul>
+
+        <div id="info">
+            <div class="box-content">
+                <div class="form-row">
+                    <p class="form-label">Task title</p>
+                    <div class="form-item">{echo $task->getTitle()}</div>
+                </div>
+                <div class="form-row">
+                    <p class="form-label">Project</p>
+                    <div class="form-item">
+                        <a href="/project/{echo $task->prUrlKey}/">{echo $task->prTitle}</a>
+                    </div>
+                </div>
+                
+                <div class="form-row">
+                    <p class="form-label">Type</p>
+                    <div class="form-item">{echo ucfirst($task->getTaskType())}</div>
+                </div>
+                <div class="form-row">
+                    <p class="form-label">Description</p>
+                    <div class="form-item">{echo $task->getDescription()}</div>
+                </div>
+                <div class="form-row">
+                    <p class="form-label">Created by</p>
+                    <div class="form-item">{echo $task->cFname . " " . $task->cLname}</div>
+                </div>
+                <div class="form-row">
+                    <p class="form-label">Assigned to</p>
+                    <div class="form-item">{echo $task->asFname . " " . $task->asLname}</div>
+                </div>
+                <div class="form-row">
+                    <p class="form-label">Spent time</p>
+                    <div class="form-item">{echo $spenttime} minutes</div>
+                </div>
+                <div class="form-row">
+                    <p class="form-label">Created</p>
+                    <div class="form-item">{echo $task->getCreated()}</div>
+                </div>
+                <div class="form-row">
+                    <p class="form-label">State</p>
+                    <div class="form-item">{echo $task->stateTitle}</div>
+                </div>
+                <div class="form-row">
+                    <p class="form-label">Priority [1 - Low]</p>
+                    <div class="form-item">{echo $task->getPriority()}</div>
+                </div>
+            </div>
+        </div>
+
+        <div id="chat">
+            <div class="box-content">
+                {if !in_array($task->getStateId(), array(8,10,15))}
+                    <form class="taskMessageForm" action="#" method="post">
+                        <input type="hidden" name="tk" value="{echo $token}" />
+                        <div class="form-row">
+                            <p class="form-label">Message title</p>
+                            <div class="form-item">
+                                <input type="text" name="messtitle" required value="{echo isset($message)? $message->title: ""}"/>
+                            </div>
+                            {if isset($errors["title"])}
+                                <p class="form-label-error">{echo join("<br/>", $errors["title"])}</p>
+                            {/if}
+                        </div>
+
+                        <div class="form-row">
+                            <p class="form-label">Text</p>
+                            <div class="form-item">
+                                <textarea rows="5" required name="messtext">{echo isset($message)? $message->body: ""}</textarea>
+                            </div>
+                             {if isset($errors["body"])}
+                                <p class="form-label-error">{echo join("<br/>", $errors["body"])}</p>
+                            {/if}
+                        </div>
+
+                        {if $isDeveloper}
+                            <div class="form-row">
+                                <p class="form-label">Show to</p>
+                                <div class="form-item">
+                                    <select name="showto">
+                                        <option value="1">Everybody</option>
+                                        <option value="2">Developers only</option>
+                                    </select>
+                                </div>
+                            </div>
+                        {/if}
+                        <div class="form-row">
+                            <div class="form-item">
+                                <input type="submit" class="button blue" name="submitSendMess" value="Send message"/>
+                            </div>
+                        </div>
+                    </form>
+                {/if}
+                {script $chat = $task->getChat()}
+                {if !empty($chat)}
+                    {foreach $message in $chat}
+                    <div class="box-content overflow">
+                        <div class="message-box">
+                            <div class="message-user">{echo $message->fname." ".$message->lname}</div>
+                            <div class="message-content">
+                                <span class="title">{echo $message->getTitle()}
+                                    {if $message->isPublic == 2} - developers only{/if}</span><br/>
+                                <span class="created">{echo $message->getCreated()}</span><br/>
+                                {echo html_entity_decode($message->getBody())}
+                            </div>
+                        </div>
+                    </div>
+                    {/foreach}
+                {/if}{else}
+                    <div class="box-content">
+                        <div class="grid_12 message"><p>No messages available</p></div>
+                    </div>
+                {/else}
+            </div>
+        </div>
+        
+        <div id="files">
+            <div class="box-content">
+                {script $attachments = $task->getAttachment()}
+                {if !empty($attachments)}
+                    <ul class="imagelist">
+                        {foreach $attch in $attachments}
+                        <li>
+                            {if $attch->isImage()}
+                                <a href="{echo $attch->getPath()}" class="view">
+                                    <img src="{echo $attch->getThumbPath()}" alt="{echo $attch->getFilename()}" height="128px" />
+                                </a>
+                            {/if}{else}
+                                <img src="/public/images/fileicon/{echo $attch->getExt()}.png" width="128px" alt="{echo $attch->getTitle()}"/>
+                            {/else}
+                            <span>
+                                <span class="name">{echo $attch->getFilename()}</span><br/>
+                                <a class="view" href="/file/download/{echo $attch->getId()}">Download</a>
+                                {if $isPM}
+                                    <a class="delete" href="/file/delete/{echo $attch->getId()}">Delete file</a></li>
+                                {/if}
+                            </span>
+                        </li>
+                        {/foreach}
+                    </ul>
+                {/if}{else}
+                    <div class="grid_12 message"><p>No files available</p></div>
+                {/else}
+            </div>
+        </div>
+        <div id="timelog">
+            <div class="box-head"><h2>Time log</h2></div>
+            <div class="box-content no-pad">
+                <table class="stdtable display">
+                    <thead>
+                        <tr>
+                            <th>Time [minutes]</th><th>Description</th>
+                            <th>User</th><th>&nbsp;</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {script $timelogs=$task->getTimeLog()}
+                        {if !empty($timelogs)}
+                            {foreach $timelog in $timelogs}
+                                <tr>
+                                    <td>{echo $timelog->getSpentTime()}</td>
+                                    <td>{echo $timelog->getDescription()}</td>
+                                    <td>{echo $timelog->firstname." ".$timelog->lastname}</td>
+                                    <td>
+                                        {if $timelog->userId == $authUser->getId()}
+                                            <a class="button-delete-ajax" href="/task/deletetimelog/{echo $timelog->getId()}">Delete</a>
+                                        {/if}
+                                    </td>
+                                </tr>
+                            {/foreach}
+                        {/if}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    
+    <div class="tab-nav grid_5">
+        <ul>
+            <li><a href="#sub">Sub Tasks</a></li>
+            <li><a href="#rel">Related Tasks</a></li>
+        </ul>
+        <div id="sub">
+            {if $isDeveloper && !in_array($task->getStateId(), array(8,10,15))}
+                <a class="button grey ajax-dialog" href="/task/addsubtask/{echo $task->getId()}" value="Add subtask">Add subtask</a>
+                <br/><br/>
+            {/if}
+            <div class="box-head"><h2>Sub Tasks</h2></div>
+            <div class="box-content no-pad">
+                <table class="stdtable display">
+                    <thead>
+                        <tr>
+                            <th>Task name</th><th>State</th>
+                            <th>Type</th><th>Priority</th>
+                            <th>&nbsp;</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {script $subtasks=$task->getSubTasks()}
+                        {if !empty($subtasks)}
+                            {foreach $subtask in $subtasks}
+                                <tr>
+                                    <td><a href="/task/{echo $subtask->getUrlKey()}/">{echo $subtask->getTitle()}</a></td>
+                                    <td>{echo $subtask->stateTitle}</td>
+                                    <td>{echo $subtask->getTaskType()}</td>
+                                    <td>{echo $subtask->getPriority()}</td>
+                                    <td>
+                                        <a class="button-delete-ajax" href="/task/removesubtask/{echo $task->getId()}/{echo $subtask->getId()}">Delete subtask</a>
+                                    </td>
+                                </tr>
+                            {/foreach}
+                        {/if}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div id="rel">
+            {if $isDeveloper && !in_array($task->getStateId(), array(8,10,15))}
+                <a class="button grey ajax-dialog" href="/task/addrelatedtask/{echo $task->getId()}" 
+                   value="Add related task">Add related task</a>
+                <br/><br/>
+            {/if}
+            <div class="box-head"><h2>Related Tasks</h2></div>
+            <div class="box-content no-pad">
+                <table class="stdtable display">
+                    <thead>
+                        <tr>
+                            <th>Task name</th><th>State</th>
+                            <th>Type</th><th>Priority</th>
+                            <th>&nbsp;</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {script $reltasks=$task->getRelatedTo()}
+                        {if !empty($reltasks)}
+                            {foreach $reltask in $reltasks}
+                                <tr>
+                                    <td><a href="/task/{echo $reltask->getUrlKey()}/">{echo $reltask->getTitle()}</a></td>
+                                    <td>{echo $reltask->stateTitle}</td>
+                                    <td>{echo $reltask->getTaskType()}</td>
+                                    <td>{echo $reltask->getPriority()}</td>
+                                    <td>
+                                        <a class="button-delete-ajax" href="/task/removereletedtask/{echo $task->getId()}/{echo $reltask->getId()}">Delete related task</a>
+                                    </td>
+                                </tr>
+                            {/foreach}
+                        {/if}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>        

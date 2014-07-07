@@ -1,0 +1,182 @@
+<div class="box grid_12">
+    <div class="box-head"><h2>Create new project</h2></div>
+    <div class="box-content">
+        <form class="form" action="#" method="post">
+            <input type="hidden" name="tk" value="{echo $token}" />
+            <div class="form-row">
+                <p class="form-label">Project name*</p>
+                <div class="form-item">
+                    <input type="text" name="projname" value="{echo $project->getTitle()}" />
+                </div>
+                {if isset($errors["title"])}
+                    <p class="form-label-error">{echo join("<br/>", $errors["title"])}</p>
+                {/if}
+            </div>
+            <div class="form-row">
+                <p class="form-label">State*</p>
+                <div class="form-item">
+                    <select name="state">
+                        {if !empty($states)}
+                            {foreach $state in $states}
+                                {script $s = ""}
+                                {if $project->getStateId() == $state->getId()}
+                                    {script $s = "selected"}
+                                {/if}
+                                <option value="{echo $state->getId()}" {echo $s}>{echo $state->getTitle()}</option>
+                            {/foreach}
+                        {/if}
+                    </select>
+                </div>
+                {if isset($errors["stateId"])}
+                    <p class="form-label-error">{echo join("<br/>", $errors["stateId"])}</p>
+                {/if}
+            </div>
+            <div class="form-row">
+                <p class="form-label">Description*</p>
+                <div class="form-item">
+                    <textarea cols="85" rows="5" name="projdesc" id="ckeditor">{echo $project->getDescription()}</textarea>
+                </div>
+                {if isset($errors["description"])}
+                    <p class="form-label-error">{echo join("<br/>", $errors["description"])}</p>
+                {/if}
+            </div>
+            <div class="form-row">
+                <p class="form-label">Manager*</p>
+                <div class="form-item">
+                    <select name="manager">
+                        {if !empty($managers)}
+                            {foreach $manager in $managers}
+                                {script $s = ""}
+                                {if $manager->getId() == $project->getManagerId()}
+                                    {script $s = "selected"}
+                                {/if}
+                                <option value="{echo $manager->getId()}" {echo $s}>{echo $manager->getFirstname() . " " . $manager->getLastname()}</option>
+                            {/foreach}
+                        {/if}{else}
+                            <option value="0">No manager found</option>
+                        {/else}
+                    </select>
+                </div>
+                {if isset($errors["managerId"])}
+                    <p class="form-label-error">{echo join("<br/>", $errors["managerId"])}</p>
+                {/if}
+            </div>
+
+            <div class="form-row">
+                <p class="form-label">Client*</p>
+                <div class="form-item">
+                    <select name="client">
+                        {if !empty($clients)}
+                            {foreach $client in $clients}
+                                {script $s = ""}
+                                {if $client->getId() == $project->getClientId()}
+                                    {script $s = "selected"}
+                                {/if}
+                                <option value="{echo $client->getId()}" {echo $s}>{echo $client->getCompanyName() . " / " . $client->getContactPerson()}</option>
+                            {/foreach}
+                        {/if}{else}
+                            <option value="0">No client found</option>
+                        {/else}
+                    </select>
+                </div>
+                {if isset($errors["clientId"])}
+                    <p class="form-label-error">{echo join("<br/>", $errors["clientId"])}</p>
+                {/if}
+            </div>
+            <div class="form-row">
+                <p class="form-label">Budget</p>
+                <div class="form-item">
+                    <input type="text" name="budget" value="{echo $project->getMaxBudget()}" />
+                </div>
+                {if isset($errors["maxBudget"])}
+                    <p class="form-label-error">{echo join("<br/>", $errors["maxBudget"])}</p>
+                {/if}
+            </div>
+            <div class="form-row">
+                <p class="form-label">Git repository</p>
+                <div class="form-item">
+                    <input type="text" name="repository" value="{echo $project->getGitRepository()}" />
+                </div>
+                {if isset($errors["gitRepository"])}
+                    <p class="form-label-error">{echo join("<br/>", $errors["gitRepository"])}</p>
+                {/if}
+            </div>
+            <div class="form-row">
+                <p class="form-label">Planned start date *</p>
+                <div class="form-item">
+                    <input type="text" name="plannedStart" id="datepicker" 
+                           value="{echo $project->getPlannedStart()}"/>
+                </div>
+                {if isset($errors["plannedStart"])}
+                    <p class="form-label-error">{echo join("<br/>", $errors["plannedStart"])}</p>
+                {/if}
+            </div>
+            <div class="form-row">
+                <p class="form-label">Planned end date *</p>
+                <div class="form-item">
+                    <input type="text" name="plannedEnd" id="datepicker2" 
+                           value="{echo $project->getPlannedEnd()}"/>
+                </div>
+                {if isset($errors["plannedEnd"])}
+                    <p class="form-label-error">{echo join("<br/>", $errors["plannedEnd"])}</p>
+                {/if}
+            </div>
+            <div class="form-row">
+                <p class="form-label">Priority *</p>
+                <div class="form-item">
+                    <select name="priority">
+                        {for $i=0 $i<6 $i++}
+                            {if $i == $project->priority}
+                                <option value="$i" selected="selected">{echo $i}</option>
+                            {/if}
+                            {else}
+                                <option value="$i">{echo $i}</option>
+                            {/else}
+                        {/for}
+                    </select>
+                </div>
+                {if isset($errors["priority"])}
+                    <p class="form-label-error">{echo join("<br/>", $errors["priority"])}</p>
+                {/if}
+            </div>
+            <div class="form-row">
+                <p class="form-label">Active</p>
+                <div class="form-item">
+                    <select name="active">
+                    {if $project->active}
+                    <option value="0">Inactive</option>
+                    <option value="1" selected>Active</option>
+                    {/if}
+                    {else}
+                    <option value="0" selected>Inactive</option>
+                    <option value="1">Active</option>
+                    {/else}
+                </select>
+                </div>
+            </div>
+            
+            <div class="form-row">
+                <p class="form-label">Created</p>
+                <div class="form-item">
+                    {echo $project->created}
+                </div>
+            </div>
+            <div class="form-row">
+                <p class="form-label">Modified</p>
+                <div class="form-item">
+                    {echo $project->modified}
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-item">
+                    <input type="button" class="button grey" onclick="history.back();" value="Back">
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-item">
+                    <input type="submit" class="button blue" name="submitEditProject" value="Save changes"/>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

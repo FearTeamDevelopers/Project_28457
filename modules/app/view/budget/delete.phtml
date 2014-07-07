@@ -1,0 +1,27 @@
+<div class="box-content">
+    <form class="form" action="/budget/delete/{echo $budget->getId()}" method="post">
+        <input type="hidden" id="tk" name="tk" value="{echo $token}" />
+        <div class="form-row">
+            <p class="form-label">Item title</p>
+            <div class="form-item">{echo $budget->getTitle()}</div>
+        </div>
+        <div class="form-row">
+            <p class="form-label">Description</p>
+            <div class="form-item">{echo $budget->getDescription()}</div>
+        </div>
+        <div class="form-row">
+            <p class="form-label">Total price</p>
+            <div class="form-item">{echo $budget->getTotalPrice()}</div>
+        </div>
+        <div class="form-row">
+            <p class="form-label">Created</p>
+            <div class="form-item">{echo $budget->getCreated()}</div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-item">
+                <input type="submit" class="button red" name="submitDeleteBudget" value="Delete record"/>
+            </div>
+        </div>
+    </form>
+</div>

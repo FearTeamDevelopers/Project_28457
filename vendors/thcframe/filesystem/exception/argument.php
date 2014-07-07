@@ -1,0 +1,9 @@
+<?php
+
+namespace THCFrame\Filesystem\Exception;
+
+use THCFrame\Core as Core;
+
+class Argument extends Core\Exception\Argument {
+    
+}

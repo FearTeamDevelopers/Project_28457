@@ -1,0 +1,36 @@
+<div class="box grid_12">
+    <div class="box-head"><h2>Edit Note</h2></div>
+    <div class="box-content">
+        <form class="form" action="#" method="post">
+            <input type="hidden" name="tk" value="{echo $token}" />
+            <div class="form-row">
+                <p class="form-label">Note title</p>
+                <div class="form-item">
+                    <input type="text" name="title" value="{echo $note->getTitle()}" />
+                </div>
+                {if isset($errors["title"])}
+                    <p class="form-label-error">{echo join("<br/>", $errors["title"])}</p>
+                {/if}
+            </div>
+            <div class="form-row">
+                <p class="form-label">Text</p>
+                <div class="form-item">
+                    <textarea cols="50" rows="5" name="text" id="ckeditor">{echo $note->getBody()}</textarea>
+                </div>
+                {if isset($errors["body"])}
+                    <p class="form-label-error">{echo join("<br/>", $errors["body"])}</p>
+                {/if}
+            </div>
+            <div class="form-row">
+                <div class="form-item">
+                    <input type="button" class="button grey" onclick="history.back();" value="Back">
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-item">
+                    <input type="submit" class="button blue" name="submitEditNote" value="Save changes"/>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

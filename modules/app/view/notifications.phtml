@@ -1,0 +1,29 @@
+{if !empty($infoMessage)}
+<div class="content container_12">
+    <div class="ad-notif-info grid_12"><p>{echo $infoMessage}</p></div>
+</div>
+{/if}
+
+{if !empty($warningMessage)}
+<div class="content container_12">
+    <div class="ad-notif-warn grid_12"><p>{echo $warningMessage}</p></div>
+</div>
+{/if}
+
+{if !empty($successMessage)}
+<div class="content container_12">
+    <div class="ad-notif-success grid_12"><p>{echo $successMessage}</p></div>
+</div>
+{/if}
+
+{if !empty($errorMessage)}
+<div class="content container_12">
+    <div class="ad-notif-error grid_12"><p>{echo $errorMessage}</p></div>
+</div>
+{/if}
+
+{if !empty($longFlashMessage)}
+<div class="content container_12">
+    <div class="ad-notif-info grid_12"><p>{echo $longFlashMessage}</p></div>
+</div>
+{/if}

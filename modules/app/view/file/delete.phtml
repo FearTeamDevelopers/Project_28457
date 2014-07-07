@@ -1,0 +1,32 @@
+<div class="box grid_8">
+    <div class="box-head"><h2>Delete file</h2></div>
+    <div class="box-content">
+        <form class="form" action="#" method="post">
+            <input type="hidden" name="tk" value="{echo $token}" />
+            <div class="form-row">
+                <p class="form-label">File name</p>
+                <div class="form-item">{echo $attachment->getTitle()}</div>
+            </div>
+            <div class="form-row">
+                <p class="form-label">File size</p>
+                <div class="form-item">{echo $attachment->getSize()." KB"}</div>
+            </div>
+            <div class="form-row">
+                <p class="form-label">Uploaded</p>
+                <div class="form-item">{echo $attachment->getCreated()}</div>
+            </div>
+            <div class="form-row">
+                <p class="form-label">Uploaded by</p>
+                <!--
+                *
+                *
+                *
+                checknout názvy proměných-->
+                <div class="form-item">{echo $file->firstname." ".$file->lastname}</div>
+            </div>
+
+            <input type="submit" class="button blue" value="Cancel" name="submitDeleteFile" />
+            <input type="submit" class="button red" value="Delete" name="submitDeleteFile" />
+        </form>
+    </div>
+</div>

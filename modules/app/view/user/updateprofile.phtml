@@ -1,0 +1,136 @@
+<div class="box grid_12">
+    <div class="box-head"><h2>Update profile</h2></div>
+    <div class="box-content">
+        <form class="form" action="#" method="post">
+            <input type="hidden" name="tk" value="{echo $token}" />
+            <div class="form-row">
+                <p class="form-label">Firstname*</p>
+                <div class="form-item">
+                    <input type="text" name="firstname" value="{echo $user->getFirstname()}" />
+                </div>
+                {if isset($errors["firstname"])}
+                <p class="form-label-error">{echo join("<br/>", $errors["firstname"])}</p>
+                {/if}
+            </div>
+            <div class="form-row">
+                <p class="form-label">Lastname*</p>
+                <div class="form-item">
+                    <input type="text" name="lastname" value="{echo $user->getLastname()}" />
+                </div>
+                {if isset($errors["lastname"])}
+                <p class="form-label-error">{echo join("<br/>", $errors["lastname"])}</p>
+                {/if}
+            </div>
+
+            <div class="form-row">
+                <p class="form-label">E-mail*</p>
+                <div class="form-item">
+                    <input type="email" name="email" value="{echo $user->getEmail()}" />
+                </div>
+                {if isset($errors["email"])}
+                <p class="form-label-error">{echo join("<br/>", $errors["email"])}</p>
+                {/if}
+            </div>
+            <div class="form-row">
+                <p class="form-label">Phone</p>
+                <div class="form-item">
+                    <input type="text" name="phone" value="{echo $user->getPhone()}" />
+                </div>
+                {if isset($errors["phone"])}
+                <p class="form-label-error">{echo join("<br/>", $errors["phone"])}</p>
+                {/if}
+            </div>
+            <div class="form-row">
+                <p class="form-label">Password</p>
+                <div class="form-item">
+                    <input type="password" name="password" value="" />
+                </div>
+                {if isset($errors["password"])}
+                <p class="form-label-error">{echo join("<br/>", $errors["password"])}</p>
+                {/if}
+            </div>
+            <div class="form-row">
+                <p class="form-label">Confirm password</p>
+                <div class="form-item">
+                    <input type="password" name="password2" value="" />
+                </div>
+                {if isset($errors["password2"])}
+                <p class="form-label-error">{echo join("<br/>", $errors["password2"])}</p>
+                {/if}
+            </div>
+
+            {if isset($client)}
+                <hr/>
+                <div class="form-row">
+                    <p class="form-label">Client info</p>
+                    <div class="form-item"></div>
+                </div>
+                <div class="form-row">
+                    <p class="form-label">Company name*</p>
+                    <div class="form-item">
+                        <input type="text" name="compname" value="{echo $client->companyName}" />
+                    </div>
+                    {if isset($errors["companyName"])}
+                    <p class="form-label-error">{echo join("<br/>", $errors["companyName"])}</p>
+                    {/if}
+                </div>
+                <div class="form-row">
+                    <p class="form-label">Contact person*</p>
+                    <div class="form-item">
+                        <input type="text" name="contperson" value="{echo $client->contactPerson}" />
+                    </div>
+                    {if isset($errors["contactPerson"])}
+                    <p class="form-label-error">{echo join("<br/>", $errors["contactPerson"])}</p>
+                    {/if}
+                </div>
+                <div class="form-row">
+                    <p class="form-label">Contact email*</p>
+                    <div class="form-item">
+                        <input type="text" name="contemail" value="{echo $client->contactEmail}" />
+                    </div>
+                    {if isset($errors["contactEmail"])}
+                    <p class="form-label-error">{echo join("<br/>", $errors["contactEmail"])}</p>
+                    {/if}
+                </div>
+                <div class="form-row">
+                    <p class="form-label">Contact phone</p>
+                    <div class="form-item">
+                        <input type="text" name="contphone" value="{echo $client->contactPhone}" />
+                    </div>
+                    {if isset($errors["contactPhone"])}
+                    <p class="form-label-error">{echo join("<br/>", $errors["contactPhone"])}</p>
+                    {/if}
+                </div>
+                <div class="form-row">
+                    <p class="form-label">Address</p>
+                    <div class="form-item">
+                        <textarea rows="5" name="address">{echo $client->companyAddress}</textarea>
+                    </div>
+                    {if isset($errors["companyAddress"])}
+                    <p class="form-label-error">{echo join("<br/>", $errors["companyAddress"])}</p>
+                    {/if}
+                </div>
+                <div class="form-row">
+                    <p class="form-label">WWW</p>
+                    <div class="form-item">
+                        <input type="text" name="compwww" value="{echo $client->www}" />
+                    </div>
+                    {if isset($errors["www"])}
+                    <p class="form-label-error">{echo join("<br/>", $errors["www"])}</p>
+                    {/if}
+                </div>
+            {/if}
+            <div class="form-row">
+                <div class="form-item">
+                    <input type="button" class="button grey" onclick="history.back();" value="Back">
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-item">
+                    <input type="submit" class="button blue" name="submitUpdateProfile" value="Save changes"/>
+                </div>
+            </div>
+
+        </form>
+    </div>
+</div>

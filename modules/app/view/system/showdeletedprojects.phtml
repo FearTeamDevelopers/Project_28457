@@ -1,0 +1,32 @@
+<div class="box grid_12">
+    <div class="box-head"><h2>Deleted tasks</h2></div>
+    <div class="box-content no-pad">
+        <input type="hidden" id="tk" name="tk" value="{echo $token}" />
+        <table class="display">
+            <thead>
+                <tr>
+                    <th>Title</th><th>Client</th>
+                    <th>State</th><th>Manager</th>
+                    <th>Created</th><th>Modified</th><th>&nbsp;</th>
+                </tr>
+            </thead>
+            <tbody>
+                {if !empty($projects)}
+                    {foreach $project in $projects}
+                        <tr>
+                            <td>{echo $project->title}</td>
+                            <td>{echo $project->companyName}</td>
+                            <td>{echo $project->stateTitle}</td>
+                            <td>{echo $project->mFname." ".$project->mFname}</td>
+                            <td>{echo $project->getCreated()}</td>
+                            <td>{echo $project->getModified()}</td>
+                            <td>
+                                <a class="button-task ajax-button" href="/project/undelete/{echo $project->getId()}">Undelete Project</a>
+                            </td>
+                        </tr>
+                    {/foreach}
+                {/if}
+            </tbody>
+        </table>
+    </div>
+</div>

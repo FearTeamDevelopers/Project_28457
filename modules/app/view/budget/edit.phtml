@@ -1,0 +1,76 @@
+<div class="box grid_12">
+    <div class="box-head"><h2>Edit project</h2></div>
+    <div class="box-content">
+        <form class="form" action="#" method="post">
+            <input type="hidden" name="tk" value="{echo $token}" />
+            <div class="form-row">
+                <p class="form-label">Title</p>
+                <div class="form-item">
+                    <input type="text" name="title" value="{echo $budget->title}" />
+                </div>
+                {if isset($errors["title"])}
+                <p class="form-label-error">{echo join("<br/>", $errors["title"])}</p>
+                {/if}
+            </div>
+            <div class="form-row">
+                <p class="form-label">Description</p>
+                <div class="form-item">
+                    <textarea rows="5" name="description">{echo $budget->description}</textarea>
+                </div>
+                {if isset($errors["description"])}
+                <p class="form-label-error">{echo join("<br/>", $errors["description"])}</p>
+                {/if}
+            </div>
+            <div class="form-row">
+                <p class="form-label">Quantity</p>
+                <div class="form-item">
+                    <input type="text" name="quantity" value="{echo $budget->quantity}" />
+                </div>
+                {if isset($errors["quantity"])}
+                <p class="form-label-error">{echo join("<br/>", $errors["quantity"])}</p>
+                {/if}
+            </div>
+            <div class="form-row">
+                <p class="form-label">Measure units</p>
+                <div class="form-item">
+                    <input type="text" name="mu" value="{echo $budget->mu}" />
+                </div>
+                {if isset($errors["mu"])}
+                <p class="form-label-error">{echo join("<br/>", $errors["mu"])}</p>
+                {/if}
+            </div>
+            <div class="form-row">
+                <p class="form-label">Price per unit</p>
+                <div class="form-item">
+                    <input type="text" name="ppu" value="{echo $budget->ppu}" />
+                </div>
+                {if isset($errors["ppu"])}
+                <p class="form-label-error">{echo join("<br/>", $errors["ppu"])}</p>
+                {/if}
+            </div>
+
+            <div class="form-row">
+                <p class="form-label">Created</p>
+                <div class="form-item">
+                    {echo $budget->created}
+                </div>
+            </div>
+            <div class="form-row">
+                <p class="form-label">Modified</p>
+                <div class="form-item">
+                    {echo $budget->modified}
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-item">
+                    <input type="button" class="button grey" onclick="history.back();" value="Back">
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-item">
+                    <input type="submit" class="button blue" name="submitEditBudget" value="Save changes"/>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

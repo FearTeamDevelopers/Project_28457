@@ -1,0 +1,58 @@
+<div class="box-content">
+    <form class="form" action="/budget/add/{echo $projectid}" method="post">
+        <input type="hidden" name="tk" value="{echo $token}" />
+
+        <div class="form-row">
+            <p class="form-label">Title</p>
+            <div class="form-item">
+                <input type="text" required name="title" value="{echo isset($budget)? $budget->title:""}" />
+            </div>
+            {if isset($errors["title"])}
+            <p class="form-label-error">{echo join("<br/>", $errors["title"])}</p>
+            {/if}
+        </div>
+        <div class="form-row">
+            <p class="form-label">Description</p>
+            <div class="form-item">
+                <textarea required rows="5" name="description">{echo isset($budget)? $budget->description:""}</textarea>
+            </div>
+            {if isset($errors["description"])}
+            <p class="form-label-error">{echo join("<br/>", $errors["description"])}</p>
+            {/if}
+        </div>
+        <div class="form-row">
+            <p class="form-label">Quantity</p>
+            <div class="form-item">
+                <input type="text" title="numbers only" pattern="[\d]*[\.,]?[\d]+" required name="quantity" value="{echo isset($budget)? $budget->quantity:""}" />
+            </div>
+            {if isset($errors["quantity"])}
+            <p class="form-label-error">{echo join("<br/>", $errors["quantity"])}</p>
+            {/if}
+        </div>
+
+        <div class="form-row">
+            <p class="form-label">Price per unit</p>
+            <div class="form-item">
+                <input type="text" title="numbers only" pattern="[\d]*[\.,]?[\d]+" required name="ppu" value="{echo isset($budget)? $budget->ppu:""}" />
+            </div>
+            {if isset($errors["ppu"])}
+            <p class="form-label-error">{echo join("<br/>", $errors["ppu"])}</p>
+            {/if}
+        </div>
+        <div class="form-row">
+            <p class="form-label">Measure units</p>
+            <div class="form-item">
+                <input type="text" required name="mu" value="{echo isset($budget)? $budget->mu:""}" />
+            </div>
+            {if isset($errors["mu"])}
+            <p class="form-label-error">{echo join("<br/>", $errors["mu"])}</p>
+            {/if}
+        </div>
+
+        <div class="form-row">
+            <div class="form-item">
+                <input type="submit" class="button blue" name="submitAddBudget" value="Add item"/>
+            </div>
+        </div>
+    </form>
+</div>

@@ -1,0 +1,29 @@
+<div class="box grid_12">
+    <div class="box-head"><h2>Admin Log</h2></div>
+    <div class="box-content no-pad">
+        <table class="display">
+            <thead>
+                <tr>
+                    <th>Created</th><th>User</th><th>Result</th>
+                    <th>Module</th><th>Controller</th>
+                    <th>Action</th><th>Message</th>
+                </tr>
+            </thead>
+            <tbody>
+                {if !empty($adminlog)}
+                    {foreach $logitem in $adminlog}
+                        <tr>
+                            <td>{echo $logitem->created}</td>
+                            <td>{echo $logitem->userId}</td>
+                            <td>{echo $logitem->result}</td>
+                            <td>{echo $logitem->module}</td>
+                            <td>{echo $logitem->controller}</td>
+                            <td>{echo $logitem->action}</td>
+                            <td>{echo $logitem->params}</td>
+                        </tr>
+                    {/foreach}
+                {/if}
+            </tbody>
+        </table>
+    </div>
+</div>

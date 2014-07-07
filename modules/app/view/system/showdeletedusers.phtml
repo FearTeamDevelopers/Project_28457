@@ -1,0 +1,34 @@
+<div class="box grid_12">
+    <div class="box-head"><h2>Deleted users</h2></div>
+    <div class="box-content no-pad">
+        <input type="hidden" id="tk" name="tk" value="{echo $token}" />
+        <table class="stdtable display">
+            <thead>
+                <tr>
+                    <th>Firstname</th><th>Lastname</th>
+                    <th>Email</th><th>Client id</th>
+                    <th>Last login</th><th>Created</th>
+                    <th>Modified</th><th>&nbsp;</th>
+                </tr>
+            </thead>
+            <tbody>
+                {if !empty($users)}
+                    {foreach $user in $users}
+                        <tr>
+                            <td>{echo $user->getFirstname()}</td>
+                            <td>{echo $user->getLastname()}</td>
+                            <td>{echo $user->getEmail()}</td>
+                            <td>{echo $user->getClientId()}</td>
+                            <td>{echo $user->getLastLogin()}</td>
+                            <td>{echo $user->getCreated()}</td>
+                            <td>{echo $user->getModified()}</td>
+                            <td>
+                                <a class="button-task ajax-button" href="/user/undelete/{echo $user->getId()}">Undelete user</a>
+                            </td>
+                        </tr>
+                    {/foreach}
+                {/if}
+            </tbody>
+        </table>
+    </div>
+</div>

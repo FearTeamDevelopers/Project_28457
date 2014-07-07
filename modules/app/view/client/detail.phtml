@@ -1,0 +1,70 @@
+<div class="box grid_12">
+    <div class="static-header">
+        <h3 class="float-left-fixed">Client: {echo $client->getCompanyName()}</h3>
+    </div>
+    <div class="clear-both"></div>
+
+    <div class="tab-nav">
+        <ul>
+            <li><a href="#info">Info</a></li>
+            <li><a href="#projects">Client projects</a></li>
+        </ul>
+
+        <div id="info">
+            <div class="box-content">
+                <div class="form-row">
+                    <p class="form-label">Contact Person</p>
+                    <div class="form-item">{echo $client->getContactPerson()}</div>
+                </div>
+                <div class="form-row">
+                    <p class="form-label">Email</p>
+                    <div class="form-item">{echo $client->getContactEmail()}</div>
+                </div>
+                <div class="form-row">
+                    <p class="form-label">Phone</p>
+                    <div class="form-item">{echo $client->getContactPhone()}</div>                    
+                </div>
+                <div class="form-row">
+                    <p class="form-label">WWW</p>
+                    <div class="form-item">{echo $client->getWww()}</div>
+                </div>
+                <div class="form-row">
+                    <p class="form-label">Company name</p>
+                    <div class="form-item">{echo $client->getCompanyName()}</div>
+                </div>
+                <div class="form-row">
+                    <p class="form-label">Company address</p>
+                    <div class="form-item">{echo $client->getCompanyAddress()}</div>
+                </div>
+            </div>
+        </div>
+
+        <div id="projects">
+            <div class="box-head"><h2>Projects</h2></div>
+            <div class="box-content no-pad">
+                <table class="display">
+                    <thead>
+                        <tr>
+                            <th>Project name</th><th>Manager</th>
+                            <th>Created</th><th>Deadline</th>
+                            <th>State</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {if !empty($clientprojects)}
+                            {foreach $project in $clientprojects}
+                                <tr>
+                                    <td>{echo $project->getTitle()}</td>
+                                    <td>{echo $project->managerFname." ".$project->managerLname}</td>
+                                    <td>{echo $project->getCreated()}</td>
+                                    <td>{echo $project->getPlannedEnd()}</td>
+                                    <td>{echo $project->stateTitle}</td>
+                                </tr>
+                            {/foreach}
+                        {/if}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,107 @@
+<div class="box grid_8">
+    <div class="box-head"><h2>Create user account</h2></div>
+    <div class="box-content">
+        <form class="form" action="#" method="post">
+            <input type="hidden" name="tk" value="{echo $token}" />
+            <div class="form-row">
+                <p class="form-label">Firstname*</p>
+                <div class="form-item">
+                    <input type="text" name="firstname" value="{echo isset($user)?$user->firstname:""}" />
+                </div>
+                {if isset($errors["firstname"])}
+                <p class="form-label-error">{echo join("<br/>", $errors["firstname"])}</p>
+                {/if}
+            </div>
+            <div class="form-row">
+                <p class="form-label">Lastname*</p>
+                <div class="form-item">
+                    <input type="text" name="lastname" value="{echo isset($user) ? $user->lastname : ""}" />
+                </div>
+                {if isset($errors["lastname"])}
+                <p class="form-label-error">{echo join("<br/>", $errors["lastname"])}</p>
+                {/if}
+            </div>
+
+            <div class="form-row">
+                <p class="form-label">E-mail*</p>
+                <div class="form-item">
+                    <input type="email" name="email" value="{echo isset($user) ? $user->email : ""}" />
+                </div>
+                {if isset($errors["email"])}
+                <p class="form-label-error">{echo join("<br/>", $errors["email"])}</p>
+                {/if}
+            </div>
+            <div class="form-row">
+                <p class="form-label">Phone</p>
+                <div class="form-item">
+                    <input type="text" name="phone" value="{echo isset($user) ? $user->getPhone() : ""}" />
+                </div>
+                {if isset($errors["phone"])}
+                <p class="form-label-error">{echo join("<br/>", $errors["phone"])}</p>
+                {/if}
+            </div>
+            <div class="form-row">
+                <p class="form-label">Password *</p>
+                <div class="form-item">
+                    <input type="password" name="password" value="" />
+                </div>
+                {if isset($errors["password"])}
+                <p class="form-label-error">{echo join("<br/>", $errors["password"])}</p>
+                {/if}
+            </div>
+            <div class="form-row">
+                <p class="form-label">Confirm password *</p>
+                <div class="form-item">
+                    <input type="password" name="password2" value="" />
+                </div>
+                {if isset($errors["password2"])}
+                <p class="form-label-error">{echo join("<br/>", $errors["password2"])}</p>
+                {/if}
+            </div>
+            {if $isAdmin}
+            <div class="form-row">
+                <p class="form-label">User role</p>
+                <div class="form-item">
+                    <select name="role">
+                        {if !empty($roles)}
+                            {foreach $role in $roles}
+                                <option value="{echo $role}">{echo ucfirst(str_replace('role_', '', $role))}</option>
+                            {/foreach}
+                        {/if}
+                    </select>
+                </div>
+
+                {if isset($errors["role"])}
+                <p class="form-label-error">{echo join("<br/>", $errors["role"])}</p>
+                {/if}
+            </div>
+            {/if}
+            <div class="form-row">
+                <p class="form-label">Match to client</p>
+                <div class="form-item">
+                    <select name="clientid">
+                        <option value="0">Dont match with client</option>
+                        {if !empty($clients)}
+                            {foreach $client in $clients}
+                                <option value="{echo $client->getId()}">{echo $client->getContactPerson()." / ".$client->getCompanyName()}</option>
+                            {/foreach}
+                        {/if}
+                    </select>
+                </div>
+                {if isset($errors["clientId"])}
+                <p class="form-label-error">{echo join("<br/>", $errors["clientId"])}</p>
+                {/if}
+            </div>
+            <div class="form-row">
+                <div class="form-item">
+                    <input type="button" class="button grey" onclick="history.back();" value="Back">
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-item">
+                    <input type="submit" class="button blue" name="submitAddUser" value="Create user account"/>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

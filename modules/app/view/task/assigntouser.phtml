@@ -1,0 +1,20 @@
+<div class="box-content">
+    <form class="form" action="/task/assigntouser/{echo $taskid}" method="post">
+        <input type="hidden" name="tk" value="{echo $token}" />
+        <div class="form-row">
+            <p class="form-label">Assign to</p>
+            <div class="form-item">
+                <select name="user">
+                    {foreach $user in $users}
+                    <option value="{echo $user->getId()}">{echo $user->getFirstname()." ".$user->getLastname()}
+                    {/foreach}
+                </select>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-item">
+                <input type="submit" class="button blue" name="assigntouser" value="Assign to user"/>
+            </div>
+        </div>
+    </form>
+</div>

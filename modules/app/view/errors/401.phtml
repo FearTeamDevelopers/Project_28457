@@ -1,0 +1,28 @@
+<!doctype html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <meta http-equiv="Content-Language" content="cs" />
+        <title>401 Unauthorized</title>
+        <!---CSS Files-->
+        <link rel="stylesheet" href="/public/css/errorStyle.css">
+    </head>
+    <body lang="cs">
+        <div class="content container_12">
+            <h1 id="error-heading">401</h1>
+            <p id="error-desc">You are not authorized to view this page.<br><br>
+                You shall now receive a quite painful virtual slap on the wrist.</p>
+            <p id="error-back">If you are the administrator of this website, <a href="/">go to the login page.</a>
+            </p>
+        </div>
+        <div class='content container_12'>
+            <?php if (ENV == 'dev' || ENV == 'qa'): ?>
+                <pre><?php print_r($e); ?></pre>
+            <?php endif; ?>
+        </div>
+        <div class="footer container_12">
+            <p class="grid_12">THCFrame Error Page</p>
+        </div>
+
+    </body>
+</html>

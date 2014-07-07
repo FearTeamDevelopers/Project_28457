@@ -1,0 +1,120 @@
+<div class="box grid_12">
+    <div class="box-head"><h2>Create new task</h2></div>
+    <div class="box-content">
+        <form class="form" action="#" method="post">
+            <input type="hidden" name="tk" value="{echo $token}" />
+            <input type="hidden" name="projectid" value="{echo $projectid}" />
+
+            <div class="form-row">
+                <p class="form-label">Title*</p>
+                <div class="form-item">
+                    <input type="text" name="title" value="{echo isset($newtask)? $newtask->title: ""}" />
+                </div>
+                {if isset($errors["title"])}
+                    <p class="form-label-error">{echo join("<br/>", $errors["title"])}</p>
+                {/if}
+            </div>
+            <div class="form-row">
+                <p class="form-label">Type*</p>
+                <div class="form-item">
+                    <select name="type">
+                        <option value="task">Task</option>
+                        <option value="bug">Bug</option>
+                        <option value="inquiry">Inquiry</option>
+                    </select>
+                </div>
+                {if isset($errors["taskType"])}
+                    <p class="form-label-error">{echo join("<br/>", $errors["taskType"])}</p>
+                {/if}
+            </div>
+
+            {if !empty($tasks)}
+            <div class="form-row">
+                <p class="form-label">Subtask of</p>
+                <div class="form-item">
+                    <input list="subtasklist" name="subtaskof" />
+                    <datalist id="subtasklist">
+                        {foreach $task in $tasks}
+                        <option value="{echo $task->getTitle()."-".$task->getId()}">
+                        {/foreach}
+                    </datalist>
+                </div>
+                {if isset($errors["subTask"])}
+                    <p class="form-label-error">{echo join("<br/>", $errors["subTask"])}</p>
+                {/if}
+            </div>
+            <div class="form-row">
+                <p class="form-label">Related to</p>
+                <div class="form-item">
+                    <input list="reltasklist" name="relatedto"/>
+                    <datalist id="reltasklist">
+                        {foreach $task in $tasks}
+                            <option value="{echo $task->getTitle()."-".$task->getId()}">
+                        {/foreach}
+                    </datalist>
+                </div>
+                {if isset($errors["relatedTask"])}
+                    <p class="form-label-error">{echo join("<br/>", $errors["relatedTask"])}</p>
+                {/if}
+            </div>
+            {/if}
+
+            <div class="form-row">
+                <p class="form-label">Description*</p>
+                <div class="form-item">
+                    <textarea rows="5" name="description" id="ckeditor">{echo isset($newtask)? $newtask->description: ""}</textarea>
+                </div>
+                {if isset($errors["description"])}
+                    <p class="form-label-error">{echo join("<br/>", $errors["description"])}</p>
+                {/if}
+            </div>
+            <div class="form-row">
+                <p class="form-label">Assign to*</p>
+                <div class="form-item">
+                    <select name="assignTo">
+                        {if !empty($users)}
+                            {foreach $user in $users}
+                                {script $s=""}
+                                {if $user->getId()==$authUser->getId()}
+                                    {script $s="selected=selected"}
+                                {/if}
+                                <option value="{echo $user->getId()}" {echo $s}>
+                                    {echo $user->getFirstname() . " " . $user->getLastname()}
+                                </option>
+                            {/foreach}
+                        {/if}
+                    </select>
+                </div>
+                {if isset($errors["assignTo"])}
+                    <p class="form-label-error">{echo join("<br/>", $errors["assignTo"])}</p>
+                {/if}
+            </div>
+            <div class="form-row">
+                <p class="form-label">Priority *</p>
+                <div class="form-item">
+                    <select name="priority">
+                        <option value="1">1 - Low</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                        <option value="5">5 - High</option>
+                    </select>
+                </div>
+                {if isset($errors["priority"])}
+                    <p class="form-label-error">{echo join("<br/>", $errors["priority"])}</p>
+                {/if}
+            </div>
+
+            <div class="form-row">
+                <div class="form-item">
+                    <input type="button" class="button grey" onclick="history.back();" value="Back">
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-item">
+                    <input type="submit" class="button blue" name="submitAddTask" value="Create task"/>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

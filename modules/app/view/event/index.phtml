@@ -1,0 +1,58 @@
+<link href="/public/css/fullcalendar.css" media="screen" rel="stylesheet" type="text/css" />
+<script type="text/javascript" src="/public/js/fullcalendar.min.js"></script>
+
+<div class="box grid_12">
+    
+    <a class="button big green" href="/event/add">Create new event</a>
+    
+    <div class="legend">
+        <div class="color-public">Public events</div>
+        <div class="color-personal">Personal events</div>
+        <div class="color-project">Project deadlines</div>
+    </div>
+    <br/><br/>
+    <div class="box-head"><h2>Calendar</h2></div>
+    <div class="box-content">
+        <div id="calendar"></div>
+    </div>
+</div>
+<div id="bla"></div>
+<script type="text/javascript">
+
+    $(document).ready(function() {
+
+        $("#calendar").fullCalendar({
+            header: {
+                left: "prev,next today",
+                center: "title",
+                right: "month,agendaWeek,agendaDay"
+            },
+            editable: false,
+            allDayDefault: false,
+            firstDay: 1,
+            weekNumbers: true,
+            events: "/event/getEvents",
+            timeFormat: "H:mm",
+            eventClick: function(event) {
+                if (event.className == "projectEvent") {
+                    location.href="/project/detail/"+event.id;
+                    return false;
+                }else{
+                    $("#dialog").load("/event/getEvent", {event_id: event.id}).dialog({
+                        title: "Event",
+                        width: "600px",
+                        modal: true,
+                        position: {my: "center", at: "top", of: window},
+                        buttons: {
+                            Cancel: function() {
+                                $(this).dialog("close");
+                            }
+                        }
+                    });
+                    return false;
+                }
+            }
+        });
+
+    });
+</script>

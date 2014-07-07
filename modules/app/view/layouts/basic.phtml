@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <meta http-equiv="Content-Language" content="cs" />
+        <meta http-equiv="CACHE-CONTROL" content="public">
+        <meta name="viewport" content="width=device-width, maximum-scale=2.0, minimum-scale=1.0, initial-scale=1.0" />
+        <meta name="keywords" content="" />
+        <meta name="description" content="" />
+        <meta name="author" content="Tomas Hodan" />
+        <meta name="robots" content="NOINDEX,NOFOLLOW" />
+
+        <link href="/public/css/reset.css" media="screen" rel="stylesheet" type="text/css" />
+        <link href="/public/css/plugins/smoothness/jquery-ui-1.10.4.custom.min.css" media="screen" rel="stylesheet" type="text/css" />
+        <link href="/public/css/plugins/jquery.lightbox-0.5.css" media="screen" rel="stylesheet" type="text/css" />
+        <link href="/public/css/styles.css" media="screen" rel="stylesheet" type="text/css" />
+        <link href="/public/css/grid.css" media="screen" rel="stylesheet" type="text/css" />
+        <link href="/public/css/tables.css" media="screen" rel="stylesheet" type="text/css" />
+        <!--[if IE]> <link href="/public/css/styles.css" media="screen" rel="stylesheet" type="text/css" /><![endif]-->
+
+        <!--[if lt IE 9]><script type="text/javascript" src="/public/js/plugins/html5.js"></script><![endif]-->
+        <script type="text/javascript" src="/public/js/plugins/jquery-1.11.1.min.js"></script>
+        <script type="text/javascript" src="/public/js/plugins/jquery-ui-1.10.4.custom.min.js"></script>
+
+        <title>Project Manager</title>
+    </head>
+    <body lang="cs">
+        <div class="header">
+        </div>
+        
+        <div class="top-bar">
+            <ul id="nav">
+                <li id="user-panel">
+                    <img src="/public/images/nav/usr-avatar.jpg" id="usr-avatar" alt="" />
+                    <div id="usr-info">
+                        <p id="usr-name">Welcome back, {echo $authUser->getWholeName()}</p>
+                        <p><a href="/user/profile">Profile</a><a href="/logout">Log out</a></p>
+                    </div>
+                </li>
+                <li>
+                    {include menu.phtml}
+                </li>
+            </ul>
+        </div>
+
+        {include notifications.phtml}
+
+        <div class="content container_12" id="loader"><img src="/public/images/loader6.gif" alt="" />Processing...</div>
+        
+        <div class="content container_12">{yield action}</div>
+
+        <div class="clear-both"></div>
+
+        <div class="footer container_12">
+                <p class="grid_12">Project Manager | Made by Tomas Hodan</p>
+        </div>
+
+        <div id="dialog"><p></p></div>
+
+        <!-- JS scripts --> 
+        <script type="text/javascript" src="/public/js/plugins/ckeditor/ckeditor.js"></script>
+        <script type="text/javascript" src="/public/js/plugins/jquery.dataTables.min.js"></script>
+        <script type="text/javascript" src="/public/js/plugins/jquery.lightbox-0.5.min.js"></script>
+        <script type="text/javascript" src="/public/js/custom/global.js"></script>
+        <!-- End JS scripts -->
+    </body>
+</html>

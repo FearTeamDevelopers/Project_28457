@@ -1,0 +1,91 @@
+<form class="form" action="/event/getEvent" method="post" id="ajaxEventForm">
+    <input type="hidden" name="tk" value="{echo $token}" />
+    <input type="hidden" name="event_id" value="{echo $calendar->getId()}"/>
+    <div class="form-row">
+        <p class="form-label">Creted by</p>
+        <div class="form-item">
+            <!--
+            *****
+            *****
+            checknout názvy proměnných-->
+            <input type="text" name="evCretor" disabled="disabled" value="{echo $event->firstname." ".$event->lastname}" />
+        </div>
+        <p class="form-label-error no-display" id="evErrTitle">Title cannot be empty</p>
+    </div>
+    <div class="form-row">
+        <p class="form-label">Title *</p>
+        <div class="form-item"><input type="text" name="evTitle" value="{echo $calendar->getTitle()}" /></div>
+        <p class="form-label-error no-display" id="evErrTitle">Title cannot be empty</p>
+    </div>
+    <div class="form-row">
+        <p class="form-label">Description *</p>
+        <div class="form-item">
+            <textarea cols="55" rows="8" name="evDesc">{echo $calendar->getDescription()}</textarea>
+        </div>
+        <p class="form-label-error no-display" id="evErrDesc">Text cannot be empty</p>
+    </div>
+    <div class="form-row">
+        <p class="form-label">Start *</p>
+        <div class="form-item">
+            <input type="text" name="evStartDate" value="{echo $calendar->getStartDate()}" />
+        </div>
+        <p class="form-label-error no-display" id="evErrStart">Select start date and time</p>
+    </div>
+    <div class="form-row">
+        <p class="form-label">End *</p>
+        <div class="form-item">
+            <input type="text" name="evEndDate" value="{echo $calendar->getEndDate()}" />
+        </div>
+        <p class="form-label-error no-display" id="evErrEnd">Select end date and time</p>
+    </div>
+    <div class="form-row">
+        <p class="form-label">Url</p>
+        <div class="form-item">
+            <input type="text" name="evUrl" value="{echo $calendar->getLink()}" />
+        </div>
+        <p class="form-label-error no-display" id="evErrUrl">Optional</p>
+    </div>
+    <div class="form-row">
+        <p class="form-label">Public *</p>
+        <div class="form-item">
+            <input type="checkbox" name="evPublic" {if $calendar->isPublic == 1} "checked=checked"{/if} />
+        </div>
+    </div>
+
+    <div class="form-row">
+        <div class="form-item">
+            <input type="submit" class="button blue" name="submitEditEvent" value="Save changes"/>
+        </div>
+    </div>
+    <div class="form-row">
+        <div class="form-item">
+            <input type="submit" class="button red" name="submitDeleteEvent" value="Delete event"/>
+        </div>
+    </div>
+</form>
+
+<script type="text/javascript">
+    $(function() {
+        $("#evErrTitle, #evErrDesc, #evErrStart, #evErrEnd, #evErrUrl").hide();
+
+        $("input, textarea").focus(function() {
+            $(this).parent("div").siblings("p.form-label-error:visible").hide();
+        });
+
+        $("#ajaxEventForm").submit(function() {
+            if ($("input[name=evTitle]").val() === "") {
+                $("#evErrTitle").show();
+                return false;
+            } else if ($("textarea[name=evDesc]").val() === "") {
+                $("#evErrDesc").show();
+                return false;
+            } else if ($("input[name=evStartDate]").val() === "") {
+                $("#evErrStart").show();
+                return false;
+            } else if ($("input[name=evEndDate]").val() === "") {
+                $("#evErrEnd").show();
+                return false;
+            }
+        });
+    });
+</script>

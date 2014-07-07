@@ -1,0 +1,84 @@
+<div class="box grid_8">
+    <div class="box-head"><h2>Create new event</h2></div>
+    <div class="box-content">
+        <form class="form" action="#" method="post">
+            <input type="hidden" name="tk" value="{echo $token}" />
+            <div class="form-row">
+                <p class="form-label">Event title *</p>
+                <div class="form-item">
+                    <input type="text" name="evTitle" value="{echo isset($calendar) ? $calendar->title : ""}" />
+                </div>
+                
+                {if isset($errors->["title"])}
+                    <p class="form-label-error">{echo $errors["title"]}</p>
+                {/if}
+                
+            </div>
+            <div class="form-row">
+                <p class="form-label">Event description *</p>
+                <div class="form-item">
+                    <textarea cols="85" rows="5" name="evDesc">{echo isset($calendar) ? $calendar->description : ""}</textarea>
+                </div>
+               {if isset($errors->["description"])}
+                    <p class="form-label-error">{echo $errors["description"]}</p>
+                {/if}
+            </div>
+            <div class="form-row">
+                <p class="form-label">Start *</p>
+                <div class="form-item">
+                    Date: <input type="text" id="datepicker" style="width: 100px;" name="evStartDate" 
+                                 value="{echo isset($calendar) ? $calendar->startDate : ""}" />
+                  <!--startTime neni v MODELU-->
+                    Time: <input type="text" style="width: 100px;" name="evStartTime" 
+                                 value="{echo isset($calendar) ? $calendar->startTime : ""}" /> (hh:mm)
+                </div>
+
+               {if isset($errors->["startDate"])}
+                    <p class="form-label-error">{echo $errors["startDate"]}</p>
+                {/if}
+            </div>
+            <div class="form-row">
+                <p class="form-label">End *</p>
+                <div class="form-item">
+                    Date: <input type="text" id="datepicker2" style="width: 100px;" name="evEndDate" 
+                                 value="{echo isset($calendar) ? $calendar->endDate : ""}" />
+                    <!--endTime neni v modelu-->
+                    Time: <input type="text" style="width: 100px;" name="evEndTime" 
+                                 value="{echo isset($calendar) ? $calendar->endTime : ""}" /> (hh:mm)
+                </div>
+                {if isset($errors->["endDate"])}
+                    <p class="form-label-error">{echo $errors["endDate"]}</p>
+                {/if}
+            </div>
+            <div class="form-row">
+                <p class="form-label">URL</p>
+                <div class="form-item">
+                    <input type="text" name="evUrl" value="{echo isset($calendar) ? $calendar->link : ""}" />
+                </div>
+                {if isset($errors->["link"])}
+                    <p class="form-label-error">{echo $errors["link"]}</p>
+                {/if}
+            </div>
+            <div class="form-row">
+                <p class="form-label">Public *</p>
+                <div class="form-item">
+                    <input type="checkbox" name="evPublic" value="{echo isset($calendar) ? $calendar->isPublic : ""}" />
+                </div>
+                {if isset($errors->["isPublic"])}
+                    <p class="form-label-error">{echo $errors["isPublic"]}</p>
+                {/if}
+            </div>
+            <div class="form-row">
+                <div class="form-item">
+                    <input type="button" class="button grey" onclick="history.back();" value="Back">
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-item">
+                    <input type="submit" class="button blue" name="submitAddEvent" value="Create event"/>
+                </div>
+            </div>
+
+        </form>
+    </div>
+</div>

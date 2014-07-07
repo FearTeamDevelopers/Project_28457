@@ -1,0 +1,369 @@
+{if $isPM}
+    <div class="box grid_6">
+        <div class="box-head"><h2>Assigned to projects</h2></div>
+        <div class="box-content no-pad">
+            <table class="display">
+                <thead>
+                    <tr>
+                        <th>Name</th><th>Client</th>
+                        <th>State</th><th>Priority</th>
+                        <th>Manager</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {if !empty($assignedTo)}
+                        {foreach $project in $assignedTo}
+                            {if $project->pPriority > 3}
+                            <tr class="row-high-priority">
+                                {/if}{else}
+                            <tr>
+                                {/else}
+                                <td><a href="/project/{echo $project->pUrlKey}/">{echo $project->pTitle}</a></td>
+                                <td>{echo $project->companyName}</td>
+                                <td>{echo $project->stateTitle}</td>
+                                <td>{echo $project->pPriority}</td>
+                                <td>{echo $project->managerFname." ".$project->managerLname}</td>
+                            </tr>
+                        {/foreach}
+                    {/if}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="box grid_6">
+        <div class="box-head"><h2>Current tasks</h2></div>
+        <div class="box-content no-pad">
+            <table class="display">
+                <thead>
+                    <tr>
+                        <th>Name</th><th>Project</th>
+                        <th>State</th><th>Priority</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {if !empty($currentTasks)}
+                        {foreach $task in $currentTasks}
+                            {if $task->tPriority > 3}
+                            <tr class="row-high-priority">
+                                {/if}{else}
+                            <tr>
+                                {/else}
+                                <td><a href="/task/{echo $task->getUrlKey()}/">{echo $task->title}</a></td>
+                                <td><a href="/project/{echo $task->pUrlKey}/">{echo $task->pTitle}</a></td>
+                                <td>{echo $task->stateTitle}</td>
+                                <td>{echo $task->priority}</td>
+                            </tr>
+                        {/foreach}
+                    {/if}
+                </tbody>
+            </table>
+        </div>
+    </div>
+<div class="clear-both"></div>
+    <div class="box grid_6">
+        <div class="box-head"><h2>Manages projects</h2></div>
+        <div class="box-content no-pad">
+            <table class="display-short">
+                <thead>
+                    <tr>
+                        <th>Name</th><th>Client</th>
+                        <th>State</th><th>Priority</th>
+                    </tr>
+                </thead>
+                <tbody>              
+                    {if !empty($managedProjects)}
+                        {foreach $managedProject in $managedProjects}
+                            {if $managedProject->pPriority > 3}
+                            <tr class="row-high-priority">
+                                {/if}{else}
+                            <tr>
+                                {/else}
+                                <td><a href="/project/{echo $managedProject->pUrlKey}/">{echo $managedProject->pTitle}</a></td>
+                                <td>{echo $managedProject->companyName}</td>
+                                <td>{echo $managedProject->stateTitle}</td>
+                                <td>{echo $managedProject->pPriority}</td>
+                            </tr>
+                        {/foreach}
+                    {/if}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="box grid_6">
+        <div class="box-head"><h2>Deadlines in next 7 days</h2></div>
+        <div class="box-content no-pad">
+            <table class="display-short">
+                <thead>
+                    <tr>
+                        <th>Name</th><th>Created</th><th>Client</th>
+                        <th>Planned end</th><th>State</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {if !empty($deadlines)}
+                        {foreach $deadline in $deadlines}
+                            <tr>
+                                <td><a href="/project/{echo $deadline->getUrlKey()}/">{echo $deadline->getTitle()}</a></td>
+                                <td>{echo $deadline->getCreated()}</td>
+                                <td>{echo $deadline->companyName}</td>
+                                <td>{echo $deadline->getPlannedEnd()}</td>
+                                <td>{echo $deadline->stateTitle}</td>
+                            </tr>
+                        {/foreach}
+                    {/if}
+                </tbody>
+            </table>
+        </div>
+    </div>
+<div class="clear-both"></div>
+    <div class="box grid_6">
+        <div class="box-head"><h2>Projects Waiting to approve</h2></div>
+        <div class="box-content no-pad">
+            <table class="display-short">
+                <thead>
+                    <tr>
+                        <th>Project</th><th>Created</th>
+                        <th>Manager</th><th>Client</th>
+                    </tr>
+                </thead>
+                <tbody>     
+                    {if !empty($projectsWaitingToApprove)}
+                        {foreach $projectWaitToApprove in $projectsWaitingToApprove}
+                            <tr>
+                                <td><a href="/project/{echo $projectWaitToApprove->getUrlKey()}/">
+                                        {echo $projectWaitToApprove->getTitle()}</a></td>
+                                <td>{echo $projectWaitToApprove->getCreated()}</td>
+                                <td>{echo $projectWaitToApprove->managerFname." ".$projectWaitToApprove->managerLname}</td>
+                                <td>{echo $projectWaitToApprove->companyName}</td>
+                            </tr>
+                        {/foreach}
+                    {/if}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="box grid_6">
+        <div class="box-head"><h2>Tasks Waiting to approve</h2></div>
+        <div class="box-content no-pad">
+            <table class="display-short">
+                <thead>
+                    <tr>
+                        <th>Title</th><th>Created by</th>
+                        <th>Project</th><th>Type</th>
+                        <th>Created</th>
+                    </tr>
+                </thead>
+                <tbody>     
+                    {if !empty($tasksWaitingToApprove)}
+                        {foreach $taskWaitToApprove in $tasksWaitingToApprove}
+                            <tr>
+                                <td><a href="/task/{echo $taskWaitToApprove->getUrlKey()}/">
+                                        {echo $taskWaitToApprove->getTitle()}</a></td>
+                                <td>{echo $taskWaitToApprove->tkFname." ".$taskWaitToApprove->tkLname}</td>
+                                <td><a href="/project/{echo $taskWaitToApprove->pUrlKey}/">
+                                        {echo $taskWaitToApprove->pTitle}</a></td>
+                                <td>{echo $taskWaitToApprove->getTaskType()}</td>
+                                <td>{echo $taskWaitToApprove->getCreated()}</td>
+                            </tr>
+                        {/foreach}
+                    {/if}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="box grid_6">
+        <div class="box-head"><h2>Notes</h2></div>
+        <div class="box-content">
+            <a class="button green" href="/note">Add new</a><br/><hr/>
+            {if !empty($notes)}
+                {foreach $note in $notes}
+                    <div class="note">{echo $note->getTitle()." / ".$note->getCreated()}<br/>
+                        <p>{echo html_entity_decode($note->getBody())}</p><br/>
+                    </div>
+                {/foreach}
+            {/if}{else}
+                <div class="message"><p>No notes found</p></div>
+            {/else}
+        </div>
+    </div>
+{/if}
+
+{elseif $isDeveloper}
+    <div class="box grid_6">
+        <div class="box-head"><h2>Assigned to projects</h2></div>
+        <div class="box-content no-pad">
+            <table class="display">
+                <thead>
+                    <tr>
+                        <th>Name</th><th>Client</th>
+                        <th>State</th><th>Priority</th>
+                        <th>Manager</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {if !empty($assignedTo)}
+                        {foreach $project in $assignedTo}
+                            {if $project->pPriority > 3}
+                            <tr class="row-high-priority">
+                                {/if}{else}
+                            <tr>
+                                {/else}
+                                <td><a href="/project/{echo $project->pUrlKey}/">{echo $project->pTitle}</a></td>
+                                <td>{echo $project->companyName}</td>
+                                <td>{echo $project->stateTitle}</td>
+                                <td>{echo $project->pPriority}</td>
+                                <td>{echo $project->managerFname." ".$project->managerLname}</td>
+                            </tr>
+                        {/foreach}
+                    {/if}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div class="box grid_6">
+        <div class="box-head"><h2>Current tasks</h2></div>
+        <div class="box-content no-pad">
+            <table class="display">
+                <thead>
+                    <tr>
+                        <th>Name</th><th>Project</th>
+                        <th>State</th><th>Priority</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {if !empty($currentTasks)}
+                        {foreach $task in $currentTasks}
+                            {if $task->tPriority > 3}
+                            <tr class="row-high-priority">
+                                {/if}{else}
+                            <tr>
+                                {/else}
+                                <td><a href="/task/{echo $task->getUrlKey()}/">{echo $task->title}</a></td>
+                                <td><a href="/project/{echo $task->pUrlKey}/">{echo $task->pTitle}</a></td>
+                                <td>{echo $task->stateTitle}</td>
+                                <td>{echo $task->priority}</td>
+                            </tr>
+                        {/foreach}
+                    {/if}
+                </tbody>
+            </table>
+        </div>
+    </div>
+<div class="clear-both"></div>
+
+    {if !empty($deadlines)}
+    <div class="box grid_6">
+        <div class="box-head"><h2>Deadlines in next 7 days</h2></div>
+        <div class="box-content no-pad">
+            <table class="display-short">
+                <thead>
+                    <tr>
+                        <th>Name</th><th>Created</th><th>Client</th>
+                        <th>Planned end</th><th>State</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {foreach $deadline in $deadlines}
+                        <tr>
+                            <td><a href="/project/{echo $deadline->getUrlKey()}/">{echo $deadline->getTitle()}</a></td>
+                            <td>{echo $deadline->getCreated()}</td>
+                            <td>{echo $deadline->companyName}</td>
+                            <td>{echo $deadline->getPlannedEnd()}</td>
+                            <td>{echo $deadline->stateTitle}</td>
+                        </tr>
+                    {/foreach}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {/if}
+    
+    <div class="box grid_6">
+        <div class="box-head"><h2>Notes</h2></div>
+        <div class="box-content">
+            <a class="button green" href="/note">Add new</a><br/><hr/>
+            {if !empty($notes)}
+                {foreach $note in $notes}
+                    <div class="note">{echo $note->getTitle()." / ".$note->getCreated()}<br/>
+                        <p>{echo html_entity_decode($note->getBody())}</p><br/>
+                    </div>
+                {/foreach}
+            {/if}{else}
+                <div class="message"><p>No notes found</p></div>
+            {/else}
+        </div>
+    </div>
+{/elseif}
+{elseif $isClient}
+    <div class="box grid_12">
+        <div class="static-header">
+            <h3 class="float-left-fixed">Clients projects</h3>
+        </div>
+        <div class="tab-nav">
+            <ul>
+                {if !empty($clientProjects)}
+                    {foreach $project in $clientProjects}
+                        <li><a href="#{echo $project->getUrlKey()}">{echo $project->getTitle()}</a></li>
+                    {/foreach}
+                {/if}
+            </ul>
+
+            {if !empty($clientProjects)}
+                {foreach $project in $clientProjects}
+                    <div id="{echo $project->getUrlKey()}">
+                        <br/><a class="button big blue" href="/project/{echo $project->getUrlKey()}/">Project Detail</a><br/>
+                        <div class="box-content">
+                            <div class="form-row">
+                                <p class="form-label">Project name</p>
+                                <div class="form-item">{echo $project->getTitle()}</div>
+                            </div>
+                            <div class="form-row">
+                                <p class="form-label">Description</p>
+                                <div class="form-item">{echo $project->getDescription()}</div>
+                            </div>
+                            <div class="form-row">
+                                <p class="form-label">Manager</p>
+                                <div class="form-item">{echo $project->managerFname." ".$project->managerLname}</div>
+                            </div>
+                            <div class="form-row">
+                                <p class="form-label">Budget</p>
+                                <div class="form-item">{echo $project->getMaxBudget()}</div>
+                            </div>
+                            <div class="form-row">
+                                <p class="form-label">Paid</p>
+                                <div class="form-item">
+                                    {if $project->isPaid == 1}
+                                    The project has been paid
+                                    {/if}{else}
+                                    The project has not been paid yet
+                                    {/else}
+                                </div>
+                            </div>
+                            <div class="form-row">
+                                <p class="form-label">State</p>
+                                <div class="form-item">{echo $project->stateTitle}</div>
+                            </div>
+                            <div class="form-row">
+                                <p class="form-label">Planned start date</p>
+                                <div class="form-item">{echo $project->getPlannedStart()}</div>
+                            </div>
+                            <div class="form-row">
+                                <p class="form-label">Planned end date</p>
+                                <div class="form-item">{echo $project->getPlannedEnd()}</div>
+                            </div>
+                            <div class="form-row">
+                                <p class="form-label">Priority [1 - Low]</p>
+                                <div class="form-item">{echo $project->getPriority()}</div>
+                            </div>
+                        </div>
+                    </div>
+                {/foreach}
+            {/if}
+        </div>
+    </div>
+{/elseif}

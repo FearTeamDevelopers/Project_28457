@@ -1,0 +1,28 @@
+<div class="box-content">
+    <form class="form" action="/task/addrelatedtask/{echo $taskid}" method="post">
+        <input type="hidden" name="tk" value="{echo $token}" />
+        {if !empty($tasks)}
+        <div class="form-row">
+            <p class="form-label">Related to</p>
+            <div class="form-item">
+                <select name="reltask">
+                    {foreach $task in $tasks}
+                    <option value="{echo $task->getId()}">{echo $task->getTitle()}
+                    {/foreach}
+                </select>
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-item">
+                <input type="submit" class="button blue" name="submitAddReltask" value="Add related task"/>
+            </div>
+        </div>
+        {/if}{else}
+        <div class="form-row">
+            <p class="form-label">No task found</p>
+            <div class="form-item">
+            </div>
+        </div>
+        {/else}
+    </form>
+</div>

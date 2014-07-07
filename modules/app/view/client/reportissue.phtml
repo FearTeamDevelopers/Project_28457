@@ -1,0 +1,82 @@
+<div class="box grid_12">
+    <div class="box-head"><h2>Report issue</h2></div>
+    <div class="box-content">
+        {if !empty($projects)}
+            <form class="form" action="#" method="post">
+                <input type="hidden" name="tk" value="{echo $token}" />
+                <div class="form-row">
+                    <p class="form-label">Project*</p>
+                    <div class="form-item">
+                        <select name="project">
+                            {foreach $project in $projects}
+                                <option value="{echo $project->getId()}">{echo $project->getTitle()}</option>
+                            {/foreach}
+                        </select>
+                    </div>
+                    {if isset($errors["projectId"])}
+                        <p class="form-label-error">{echo join("<br/>", $errors["projectId"])}</p>
+                    {/if}
+                </div>
+                <div class="form-row">
+                    <p class="form-label">Title*</p>
+                    <div class="form-item">
+                        <input type="text" name="title" value="{echo isset($task)? $task->title: ""}" />
+                    </div>
+                    {if isset($errors["title"])}
+                        <p class="form-label-error">{echo join("<br/>", $errors["title"])}</p>
+                    {/if}
+                </div>
+                <div class="form-row">
+                <p class="form-label">Type*</p>
+                <div class="form-item">
+                    <select name="type">
+                        <option value="bug">Bug</option>
+                        <option value="inquiry">Inquiry</option>
+                    </select>
+                </div>
+                {if isset($errors["taskType"])}
+                    <p class="form-label-error">{echo join("<br/>", $errors["taskType"])}</p>
+                {/if}
+            </div>
+                <div class="form-row">
+                    <p class="form-label">Description*</p>
+                    <div class="form-item">
+                        <textarea cols="85" rows="5" name="description"  id="ckeditor">{echo isset($task)? $task->description: ""}</textarea>
+                    </div>
+                    {if isset($errors["description"])}
+                        <p class="form-label-error">{echo join("<br/>", $errors["description"])}</p>
+                    {/if}
+                </div>
+
+                <div class="form-row">
+                    <p class="form-label">Priority *</p>
+                    <div class="form-item">
+                        <select name="priority">
+                            <option value="1">1 - Low</option>
+                            <option value="2">2</option>
+                            <option value="3">3</option>
+                            <option value="4">4</option>
+                            <option value="5">5 - High</option>
+                        </select>
+                    </div>
+                    {if isset($errors["priority"])}
+                        <p class="form-label-error">{echo join("<br/>", $errors["priority"])}</p>
+                    {/if}
+                </div>
+
+                <div class="form-row">
+                    <div class="form-item">
+                        <input type="button" class="button grey" onclick="history.back();" value="Back">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div class="form-item">
+                        <input type="submit" class="button blue" name="submitReportIssue" value="Report issue"/>
+                    </div>
+                </div>
+            </form>
+        {/if}{else}
+            No project is matched with this client account
+        {/else}
+    </div>
+</div>

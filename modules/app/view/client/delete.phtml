@@ -1,0 +1,24 @@
+<div class="box-content">
+    <form class="form" action="/client/delete/{echo $client->getId()}" method="post">
+        <input type="hidden" name="tk" value="{echo $token}" />
+        <div class="form-row">
+            <p class="form-label">Contact person</p>
+            <div class="form-item">{echo $client->getContactPerson()}</div>
+        </div>
+        <div class="form-row">
+            <p class="form-label">Company name</p>
+            <div class="form-item">{echo $client->getCompanyName()}</div>
+        </div>
+        <div class="form-row">
+            <p class="form-label">Created</p>
+            <div class="form-item">{echo $client->getCreated()}</div>
+        </div>
+
+        <div class="form-row">
+            <div class="form-item">
+                <input type="submit" class="button red" value="Delete client" name="submitDeleteClient" />
+            </div>
+        </div>
+        
+    </form>
+</div>

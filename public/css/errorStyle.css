@@ -1,0 +1,96 @@
+/* BODY */
+body {
+    background: #d8d6d8 url(../images/bgmain.png);
+    min-width: 320px;
+    font-size: 13px;
+}
+
+.content {
+    padding: 20px 0;
+}
+
+.container_12 .grid_12 {
+    width: 98% !important;
+}
+/* TYPOGRAPHY */
+
+h1, h2, h3, h4, h5, h6 { font-weight: 600;}
+h1 { font-size: 26px; }
+h2 { font-size: 24px; }
+h3 { font-size: 22px; }
+h4 { font-size: 20px; }
+h5 { font-size: 18px; }
+h6 { font-size: 16px; }
+
+
+h2 a{
+    margin-left: 25px;
+}
+
+p { font-size: 12px; font-weight: 400; }
+
+.font-thin { font-weight: 300; }
+.font-bold { font-weight: 600; }
+.textsh { text-shadow: 0 1px 0 #fff; }
+.text-tiny { font-size: 9px; }
+.text-small { font-size: 10px; }
+.text-normal { font-size: 12px; }
+.text-big { font-size: 14px; }
+.text-huge { font-size: 16px; }
+
+ul.circle { list-style-type: circle; }
+ol.decimal { list-style-type: decimal; }
+
+ul.circle li, ol.decimal li { height: 1em; margin: 0 0 4px 20px;}
+
+ul.circle li a{
+    font-weight: normal;
+    color: #333 !important;
+    text-decoration: underline;
+}
+ul.circle li a:hover { color: #36b7ff !important;}
+
+/* ERROR PAGES */
+
+#error-heading, #error-desc, #error-back {
+    text-shadow: 0 1px 0 #ededed;
+    text-align: center;
+    margin: 40px 0;
+    color: #292929;
+}
+#error-heading { font-size: 160px; text-shadow: 0 2px 4px #ededed; }
+#error-desc { font-size: 20px; font-weight: 600; }
+#error-back { font-size: 14px; font-weight: 600; }
+#error-back a { color: #4c7500; }
+
+.error-tree{width: 60%;}
+
+.error-tree p.error-head{
+    font-size: 15px;
+    font-weight: 600;
+    margin: 15px;
+}
+
+.error-tree p{
+    font-size: 13px;
+    margin: 15px;
+}
+
+
+/* FOOTER */
+
+.footer {
+    clear: both;
+
+}
+.footer p {
+    font-size: 13px;
+    font-weight: 600;
+    text-align: center;
+    padding: 10px 0 30px 0;
+    text-align: center;
+    color: #292929;
+    text-shadow: 0 1px 0 #ededed;
+    width: 320px;
+    margin: 0 auto;
+}

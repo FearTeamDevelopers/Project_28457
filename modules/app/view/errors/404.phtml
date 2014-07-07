@@ -1,0 +1,26 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+        <meta http-equiv="Content-Language" content="cs" />
+        <title>404 Page not found</title>
+        <!---CSS Files-->
+        <link rel="stylesheet" href="/public/css/errorStyle.css">
+    </head>
+    <body>
+        <div class="content container_12">
+            <h1 id="error-heading">404</h1>
+            <p id="error-desc">The file you are looking for was kidnapped by aliens... Seriously.</p>
+            <p id="error-back"><a href="/">Go back</a></p>
+        </div>
+        <div class='content container_12'>
+            <?php if (ENV == 'dev' || ENV == 'qa'): ?>
+                <pre><?php print_r($e); ?></pre>
+            <?php endif; ?>
+        </div>
+        <div class="footer container_12">
+            <p class="grid_12">THCFrame Error Page</p>
+        </div>
+
+    </body>
+</html>

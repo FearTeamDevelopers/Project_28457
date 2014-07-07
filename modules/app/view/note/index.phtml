@@ -1,0 +1,61 @@
+<div class="box grid_6">
+    <div class="box-head"><h2>Notes</h2></div>
+    <div class="box-content no-pad ">
+        <input type="hidden" id="tk" name="tk" value="{echo $token}" />
+        <table class="stdtable display note">
+            <thead>
+                <tr>
+                    <th>Title</th><th>Description</th>
+                    <th>Created</th><th>&nbsp;</th>
+                </tr>
+            </thead>
+            <tbody>
+                {if !empty($notes)}
+                    {foreach $note in $notes}
+                        <tr>
+                            <td>{echo $note->getTitle()}</td>
+                            <td>{echo html_entity_decode($note->getBody())}</td>
+                            <td>{echo $note->getCreated()}</td>
+                            <td>
+                                <a class="button-edit" href="/note/edit/{echo $note->getId()}">Edit</a>
+                                <a class="button-delete-ajax" href="/note/delete/{echo $note->getId()}">Delete</a>
+                            </td>
+                        </tr>
+                    {/foreach}
+                {/if}
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<div class="box grid_6">
+    <div class="box-head"><h2>Create new</h2></div>
+    <div class="box-content">
+        <form class="form" action="#" method="post">
+            <input type="hidden" name="tk" value="{echo $token}" />
+            <div class="form-row">
+                <p class="form-label">Note title</p>
+                <div class="form-item">
+                    <input type="text" name="title" value="{echo isset($addnote) ? $addnote->title : ""}" />
+                </div>
+                {if isset($errors["title"])}
+                    <p class="form-label-error">{echo join("<br/>", $errors["title"])}</p>
+                {/if}
+            </div>
+            <div class="form-row">
+                <p class="form-label">Text</p>
+                <div class="form-item">
+                    <textarea rows="5" name="text" id="ckeditor">{echo isset($addnote) ? $addnote->body : ""}</textarea>
+                </div>
+                 {if isset($errors["body"])}
+                   <p class="form-label-error">{echo join("<br/>", $errors["body"])}</p>
+                {/if}
+            </div>
+            <div class="form-row">
+                <div class="form-item">
+                    <input type="submit" class="button blue" name="submitAddNote" value="Create note"/>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

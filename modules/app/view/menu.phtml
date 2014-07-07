@@ -1,0 +1,56 @@
+<ul id="top-nav">
+    <li class="nav-item">
+        <a href="/"><img src="/public/images/nav/dash-active.png" alt="" /><p>Dashboard</p></a>
+    </li>
+    {if $isAdmin || $isSuperAdmin}
+    <li class="nav-item">
+        <a href="/project"><img src="/public/images/nav/tb.png" alt="" /><p>Projects</p></a>
+    </li>
+    <li class="nav-item">
+        <a href="/user"><img src="/public/images/nav/typ.png" alt="" /><p>Users</p></a>
+    </li>
+    <li class="nav-item">
+        <a href="/client"><img src="/public/images/nav/typ.png" alt="" /><p>Clients</p></a>
+    </li>
+    <li class="nav-item">
+        <a href="/note">
+            <img src="/public/images/nav/icn.png" alt="" /><p>My Notes</p></a>
+    </li>
+    <li class="nav-item">
+        <a href="/system"><img src="/public/images/nav/widgets.png" alt="" /><p>Settings</p></a>
+    </li>
+    {/if}
+    {elseif $isPM}
+    <li class="nav-item">
+        <a href="/project"><img src="/public/images/nav/tb.png" alt="" /><p>Projects</p></a>
+    </li>
+    <li class="nav-item">
+        <a href="/user"><img src="/public/images/nav/typ.png" alt="" /><p>Users</p></a>
+    </li>
+    <li class="nav-item">
+        <a href="/client"><img src="/public/images/nav/typ.png" alt="" /><p>Clients</p></a>
+    </li>
+    <li class="nav-item">
+        <a href="/note">
+            <img src="/public/images/nav/icn.png" alt="" /><p>My Notes</p></a>
+    </li>
+    {/elseif}
+    {elseif $isDeveloper}
+    <li class="nav-item">
+        <a href="/project"><img src="/public/images/nav/tb.png" alt="" /><p>Projects</p></a>
+    </li>
+    <li class="nav-item">
+        <a href="/note">
+            <img src="/public/images/nav/icn.png" alt="" /><p>My Notes</p></a>
+    </li>
+    <li class="nav-item">
+        <a href="/client"><img src="/public/images/nav/typ.png" alt="" /><p>Clients</p></a>
+    </li>
+    {/elseif}
+    {elseif $isClient}
+    <li class="nav-item">
+        <a href="/client/reportissue">
+            <img src="/public/images/nav/typ.png" alt="" /><p>Report issue</p></a>
+    </li>
+    {/elseif}
+</ul>

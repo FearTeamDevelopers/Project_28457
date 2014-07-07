@@ -1,0 +1,39 @@
+<div class="box grid_12">
+    {if $isPM}
+        <a class="button big green" href="/client/add">Add new client</a><br/><br/>
+    {/if}
+    <div class="box-head"><h2>Client list</h2></div>
+    <div class="box-content no-pad">
+        <table class="stdtable display">
+            <thead>
+                <tr>
+                    <th>Contact Person</th><th>E-mail</th><th>Company name</th>
+                    <th>Phone</th><th>WWW</th><th>Created</th><th>&nbsp;</th>
+                </tr>
+            </thead>
+            <tbody>
+
+                {if !empty($clients)}
+                    {foreach $client in $clients}
+                        <tr>
+                            <td>{echo $client->getContactPerson()}</td>
+                            <td>{echo $client->getContactEmail()}</td>
+                            <td>{echo $client->getCompanyName()}</td>
+                            <td>{echo $client->getContactPhone()}</td>
+                            <td>{echo $client->getWww()}</td>
+                            <td>{echo $client->getCreated()}</td>
+                            <td>
+                                <a class="button-detail" href="/client/detail/{echo $client->getId()}">Detail</a>
+                                {if $isPM} 
+                                    <a class="button-edit" href="/client/edit/{echo $client->getId()}">Edit</a>
+                                    <a class="button-delete ajax-dialog" href="/client/delete/{echo $client->getId()}">Delete</a>
+                                {/if}
+                            </td>
+                        </tr>
+                    {/foreach}
+                {/if}
+
+            </tbody>
+        </table>
+    </div>
+</div>

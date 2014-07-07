@@ -1,0 +1,28 @@
+<div class="box-content">
+    <form class="form" action="/task/logtime/{echo $task->getId()}" method="post">
+        <input type="hidden" name="tk" value="{echo $token}" />
+        <div class="form-row">
+            <p class="form-label">Spent time [minutes]</p>
+            <div class="form-item">
+                <input type="number" required name="time" value="{echo isset($tasktime)? $tasktime->spentTime: "1"}"/>
+                {if isset($errors["spentTime"])}
+                    <p class="form-label-error">{echo join("<br/>", $errors["spentTime"])}</p>
+                {/if}
+            </div>
+        </div>
+        <div class="form-row">
+            <p class="form-label">Description</p>
+            <div class="form-item">
+                <textarea rows="3" name="description" >{echo isset($tasktime)? $tasktime->description: ""}</textarea>
+                {if isset($errors["description"])}
+                    <p class="form-label-error">{echo join("<br/>", $errors["description"])}</p>
+                {/if}
+            </div>
+        </div>
+        <div class="form-row">
+            <div class="form-item">
+                <input type="submit" class="button blue" name="submitLogTime" value="Log time"/>
+            </div>
+        </div>
+    </form>
+</div>
