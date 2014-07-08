@@ -52,11 +52,10 @@ class App_Controller_File extends Controller
             $security = Registry::get('security');
 
             if ($security->isGranted('role_admin')) {
-                $attachment = App_Model_Attachment::first(
-                                array('active = ?' => true, 'id = ?' => (int) $id));
+                $attachment = App_Model_Attachment::first(array('id = ?' => (int) $id));
             } else {
                 $attachment = App_Model_Attachment::first(
-                                array('active = ?' => true, 'id = ?' => (int) $id, 'userId = ?' => $this->getUser()->getId()));
+                                array('id = ?' => (int) $id, 'userId = ?' => $this->getUser()->getId()));
             }
 
             if ($attachment === null) {

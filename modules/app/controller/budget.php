@@ -86,7 +86,7 @@ class App_Controller_Budget extends Controller
         $view = $this->getActionView();
 
         $budgetRec = App_Model_ProjectBudget::first(
-                        array('active = ?' => true, 'deleted = ?' => false, 'id = ?' => (int) $id));
+                        array('deleted = ?' => false, 'id = ?' => (int) $id));
 
         if($budgetRec === null){
             $view->warningMessage('Record not found');
@@ -127,7 +127,7 @@ class App_Controller_Budget extends Controller
         $view = $this->getActionView();
         
         $budget = App_Model_ProjectBudget::first(
-                array('active = ?' => true, 'deleted = ?' => false, 'id = ?' => (int) $id));
+                array('deleted = ?' => false, 'id = ?' => (int) $id));
         
         if($budget === null){
             $view->warningMessage('Recored not found');
@@ -164,7 +164,7 @@ class App_Controller_Budget extends Controller
 
         if ($this->checkToken()) {
             $budget = App_Model_ProjectBudget::first(
-                            array('active = ?' => true, 'deleted = ?' => true, 'id = ?' => (int) $id));
+                            array('deleted = ?' => true, 'id = ?' => (int) $id));
 
             if ($budget === null) {
                 echo 'Record not found';

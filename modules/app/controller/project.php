@@ -268,7 +268,7 @@ class App_Controller_Project extends Controller
         }
         
         $project = App_Model_Project::first(
-                array('active = ?' => true, 'deleted = ?' => false, 'id = ?' => (int)$id));
+                array('deleted = ?' => false, 'id = ?' => (int)$id));
 
         if($project === null){
             $view->warningMessage('Project not found');
@@ -459,7 +459,7 @@ class App_Controller_Project extends Controller
         }
         
         $project = App_Model_Project::first(
-                array('active = ?' => true, 'deleted = ?' => false, 'id = ?' => (int) $id));
+                array('deleted = ?' => false, 'id = ?' => (int) $id));
         
         if($project === null){
             $view->warningMessage('Project not found');

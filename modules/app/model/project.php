@@ -339,7 +339,6 @@ class App_Model_Project extends Model
                     ->join('tb_user', 'us.id = pr.managerId', 'us', 
                             array('us.firstname' => 'managerFname', 'us.lastname' => 'managerLname'))
                     ->where('pr.id = ?', (int)$id)
-                    ->where('pr.active = ?', true)
                     ->where('pr.deleted = ?', false);
             $projectArr = self::initialize($projectQuery);
             $project = array_shift($projectArr);
@@ -352,7 +351,6 @@ class App_Model_Project extends Model
                     ->join('tb_user', 'us.id = pr.managerId', 'us', 
                             array('us.firstname' => 'managerFname', 'us.lastname' => 'managerLname'))
                     ->where('pr.urlKey = ?', (string)$id)
-                    ->where('pr.active = ?', true)
                     ->where('pr.deleted = ?', false);
             $projectArr = self::initialize($projectQuery);
             $project = array_shift($projectArr);
@@ -377,7 +375,6 @@ class App_Model_Project extends Model
                         array('c.companyName', 'c.id' => 'cId', 'c.contactPerson'))
                 ->join('tb_user', 'us.id = pr.managerId', 'us', 
                         array('us.firstname' => 'managerFname', 'us.lastname' => 'managerLname'))
-                ->where('pr.active = ?', true)
                 ->where('pr.deleted = ?', false);
         $projects = self::initialize($projectsQuery);
         
@@ -426,7 +423,6 @@ class App_Model_Project extends Model
                 ->join('tb_client', 'pr.clientId = c.id', 'c', 
                         array('c.companyName', 'c.id' => 'cId', 'c.contactPerson'))
                 ->where('datediff(DATE(CURDATE()), DATE(pr.plannedEnd)) between -7 and 0', '')
-                ->where('pr.active = ?', true)
                 ->where('pr.deleted = ?', false)
                 ->order('pr.created', 'desc');
         $projects = self::initialize($projectsQuery);
@@ -465,7 +461,6 @@ class App_Model_Project extends Model
                 ->join('tb_user', 'us.id = pr.managerId', 'us', 
                         array('us.firstname' => 'managerFname', 'us.lastname' => 'managerLname'))
                 ->where('pr.clientId', $this->getClientId())
-                ->where('pr.active = ?', true)
                 ->where('pr.deleted = ?', false)
                 ->order('pr.created', 'desc');
         $projects = self::initialize($projectsQuery);
@@ -485,7 +480,6 @@ class App_Model_Project extends Model
                 ->join('tb_user', 'us.id = pr.managerId', 'us', 
                         array('us.firstname' => 'managerFname', 'us.lastname' => 'managerLname'))
                 ->where('pr.stateId = ?', (int)$this->getStateId())
-                ->where('pr.active = ?', true)
                 ->where('pr.deleted = ?', false)
                 ->order('pr.created', 'desc');
         $projects = self::initialize($projectQuery);
@@ -505,7 +499,6 @@ class App_Model_Project extends Model
                 ->join('tb_project', 'pb.projectId = pr.id', 'pr', 
                         array('pr.title' => 'pTitle', 'pr.urlKey' => 'pUrlKey'))
                 ->where('pb.projectId = ?', $this->getId())
-                ->where('pb.active = ?', true)
                 ->where('pb.deleted = ?', false)
                 ->order('pb.created', 'desc');
         $this->_budget = App_Model_ProjectBudget::initialize($budgetQuery);
@@ -517,7 +510,6 @@ class App_Model_Project extends Model
                 ->join('tb_project', 'pc.projectId = pr.id', 'pr', 
                         array('pr.title' => 'pTitle', 'pr.urlKey' => 'pUrlKey'))
                 ->where('pc.projectId = ?', $this->getId())
-                ->where('pc.active = ?', true)
                 ->order('pc.created', 'desc');
         $this->_chat = App_Model_ProjectChat::initialize($chatQuery);
         
@@ -529,7 +521,6 @@ class App_Model_Project extends Model
                 ->join('tb_project', 'pa.projectId = pr.id', 'pr', 
                         array('pr.title' => 'pTitle', 'pr.urlKey' => 'pUrlKey'))
                 ->where('pa.projectId = ?', $this->getId())
-                ->where('at.active = ?', true)
                 ->order('at.created', 'desc');
         $this->_attachment = App_Model_Attachment::initialize($attachmentQuery);
         

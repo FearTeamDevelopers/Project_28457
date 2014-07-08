@@ -24,7 +24,8 @@ class App_Controller_Task extends Controller
         $view = $this->getActionView();
 
         $project = App_Model_Project::first(
-                        array('active = ?' => true, 'deleted = ?' => false, 'id = ?' => $projectId), array('id'));
+                        array('active = ?' => true, 'deleted = ?' => false, 'id = ?' => (int)$projectId), 
+                        array('id'));
 
         if ($project === null) {
             $view->warningMessage('Project not found');
@@ -37,7 +38,8 @@ class App_Controller_Task extends Controller
                         ), array('id', 'firstname', 'lastname'));
 
         $tasks = App_Model_Task::all(
-                        array('active = ?' => true, 'deleted = ?' => false), array('id', 'title'));
+                        array('active = ?' => true, 'deleted = ?' => false), 
+                        array('id', 'title'));
 
         $view->set('projectid', $project->getId())
                 ->set('tasks', $tasks)
@@ -215,7 +217,8 @@ class App_Controller_Task extends Controller
         }
 
         $taskTime = App_Model_TaskTime::all(
-                        array('taskId = ?' => $task->getId()), array('spentTime'));
+                        array('taskId = ?' => $task->getId()), 
+                        array('spentTime'));
 
         $spentTime = 0;
         foreach ($taskTime as $time) {
@@ -269,7 +272,8 @@ class App_Controller_Task extends Controller
                         array('active = ?' => true, 'deleted = ?' => false, 'id = ?' => (int) $taskId));
 
         $users = App_Model_User::all(
-                        array('active = ?' => true, 'deleted = ?' => false), array('id', 'firstname', 'lastname'));
+                        array('active = ?' => true, 'deleted = ?' => false), 
+                        array('id', 'firstname', 'lastname'));
 
         if ($task === null) {
             $view->warningMessage('Task not found');
@@ -349,7 +353,8 @@ class App_Controller_Task extends Controller
 
         if ($state == 15) {
             $taskTime = App_Model_TaskTime::all(
-                            array('taskId = ?' => $task->getId()), array('spentTime'));
+                            array('taskId = ?' => $task->getId()), 
+                            array('spentTime'));
 
             $spentTime = 0;
             foreach ($taskTime as $time) {
@@ -383,7 +388,7 @@ class App_Controller_Task extends Controller
         $view = $this->getActionView();
 
         $task = App_Model_Task::first(
-                        array('active = ?' => true, 'deleted = ?' => false, 'id = ?' => (int) $id));
+                        array('deleted = ?' => false, 'id = ?' => (int) $id));
 
         if ($task === null) {
             $view->warningMessage('Task not found');
@@ -674,7 +679,8 @@ class App_Controller_Task extends Controller
         $view = $this->getActionView();
 
         $task = App_Model_Task::first(
-                        array('active = ?' => true, 'deleted = ?' => false, 'id = ?' => (int) $id), array('id', 'urlKey'));
+                    array('active = ?' => true, 'deleted = ?' => false, 'id = ?' => (int) $id), 
+                    array('id', 'urlKey'));
 
         if ($task === null) {
             $view->warningMessage('Task not found');

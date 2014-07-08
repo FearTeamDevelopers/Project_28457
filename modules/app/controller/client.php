@@ -85,8 +85,7 @@ class App_Controller_Client extends Controller
     {
         $view = $this->getActionView();
         
-        $client = App_Model_Client::first(
-                array('active = ?' => true, 'id = ?'=> (int)$id));
+        $client = App_Model_Client::first(array('id = ?'=> (int)$id));
         
         if($client === null){
             $view->warningMessage('Client not found');

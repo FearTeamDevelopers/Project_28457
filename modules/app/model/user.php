@@ -387,7 +387,6 @@ class App_Model_User extends Model implements UserInterface
                 ->join('tb_client', 'us.clientId = cl.id', 'cl',
                         array('cl.contactPerson', 'cl.contactEmail', 'cl.companyName'))
                 ->where('us.id = ?', $this->getId())
-                ->where('us.active = ?', true)
                 ->where('us.deleted = ?', false);
         return self::initialize($query);
     }
@@ -405,7 +404,6 @@ class App_Model_User extends Model implements UserInterface
                 ->join('tb_client', 'pr.clientId = c.id', 'c', 
                         array('c.companyName', 'c.contactEmail', 'c.contactPerson'))
                 ->where('pr.managerId = ?', $this->getId())
-                ->where('pr.active = ?', true)
                 ->where('pr.deleted = ?', false)
                 ->order('pr.created', 'desc');
         
@@ -427,7 +425,6 @@ class App_Model_User extends Model implements UserInterface
                 ->join('tb_user', 'us.id = tk.createdBy', 'us', 
                         array('us.firstname' => 'cFname', 'us.lastname' => 'cLname'))
                 ->where('tk.assignedTo = ?', $this->getId())
-                ->where('tk.active = ?', true)
                 ->where('tk.deleted = ?', false)
                 ->order('tk.priority', 'DESC');
 
@@ -454,7 +451,6 @@ class App_Model_User extends Model implements UserInterface
                 ->join('tb_user', 'uss.id = p.managerId', 'uss', 
                         array('uss.firstname' => 'managerFname', 'uss.lastname' => 'managerLname'))
                 ->where('pu.userId = ?', $this->getId())
-                ->where('p.active = ?', true)
                 ->where('p.deleted = ?', false)
                 ->order('p.priority', 'DESC')
                 ->order('p.created', 'DESC');

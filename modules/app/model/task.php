@@ -266,7 +266,6 @@ class App_Model_Task extends Model
                 ->join('tb_user', 'uss.id = tk.assignedTo', 'uss', 
                         array('uss.firstname' => 'asFname', 'uss.lastname' => 'asLname'))
                 ->where('tk.id = ?', (int) $id)
-                ->where('tk.active = ?', true)
                 ->where('tk.deleted = ?', false);
         $taskArr = self::initialize($taskQuery);
         $task = array_shift($taskArr);
@@ -311,7 +310,6 @@ class App_Model_Task extends Model
                     ->join('tb_user', 'uss.id = tk.assignedTo', 'uss', 
                             array('uss.firstname' => 'asFname', 'uss.lastname' => 'asLname'))
                     ->where('tk.id = ?', (int)$id)
-                    ->where('tk.active = ?', true)
                     ->where('tk.deleted = ?', false);
             $taskArr = self::initialize($taskQuery);
             $task = array_shift($taskArr);
@@ -326,7 +324,6 @@ class App_Model_Task extends Model
                     ->join('tb_user', 'uss.id = tk.assignedTo', 'uss', 
                             array('uss.firstname' => 'asFname', 'uss.lastname' => 'asLname'))
                     ->where('tk.urlKey = ?', (string)$id)
-                    ->where('tk.active = ?', true)
                     ->where('tk.deleted = ?', false);
             $taskArr = self::initialize($taskQuery);
             $task = array_shift($taskArr);

@@ -84,7 +84,6 @@ class App_Controller_User extends Controller
 
         $users = App_Model_User::all(
                         array(
-                            'active = ?' => true,
                             'deleted = ?' => false,
                             'role <> ?' => 'role_superadmin'), 
                         array('id', 'firstname', 'lastname', 'email', 'role', 
@@ -317,7 +316,7 @@ class App_Controller_User extends Controller
         $errors = array();
         $superAdmin = $security->isGranted('role_superadmin');
         $user = App_Model_User::first(
-                array('active = ?' => true, 'deleted = ?' => false,'id = ?' => $id));
+                array('deleted = ?' => false,'id = ?' => $id));
 
         if (NULL === $user) {
             $view->warningMessage('User not found');
@@ -395,7 +394,7 @@ class App_Controller_User extends Controller
         $view = $this->getActionView();
         
         $user = App_Model_User::first(
-                array('active = ?' => true, 'deleted = ?' => false, 'id = ?' => (int) $id));
+                array('deleted = ?' => false, 'id = ?' => (int) $id));
         
         if($user === null){
             $view->warningMessage('User not found');
