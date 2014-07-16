@@ -20,6 +20,15 @@
             </div>
         </div>
         <div class="form-row">
+            <p class="form-label">Date</p>
+            <div class="form-item">
+                <input type="date" required name="date" />
+                {if isset($errors["logDate"])}
+                    <p class="form-label-error">{echo join("<br/>", $errors["logDate"])}</p>
+                {/if}
+            </div>
+        </div>
+        <div class="form-row">
             <div class="form-item">
                 <input type="submit" class="button blue" name="submitLogTime" value="Log time"/>
             </div>

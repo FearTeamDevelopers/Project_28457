@@ -198,7 +198,7 @@
                     <thead>
                         <tr>
                             <th>Time [minutes]</th><th>Description</th>
-                            <th>User</th><th>&nbsp;</th>
+                            <th>User</th><th>Date</th><th>&nbsp;</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -209,6 +209,7 @@
                                     <td>{echo $timelog->getSpentTime()}</td>
                                     <td>{echo $timelog->getDescription()}</td>
                                     <td>{echo $timelog->firstname." ".$timelog->lastname}</td>
+                                    <td>{echo $timelog->getLogDate()}</td>
                                     <td>
                                         {if $timelog->userId == $authUser->getId()}
                                             <a class="button-delete-ajax" href="/task/deletetimelog/{echo $timelog->getId()}">Delete</a>

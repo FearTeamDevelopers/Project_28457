@@ -147,6 +147,8 @@ class App_Controller_Project extends Controller
                 'description' => RequestMethods::post('projdesc'),
                 'maxBudget' => RequestMethods::post('budget'),
                 'gitRepository' => RequestMethods::post('repository'),
+                'taskPrefix' => RequestMethods::post('taskprefix'),
+                'nextTaskNumber' => 1,
                 'plannedStart' => RequestMethods::post('plannedStart', date('Y-m-d')),
                 'plannedEnd' => RequestMethods::post('plannedEnd'),
                 'priority' => RequestMethods::post('priority', 1)
@@ -303,6 +305,7 @@ class App_Controller_Project extends Controller
             $project->description = RequestMethods::post('projdesc');
             $project->maxBudget = RequestMethods::post('budget');
             $project->gitRepository = RequestMethods::post('repository');
+            $project->taskPrefix = RequestMethods::post('taskprefix');
             $project->plannedStart = RequestMethods::post('plannedStart', date('Y-m-d'));
             $project->plannedEnd = RequestMethods::post('plannedEnd');
             $project->priority = RequestMethods::post('priority', 1);
@@ -534,7 +537,6 @@ class App_Controller_Project extends Controller
             switch ($action) {
                 case 'activate':
                     $projects = App_Model_Project::all(array(
-                                'active = ?' => true, 
                                 'deleted = ?' => false,
                                 'id IN ?' => $ids
                     ));
@@ -551,10 +553,10 @@ class App_Controller_Project extends Controller
                     }
 
                     if (empty($errors)) {
-                        Event::fire('admin.log', array('delete success', 'Project ids: ' . join(',', $ids)));
+                        Event::fire('admin.log', array('activate success', 'Project ids: ' . join(',', $ids)));
                         $view->successMessage('Projects have been activated successfully');
                     } else {
-                        Event::fire('admin.log', array('delete fail', 'Project ids: ' . join(',', $errorsIds)));
+                        Event::fire('admin.log', array('activate fail', 'Project ids: ' . join(',', $errorsIds)));
                         $message = join(PHP_EOL, $errors);
                         $view->longFlashMessage($message);
                     }
@@ -563,7 +565,6 @@ class App_Controller_Project extends Controller
                     break;
                 case 'deactivate':
                     $projects = App_Model_Project::all(array(
-                                'active = ?' => true, 
                                 'deleted = ?' => false,
                                 'id IN ?' => $ids
                     ));
@@ -573,7 +574,6 @@ class App_Controller_Project extends Controller
                             if ($project->validate()) {
                                 $project->save();
                             }else{
-                                var_dump($project->getErrors());die;
                                 $errors[] = 'An error occured while deactivating ' . $project->getTitle();
                                 $errorsIds [] = $project->getId();
                             }
@@ -581,10 +581,10 @@ class App_Controller_Project extends Controller
                     }
 
                     if (empty($errors)) {
-                        Event::fire('admin.log', array('delete success', 'Project ids: ' . join(',', $ids)));
+                        Event::fire('admin.log', array('deactivate success', 'Project ids: ' . join(',', $ids)));
                         $view->successMessage('Projects have been deactivated successfully');
                     } else {
-                        Event::fire('admin.log', array('delete fail', 'Project ids: ' . join(',', $errorsIds)));
+                        Event::fire('admin.log', array('deactivate fail', 'Project ids: ' . join(',', $errorsIds)));
                         $message = join(PHP_EOL, $errors);
                         $view->longFlashMessage($message);
                     }

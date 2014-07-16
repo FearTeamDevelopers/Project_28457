@@ -55,7 +55,7 @@ jQuery(document).ready(function() {
     jQuery('.imagelist a.delete').click(function(event) {
         event.preventDefault();
         var parent = jQuery(this).parents('li');
-        var c = confirm('Delete this image?');
+        var c = confirm('Delete this file?');
         
         if (c) {
             var url = jQuery(this).attr('href');

@@ -1,7 +1,7 @@
 <div class="box grid_12">
     <div class="static-header">
         <h3 class="float-left-fixed">
-             {echo $user->getFirstname()." ".$user->getLastname()}
+            {echo $user->getFirstname()." ".$user->getLastname()}
 
             {if isset($user->companyName)}
                  - account for client: 
@@ -16,6 +16,7 @@
             <li><a href="#info">Overview</a></li>
             <li><a href="#projects">Assigned to projects</a></li>
             <li><a href="#tasks">Assigned to tasks</a></li>
+            <li><a href="#time">Time log</a></li>
         </ul>
 
         <div id="info">
@@ -129,6 +130,68 @@
                                     <td>{echo $task->getCreated()}</td>
                                     <td>{echo $task->getPriority()}</td>
                                 </tr>
+                            {/foreach}
+                        {/if}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        
+        <div id="time">
+            <div class="box-head"><h2>Time</h2></div>
+            <div class="box-content no-pad">
+                <table class="stdtable2">
+                    <thead>
+                        <tr>
+                            <th colspan="{echo $calendar[1]["daysofmonth"]+1}">{echo $calendar[1]["month"]}</th>
+                        </tr>
+                        <tr>
+                            <th>Task</th>
+                            {if !empty($calendar)}
+                                {foreach $time in $calendar}
+                                    <th class="width50">{echo $time["day"]."<br/>".$time["dayname"]}</th>
+                                {/foreach}
+                            {/if}
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {if !empty($timelog)}
+                            {foreach $project in $timelog}
+                                <tr class="timelog-project-row">
+                                    {script $pident = explode("|", $project_i)}
+                                    <td colspan="{echo $calendar[1]["daysofmonth"]+1}">
+                                        <a href="/project/{echo $pident[0]}/">{echo $pident[1]}</a>
+                                    </td>
+                                </tr>
+                                    
+                                {foreach $task in $project}
+                                    <tr>
+                                        {script $tident = explode("|", $task_i)}
+                                        <td><a href="/task/{echo $tident[0]}/">{echo $tident[1]}</a></td>
+
+                                        {script $j=1;$tt=count($task);}
+                                        {foreach $log in $task}
+                                            {script $day = explode("-", $log->getLogDate());}
+
+                                            {for $i=$j $i<=$calendar[1]["daysofmonth"] $i++}
+                                                {if $day[2] == $i}
+                                                    <td>{echo $log->getSpentTime()}</td>
+                                                    {script break;}
+                                                {/if}{else}
+                                                    <td></td>
+                                                {/else}
+                                            {/for}
+
+                                            {script $j=$day[2]+1;}
+
+                                            {if $log_i == $tt-1}
+                                                {for $i=$j $i<=$calendar[1]["daysofmonth"] $i++}
+                                                    <td></td>
+                                                {/for}
+                                            {/if}
+                                        {/foreach}
+                                    </tr>
+                                {/foreach}
                             {/foreach}
                         {/if}
                     </tbody>

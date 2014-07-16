@@ -158,6 +158,28 @@ class App_Model_Project extends Model
      * @label git repository
      */
     protected $_gitRepository;
+    
+    /**
+     * @column
+     * @readwrite
+     * @type text
+     * @length 10
+     *
+     * @validate alphanumeric, max(10)
+     * @label task prefix
+     */
+    protected $_taskPrefix;
+    
+    /**
+     * @column
+     * @readwrite
+     * @type integer
+     *
+     * @validate numeric
+     * @label next task number
+     */
+    protected $_nextTaskNumber;
+    
     /**
      * @column
      * @readwrite

@@ -24,8 +24,7 @@ class App_Controller_Task extends Controller
         $view = $this->getActionView();
 
         $project = App_Model_Project::first(
-                        array('active = ?' => true, 'deleted = ?' => false, 'id = ?' => (int)$projectId), 
-                        array('id'));
+                        array('active = ?' => true, 'deleted = ?' => false, 'id = ?' => (int)$projectId));
 
         if ($project === null) {
             $view->warningMessage('Project not found');
@@ -49,15 +48,15 @@ class App_Controller_Task extends Controller
             $this->checkToken();
             $errors = array();
             
-            $urlKey = strtolower(
-                    str_replace(' ', '-', StringMethods::removeDiacriticalMarks(RequestMethods::post('title'))));
+            $urlKey = $project->getTaskPrefix().'-'.$project->getNextTaskNumber();
 
             $checkUrl = App_Model_Task::first(
-                            array('active = ?' => true, 'deleted = ?' => false, 'urlKey = ?' => $urlKey), array('id')
+                            array('urlKey = ?' => $urlKey), 
+                            array('id')
             );
 
             if ($checkUrl !== null) {
-                $errors['title'] = array('This task already exists');
+                $errors['urlKey'] = array('This task already exists');
             }
             
             if (RequestMethods::post('type') == 'inquiry' || RequestMethods::post('type') == 'bug') {
@@ -80,7 +79,7 @@ class App_Controller_Task extends Controller
             ));
 
             if (RequestMethods::post('subtaskof', null)) {
-                $parts = explode('-', RequestMethods::post('subtaskof'));
+                $parts = explode('|', RequestMethods::post('subtaskof'));
                 $checkUrl = App_Model_Task::first(
                                 array('active = ?' => true,'deleted = ?' => false,'id = ?' => $parts[1]), 
                                 array('id')
@@ -92,7 +91,7 @@ class App_Controller_Task extends Controller
             }
 
             if (RequestMethods::post('relatedto', null)) {
-                $parts = explode('-', RequestMethods::post('relatedto'));
+                $parts = explode('|', RequestMethods::post('relatedto'));
                 $checkUrl = App_Model_Task::first(
                                 array('active = ?' => true, 'deleted = ?' => false, 'id = ?' => $parts[1]), 
                                 array('id')
@@ -107,7 +106,7 @@ class App_Controller_Task extends Controller
                 $tid = $task->save();
 
                 if (RequestMethods::post('subtaskof', null)) {
-                    $parts = explode('-', RequestMethods::post('subtaskof'));
+                    $parts = explode('|', RequestMethods::post('subtaskof'));
                     
                     $subTask = new App_Model_TaskSubTask(array(
                         'taskId' => (int) $parts[1],
@@ -118,7 +117,7 @@ class App_Controller_Task extends Controller
                 }
 
                 if (RequestMethods::post('relatedto', null)) {
-                    $parts = explode('-', RequestMethods::post('relatedto'));
+                    $parts = explode('|', RequestMethods::post('relatedto'));
 
                     $relTask = new App_Model_TaskRelated(array(
                         'taskId' => $tid,
@@ -134,6 +133,9 @@ class App_Controller_Task extends Controller
                     $relTaskCross->save();
                     Event::fire('app.log', array('success', 'Task id: ' . $parts[1] . ' related to ' . $tid));
                 }
+                
+                $project->nextTaskNumber += 1;
+                $project->save();
 
                 Event::fire('app.log', array('success', 'Task id: ' . $tid));
                 $view->successMessage('Task has been successfully saved');
@@ -176,13 +178,10 @@ class App_Controller_Task extends Controller
 
         if (RequestMethods::post('submitEditTask')) {
             $this->checkToken();
-            $urlKey = strtolower(
-                    str_replace(' ', '-', StringMethods::removeDiacriticalMarks(RequestMethods::post('title'))));
 
             $task->stateId = RequestMethods::post('state');
             $task->active = RequestMethods::post('active');
             $task->assignedTo = RequestMethods::post('assignTo', $this->getUser()->getId());
-            $task->urlKey = $urlKey;
             $task->title = RequestMethods::post('title');
             $task->description = RequestMethods::post('description');
             $task->priority = RequestMethods::post('priority', 1);
@@ -691,23 +690,40 @@ class App_Controller_Task extends Controller
         if (RequestMethods::post('submitLogTime')) {
             $this->checkToken();
 
-            $taskTime = new App_Model_TaskTime(array(
-                'taskId' => $task->getId(),
-                'userId' => $this->getUser()->getId(),
-                'spentTime' => RequestMethods::post('time'),
-                'description' => RequestMethods::post('description')
+            $taskTimeExist = App_Model_TaskTime::first(
+                            array(
+                                'taskId = ?' => $task->getId(),
+                                'userId = ?' => $this->getUser()->getId(),
+                                'logDate = ?' => RequestMethods::post('date', date('Y-m-d', time()))
             ));
 
-            if ($taskTime->validate()) {
-                $ttid = $taskTime->save();
+            if ($taskTimeExist === null) {
+                $taskTime = new App_Model_TaskTime(array(
+                    'taskId' => $task->getId(),
+                    'userId' => $this->getUser()->getId(),
+                    'spentTime' => RequestMethods::post('time'),
+                    'description' => RequestMethods::post('description'),
+                    'logDate' => RequestMethods::post('date', date('Y-m-d', time()))
+                ));
 
-                Event::fire('app.log', array('success', 'Time log ' . $ttid . ' for task ' . $task->getId()));
+                if ($taskTime->validate()) {
+                    $ttid = $taskTime->save();
+
+                    Event::fire('app.log', array('success', 'Time log ' . $ttid . ' for task ' . $task->getId()));
+                    $view->successMessage('Time has been successfully loged');
+                    self::redirect('/task/' . $task->getUrlKey() . '/');
+                } else {
+                    Event::fire('app.log', array('fail', 'Time log for task ' . $task->getId()));
+                    $view->set('tasktime', $taskTime)
+                            ->set('errors', $taskTime->getErrors());
+                }
+            } else {
+                $taskTimeExist->spentTime = $taskTimeExist->spentTime + RequestMethods::post('time');
+                $taskTimeExist->save();
+                
+                Event::fire('app.log', array('success', 'Time log ' . $taskTimeExist->getId() . ' for task ' . $task->getId()));
                 $view->successMessage('Time has been successfully loged');
                 self::redirect('/task/' . $task->getUrlKey() . '/');
-            } else {
-                Event::fire('app.log', array('fail', 'Time log for task ' . $task->getId()));
-                $view->set('tasktime', $taskTime)
-                        ->set('errors', $taskTime->getErrors());
             }
         }
     }

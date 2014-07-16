@@ -180,9 +180,28 @@ class App_Controller_User extends Controller
         $assignedTasks = App_Model_User::fetchAssignedToTasks($user->getId());
         $assignedProjects = App_Model_User::fetchAssignedToProjects($user->getId());
         
+        $daysOfMonth = cal_days_in_month(CAL_GREGORIAN, date('m'), date('Y'));
+        $days = array();
+        
+        for($i = 1; $i <= $daysOfMonth; $i++){
+            $tm = mktime(0, 0, 0, date('m'), $i, date('Y'));
+            $days[$i] = array(
+                'day' => date('d', $tm),
+                'dayname' => date('D', $tm),
+                'weekofyear' => date('W', $tm),
+                'month' => date('F', $tm),
+                'daysofmonth' => $daysOfMonth
+                    );
+            
+        }
+
+        $timeLog = App_Model_User::fetchTimeLog($user->getId());
+
         $view->set('user', $user)
+            ->set('calendar', $days)
             ->set('assignedProjects', $assignedProjects)
-            ->set('assignedTasks', $assignedTasks);
+            ->set('assignedTasks', $assignedTasks)
+            ->set('timelog', $timeLog);
         
     }
     
@@ -280,7 +299,7 @@ class App_Controller_User extends Controller
     }
     
     /**
-     * @before _secured, _developer
+     * @before _secured, _projectmanager
      */
     public function detail($id)
     {
@@ -299,7 +318,26 @@ class App_Controller_User extends Controller
         $assignedTasks = App_Model_User::fetchAssignedToTasks($user->getId());
         $assignedProjects = App_Model_User::fetchAssignedToProjects($user->getId());
         
+        $daysOfMonth = cal_days_in_month(CAL_GREGORIAN, date('m'), date('Y'));
+        $days = array();
+        
+        for($i = 1; $i <= $daysOfMonth; $i++){
+            $tm = mktime(0, 0, 0, date('m'), $i, date('Y'));
+            $days[$i] = array(
+                'day' => date('d', $tm),
+                'dayname' => date('D', $tm),
+                'weekofyear' => date('W', $tm),
+                'month' => date('F', $tm),
+                'daysofmonth' => $daysOfMonth
+                    );
+            
+        }
+        
+        $timeLog = App_Model_User::fetchTimeLog($user->getId());
+        
         $view->set('user', $user)
+            ->set('timelog', $timeLog)
+            ->set('calendar', $days)
             ->set('assignedProjects', $assignedProjects)
             ->set('assignedTasks', $assignedTasks);
         
@@ -459,5 +497,7 @@ class App_Controller_User extends Controller
             echo 'Security token is not valid';
         }
     }
+    
+    
 
 }

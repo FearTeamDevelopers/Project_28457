@@ -6,6 +6,7 @@ use THCFrame\Request\RequestMethods;
 use THCFrame\Events\Events as Event;
 use THCFrame\Filesystem\FileManager;
 use THCFrame\Database\Mysqldump;
+use THCFrame\Configuration\Model\Config;
 
 /**
  * Description of App_Controller_System
@@ -82,6 +83,39 @@ class App_Controller_System extends Controller
         $view = $this->getActionView();
         $users = App_Model_User::all(array('deleted = ?' => true));
         $view->set('users', $users);
+    }
+    
+    /**
+     * @before _secured, _admin
+     */
+    public function settings()
+    {
+        $view = $this->getActionView();
+        $config = Config::all();
+        $view->set('config', $config);
+        
+        if(RequestMethods::post('submitEditSet')){
+            $this->checkToken();
+            $errors = array();
+            
+            foreach($config as $conf){
+                $conf->value = RequestMethods::post($conf->getXkey(), '');
+                if($conf->validate()){
+                    Event::fire('admin.log', array('success', $conf->getXkey().': ' . $conf->getValue()));
+                    $conf->save();
+                }else{
+                    Event::fire('admin.log', array('fail', $conf->getXkey().': ' . $conf->getValue()));
+                    $errors[$conf->xkey] = array_shift($conf->getErrors());
+                }
+            }
+
+            if(empty($errors)){
+                $view->successMessage('Settings have been successfully changed');
+                self::redirect('/admin/system/');
+            }else{
+                $view->set('errors', $errors);
+            }
+        }
     }
 
 }

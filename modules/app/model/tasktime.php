@@ -68,6 +68,17 @@ class App_Model_TaskTime extends Model
     /**
      * @column
      * @readwrite
+     * @type text
+     * @length 15
+     *
+     * @validate date, max(15)
+     * @label date
+     */
+    protected $_logDate;
+    
+    /**
+     * @column
+     * @readwrite
      * @type datetime
      */
     protected $_created;

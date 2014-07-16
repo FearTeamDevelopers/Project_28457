@@ -13,6 +13,9 @@
                 {if isset($errors["title"])}
                     <p class="form-label-error">{echo join("<br/>", $errors["title"])}</p>
                 {/if}
+                {if isset($errors["urlKey"])}
+                    <p class="form-label-error">{echo join("<br/>", $errors["urlKey"])}</p>
+                {/if}
             </div>
             <div class="form-row">
                 <p class="form-label">Type*</p>
@@ -35,7 +38,7 @@
                     <input list="subtasklist" name="subtaskof" />
                     <datalist id="subtasklist">
                         {foreach $task in $tasks}
-                        <option value="{echo $task->getTitle()."-".$task->getId()}">
+                        <option value="{echo $task->getTitle()."|".$task->getId()}">
                         {/foreach}
                     </datalist>
                 </div>
@@ -49,7 +52,7 @@
                     <input list="reltasklist" name="relatedto"/>
                     <datalist id="reltasklist">
                         {foreach $task in $tasks}
-                            <option value="{echo $task->getTitle()."-".$task->getId()}">
+                            <option value="{echo $task->getTitle()."|".$task->getId()}">
                         {/foreach}
                     </datalist>
                 </div>

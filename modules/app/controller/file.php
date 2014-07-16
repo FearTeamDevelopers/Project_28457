@@ -31,6 +31,9 @@ class App_Controller_File extends Controller
         
         Event::fire('app.log', array('success', 'File id: ' . $attachment->getId()));
         
+        header('Pragma: public');
+        header('Expires: 0');
+        header('Cache-Control: must-revalidate, post-check=0, pre-check=0');
         header('Content-Type: application/octet-stream');
         header('Content-Transfer-Encoding: Binary');
         header("Content-Disposition: attachment; filename=\"" . basename($attachment->getUnlinkPath()) . "\"");

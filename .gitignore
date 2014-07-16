@@ -6,3 +6,4 @@
 /temp/db/
 /nbproject/
 /public/uploads/
+/application/configuration/updatedbschema.sql

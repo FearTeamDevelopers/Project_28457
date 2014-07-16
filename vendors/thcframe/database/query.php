@@ -529,7 +529,7 @@ class Query extends Base
     public function wheresql($sql)
     {
         if (empty($this->_where)) {
-            $this->_wheresql = $this->_quote($sql);
+            $this->_wheresql = $sql;
             return $this;
         } else {
             throw new Exception\Sql('You can use only one of the where methods');

@@ -1,0 +1,39 @@
+<div class="box grid_12">
+    <div class="box-head"><h2>Create new project</h2></div>
+    <div class="box-content">
+        <form class="form" method="post" action="#" >
+            <input type="hidden" name="tk" value="{echo $token}" />
+
+            {if !empty($config)}
+                {foreach $conf in $config}
+                <div class="form-row">
+                    <p class="form-label">{echo $conf->getTitle()}</p>
+                    <div class="form-item">
+                        {if strlen($conf->getValue()) > 250}
+                            <textarea name="{echo $conf->getXkey()}" rows="3">{echo $conf->getValue()}</textarea>
+                        {/if}
+                        {else}
+                            <input type="text" name="{echo $conf->getXkey()}" value="{echo $conf->getValue()}" />
+                        {/else}
+
+                        {if isset($errors[$conf->getXkey()])}
+                            <p class="form-label-error">{echo join("<br/>", $errors[$conf->getXkey()])}</p>
+                        {/if}
+                    </div>
+                </div>
+                {/foreach}
+            {/if}
+
+            <div class="form-row">
+                <div class="form-item">
+                    <input type="button" class="button grey" onclick="history.back();" value="Back">
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-item">
+                    <input type="submit" class="button blue" name="submitEditSet" value="Save settings"/>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>

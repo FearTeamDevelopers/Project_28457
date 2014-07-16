@@ -77,6 +77,15 @@
                 {/if}
             </div>
             <div class="form-row">
+                <p class="form-label">Task prefix</p>
+                <div class="form-item">
+                    <input type="text" name="taskprefix" value="{echo isset($project)? $project->taskPrefix: ""}" />
+                </div>
+                {if isset($errors["taskPrefix"])}
+                    <p class="form-label-error">{echo join("<br/>", $errors["taskPrefix"])}</p>
+                {/if}
+            </div>
+            <div class="form-row">
                 <p class="form-label">Planned start date *</p>
                 <div class="form-item">
                     <input type="text" name="plannedStart" id="datepicker" 

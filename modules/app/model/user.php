@@ -348,6 +348,17 @@ class App_Model_User extends Model implements UserInterface
      * @param type $id
      * @return type
      */
+    public static function fetchTimeLog($id)
+    {
+        $user = new self(array('id' => $id));
+        return $user->getTimeLog();
+    }
+    
+    /**
+     * 
+     * @param type $id
+     * @return type
+     */
     public static function fetchManagedProjects($id)
     {
         $user = new self(array('id' => $id));
@@ -417,7 +428,7 @@ class App_Model_User extends Model implements UserInterface
      */
     public function getAssignedToTasks()
     {
-        $query = App_model_task::getQuery(array('tk.*'))
+        $query = App_Model_Task::getQuery(array('tk.*'))
                 ->join('tb_project', 'tk.projectId = p.id', 'p', 
                         array('p.id' => 'pId', 'p.title' => 'pTitle', 'p.urlKey' => 'pUrlKey'))
                 ->join('tb_state', 'tk.stateId = s.id', 's', 
@@ -430,6 +441,61 @@ class App_Model_User extends Model implements UserInterface
 
         $result = self::initialize($query);
         return $result;
+    }
+    
+    /**
+     * 
+     * @return type
+     */
+    public function getTimeLog()
+    {
+        $firstDayUTS = mktime (0, 0, 0, date('m'), 1, date('Y'));
+        $lastDayUTS = mktime (0, 0, 0, date('m'), date('t'), date('Y'));
+
+        $firstDay = date('Y-m-d', $firstDayUTS);
+        $lastDay = date('Y-m-d', $lastDayUTS);
+
+        $projectQuery = App_Model_TaskTime::getQuery(array('tt.id'))
+                ->join('tb_task', 'tt.taskId = tk.id', 'tk', 
+                        array('tk.id' => 'tId'))
+                ->join('tb_project', 'tk.projectId = pr.id', 'pr', 
+                        array('pr.id' => 'pid', 'pr.title' => 'prTitle', 'pr.urlKey' => 'prUrlKey'))
+                ->where('pr.deleted = ?', false)
+                ->where('tt.logDate > ?', $firstDay)
+                ->where('tt.logDate < ?', $lastDay)
+                ->where('tt.userId = ?', $this->getId())
+                ->groupby('tk.title');
+        $projectTitles = App_Model_TaskTime::initialize($projectQuery);
+        
+        $returnArray = $taskArray = array();
+        
+        foreach ($projectTitles as $project) {
+            $taskQuery = App_Model_TaskTime::getQuery(array('tt.id'))
+                    ->join('tb_task', 'tt.taskId = tk.id', 'tk', 
+                            array('tk.title', 'tk.urlKey', 'tk.id' => 'tId'))
+                    ->where('tk.deleted = ?', false)
+                    ->where('tk.projectId = ?', $project->pid)
+                    ->where('tt.logDate > ?', $firstDay)
+                    ->where('tt.logDate < ?', $lastDay)
+                    ->where('tt.userId = ?', $this->getId())
+                    ->groupby('tk.title');
+            $taskTitles = App_Model_TaskTime::initialize($taskQuery);
+
+            foreach ($taskTitles as $task) {
+                $time = App_Model_TaskTime::all(array(
+                            'tt.taskId = ?' => $task->tId,
+                            'tt.logDate > ?' => $firstDay,
+                            'tt.logDate < ?' => $lastDay,
+                            'tt.userId = ?' => $this->getId()
+                                ), array('*'), array('tt.logDate' => 'asc'));
+
+                $taskArray[$task->getUrlKey() . '|' . $task->getTitle()] = $time;
+            }
+            
+            $returnArray[$project->prUrlKey.'|'.$project->prTitle] = $taskArray;
+        }
+
+        return $returnArray;
     }
 
     /**

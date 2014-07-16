@@ -609,11 +609,16 @@ input.filebase {
 }
 
 /* TABLES */
+.stdtable2{width: 100%;}
+.stdtable2 tr th{vertical-align: middle;}
+
+
 table td {font-size: 14px !important;}
 .tableoptions{margin-left: 15px; padding: 5px;}
 
 .row-high-priority td{color: red;}
 .row-inactive td{color: gray !important;}
+.timelog-project-row{font-weight: bold; text-align: center; border: 1px solid #bbb;}
 
 /* AJAX FORMS */
 #ajaxFinAddForm input, #ajaxReportBugForm input,
@@ -637,6 +642,7 @@ table td {font-size: 14px !important;}
 .float-right-fixed{ float: right;}
 .clear-both { clear: both;}
 .width100 {width: 100px;}
+.width50 {width: 50px;}
 
 .imagelist { list-style: none; overflow: hidden; }
 .imagelist li { 
