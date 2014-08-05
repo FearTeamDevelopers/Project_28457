@@ -46,9 +46,9 @@ class Config extends Model
      * @column
      * @readwrite
      * @type text
-     * @length 250
+     * @length 256
      * 
-     * @validate required, alphanumeric, max(250)
+     * @validate required, alphanumeric, max(8496)
      * @label value
      */
     protected $_value;

@@ -42,10 +42,23 @@ class RequestMethods
      */
     public static function post($key, $default = '')
     {
-        if (!empty($_POST[$key])) {
+        if (isset($_POST[$key]) && !empty($_POST[$key])) {
             return $_POST[$key];
         }
         return $default;
+    }
+    
+    /**
+     * 
+     * @param type $key
+     * @return boolean
+     */
+    public static function issetpost($key)
+    {
+        if (isset($_POST[$key])) {
+            return true;
+        }
+        return false;
     }
 
     /**

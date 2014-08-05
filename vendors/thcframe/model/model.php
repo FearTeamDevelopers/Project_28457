@@ -143,7 +143,7 @@ class Model extends Base
         if ($value == '') {
             return true;
         } else {
-            return StringMethods::match($value, '#^([a-zA-Zá-žÁ-Ž_-\s\?\.,!\/]*)$#');
+            return StringMethods::match($value, '#^([a-zA-Zá-žÁ-Ž_-\s\?\.,!:()+=\"\'&@\*\/°\´\`%~\[\]]*)$#');
         }
     }
 
@@ -171,7 +171,7 @@ class Model extends Base
         if ($value == '') {
             return true;
         } else {
-            return StringMethods::match($value, '#^([a-zA-Zá-žÁ-Ž0-9_-\s\?\.,!:()+=\"&@\*\/]*)$#');
+            return StringMethods::match($value, '#^([a-zA-Zá-žÁ-Ž0-9_-\s\?\.,!:()+=\"\'&@\*\/°\´\`%~\[\]]*)$#');
         }
     }
 
@@ -186,7 +186,8 @@ class Model extends Base
             return true;
         } else {
             return StringMethods::match($value, '#((<|&lt;)(strong|em|s|p|div|a|img|table|tr|td|thead|tbody|ol|li|ul|caption|span)(>|&gt;)'
-                            . '([a-zA-Zá-žÁ-Ž0-9_-\s\?\.,!:()+=\"&@\*]*)</\2>)*([a-zA-Zá-žÁ-Ž0-9_-\s\?\.,!:()+=\"&@\*]*)#');
+                            . '([a-zA-Zá-žÁ-Ž0-9_-\s\?\.,!:()+=\"\'&@\*\/°\´\`%~\[\]]*)</\2>)*'
+                            . '([a-zA-Zá-žÁ-Ž0-9_-\s\?\.,!:()+=\"\'&@\*\/°\´\`%~\[\]]*)#');
         }
     }
 
@@ -200,7 +201,7 @@ class Model extends Base
         if ($value == '') {
             return true;
         } else {
-            return StringMethods::match($value, '#^([a-zA-Z0-9_\\-\/:]*\.[a-z]{2,4})$#');
+            return StringMethods::match($value, '#^([a-zA-Z0-9-_\\\/:\.()]*\.[a-z]{2,4})$#');
         }
     }
 

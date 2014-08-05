@@ -19,7 +19,7 @@ class FileManager extends Base
      * @readwrite
      */
     protected $_pathToDocs;
-    
+
     /**
      * @read
      */
@@ -59,7 +59,7 @@ class FileManager extends Base
      * @read
      */
     protected $_imageExtensions = array('gif', 'jpg', 'png', 'jpeg');
-    
+
     /**
      * @read
      */
@@ -68,7 +68,7 @@ class FileManager extends Base
     public function __construct($options = array())
     {
         parent::__construct($options);
-        
+
         $configuration = Registry::get('config');
 
         if (!empty($configuration->files)) {
@@ -127,7 +127,7 @@ class FileManager extends Base
                 throw new Exception\IO(sprintf('Failed to copy %s to %s', $originFile, $targetFile));
             }
         }
-        
+
         return true;
     }
 
@@ -163,7 +163,7 @@ class FileManager extends Base
                 }
             }
         }
-        
+
         return true;
     }
 
@@ -183,7 +183,7 @@ class FileManager extends Base
         if (true !== @rename($origin, $target)) {
             throw new Exception\IO(sprintf('Cannot rename "%s" to "%s".', $origin, $target));
         }
-        
+
         return true;
     }
 
@@ -221,12 +221,12 @@ class FileManager extends Base
             if ($recursive && is_dir($file) && !is_link($file)) {
                 $this->chmod(new \FilesystemIterator($file), $mode, $umask, true);
             }
-            
+
             if (true !== @chmod($file, $mode & ~$umask)) {
                 throw new Exception\IO(sprintf('Failed to chmod file %s', $file));
             }
         }
-        
+
         return true;
     }
 
@@ -271,7 +271,7 @@ class FileManager extends Base
             return null;
         }
     }
-    
+
     /**
      * 
      * @param type $path
@@ -282,7 +282,7 @@ class FileManager extends Base
         if ($path != '') {
             $name = pathinfo($path, PATHINFO_FILENAME);
             return StringMethods::removeDiacriticalMarks(
-                            str_replace(' ', '_', $name)
+                    str_replace('.', '_', str_replace(' ', '_', $name))
             );
         } else {
             return null;
@@ -345,7 +345,7 @@ class FileManager extends Base
             return APP_PATH . '/' . $this->_pathToThumbs;
         }
     }
-    
+
     /**
      * 
      * @return type
@@ -360,7 +360,7 @@ class FileManager extends Base
             return APP_PATH . '/' . $this->_pathToDocs;
         }
     }
-    
+
     /**
      * 
      * @param type $postField
@@ -370,19 +370,7 @@ class FileManager extends Base
     {
         $path = $this->getPathToImages() . '/' . $uploadto . '/';
         $pathToThumbs = $this->getPathToThumbs() . '/' . $uploadto . '/';
-        $pathToDocs = $this->getPathToDocuments().'/' . $uploadto . '/';
-
-        if (!is_dir($path)) {
-            $this->mkdir($path, 0766);
-        }
-
-        if (!is_dir($pathToThumbs)) {
-            $this->mkdir($pathToThumbs, 0766);
-        }
-        
-        if (!is_dir($pathToDocs)) {
-            $this->mkdir($pathToDocs, 0766);
-        }
+        $pathToDocs = $this->getPathToDocuments() . '/' . $uploadto . '/';
 
         if (is_array($_FILES[$postField]['tmp_name'])) {
             $fileDataArray = array('files' => array(), 'errors' => array());
@@ -398,23 +386,34 @@ class FileManager extends Base
                         continue;
                     } else {
                         if (in_array($extension, $this->_imageExtensions)) {
-                            try{
+                            if (!is_dir($path)) {
+                                $this->mkdir($path, 0755);
+                            }
+
+                            if (!is_dir($pathToThumbs)) {
+                                $this->mkdir($pathToThumbs, 0755);
+                            }
+
+                            try {
                                 $fileDataArray['files'][$i] = $this->uploadImage($_FILES[$postField]['tmp_name'][$i], 
                                         $filename, $extension, $path, $pathToThumbs, $namePrefix);
                             } catch (Exception $ex) {
                                 $fileDataArray['errors'][] = $ex->getMessage();
                             }
-                        }elseif(in_array($extension, $this->_fileExtensions)){
-                            try{
+                        } elseif (in_array($extension, $this->_fileExtensions)) {
+                            if (!is_dir($pathToDocs)) {
+                                $this->mkdir($pathToDocs, 0755);
+                            }
+
+                            try {
                                 $fileDataArray['files'][$i] = $this->uploadDocument($_FILES[$postField]['tmp_name'][$i], 
                                         $filename, $extension, $pathToDocs, $namePrefix);
                             } catch (Exception $ex) {
                                 $fileDataArray['errors'][] = $ex->getMessage();
                             }
                         } else {
-                            $fileDataArray['errors'][] = 
-                                    sprintf('File has unsupported extension. Images: %s | Files: %s', 
-                                            join(', ', $this->_imageExtensions), join(', ', $this->_fileExtensions));
+                            $fileDataArray['errors'][] = sprintf('File has unsupported extension. Images: %s | Files: %s', 
+                                    join(', ', $this->_imageExtensions), join(', ', $this->_fileExtensions));
                             continue;
                         }
                     }
@@ -436,22 +435,34 @@ class FileManager extends Base
                     throw new Exception(sprintf('Your file %s size exceeds the maximum size limit', $filename));
                 } else {
                     if (in_array($extension, $this->_imageExtensions)) {
+                        if (!is_dir($path)) {
+                            $this->mkdir($path, 0755);
+                        }
+
+                        if (!is_dir($pathToThumbs)) {
+                            $this->mkdir($pathToThumbs, 0755);
+                        }
+
                         try {
                             $fileDataArray = $this->uploadImage($_FILES[$postField]['tmp_name'], 
                                     $filename, $extension, $path, $pathToThumbs, $namePrefix);
                         } catch (Exception $ex) {
                             throw new Exception($ex->getMessage());
                         }
-                        
+
                         return $fileDataArray;
                     } elseif (in_array($extension, $this->_fileExtensions)) {
+                        if (!is_dir($pathToDocs)) {
+                            $this->mkdir($pathToDocs, 0755);
+                        }
+
                         try {
                             $fileDataArray = $this->uploadDocument($_FILES[$postField]['tmp_name'], 
                                     $filename, $extension, $pathToDocs, $namePrefix);
                         } catch (Exception $ex) {
                             throw new Exception($ex->getMessage());
                         }
-                        
+
                         return $fileDataArray;
                     } else {
                         throw new Exception(sprintf('File has unsupported extension. Images: %s | Files: %s', 
@@ -473,10 +484,6 @@ class FileManager extends Base
     {
         $path = $this->getPathToImages() . '/' . $uploadto . '/';
 
-        if (!is_dir($path)) {
-            $this->mkdir($path, 0755);
-        }
-
         if (is_array($_FILES[$postField]['tmp_name'])) {
             $returnArray = array('files' => array(), 'errors' => array());
 
@@ -491,16 +498,19 @@ class FileManager extends Base
                         continue;
                     } else {
                         if (in_array($extension, $this->_imageExtensions)) {
-                            try{
+                            if (!is_dir($path)) {
+                                $this->mkdir($path, 0755);
+                            }
+
+                            try {
                                 $fileDataArray['files'][$i] = $this->uploadImageWithoutThumb($_FILES[$postField]['tmp_name'][$i], 
                                         $filename, $extension, $path, $namePrefix);
                             } catch (Exception $ex) {
                                 $fileDataArray['errors'][] = $ex->getMessage();
                             }
                         } else {
-                            $fileDataArray['errors'][] = 
-                                    sprintf('File has unsupported extension. Images: %s', 
-                                            join(', ', $this->_imageExtensions));
+                            $fileDataArray['errors'][] = sprintf('File has unsupported extension. Images: %s', 
+                                    join(', ', $this->_imageExtensions));
                             continue;
                         }
                     }
@@ -522,17 +532,21 @@ class FileManager extends Base
                     throw new Exception(sprintf('Your file %s size exceeds the maximum size limit', $filename));
                 } else {
                     if (in_array($extension, $this->_imageExtensions)) {
+                        if (!is_dir($path)) {
+                            $this->mkdir($path, 0755);
+                        }
+
                         try {
                             $fileDataArray = $this->uploadImageWithoutThumb($_FILES[$postField]['tmp_name'], 
                                     $filename, $extension, $path, $namePrefix);
                         } catch (Exception $ex) {
                             throw new Exception($ex->getMessage());
                         }
-                        
+
                         return $fileDataArray;
                     } else {
-                        throw new Exception(sprintf('File has unsupported extension. Images: %s', 
-                                join(', ', $this->_imageExtensions)));
+                        throw new Exception(sprintf('File has unsupported extension. Images: %s', join(', ', 
+                                $this->_imageExtensions)));
                     }
                 }
             } else {
@@ -659,12 +673,12 @@ class FileManager extends Base
             }
 
             $returnData['file'] = $img->getDataForDb();
-           
+
             unset($img);
             return $returnData;
         }
     }
-    
+
     /**
      * 
      * @param type $tmpFile

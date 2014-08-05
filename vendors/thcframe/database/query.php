@@ -526,14 +526,28 @@ class Query extends Base
      * @return \THCFrame\Database\Query
      * @throws Exception\Sql
      */
-    public function wheresql($sql)
+    public function wheresql()
     {
-        if (empty($this->_where)) {
-            $this->_wheresql = $sql;
-            return $this;
-        } else {
+        if (!empty($this->_where)) {
             throw new Exception\Sql('You can use only one of the where methods');
         }
+        
+        $arguments = func_get_args();
+
+        if (count($arguments) < 1) {
+            throw new Exception\Argument('Invalid argument');
+        }
+
+        $connector = $this->getConnector();
+        $arguments[0] = preg_replace('#\?#', '%s', $arguments[0]);
+
+        foreach (array_slice($arguments, 1, null, true) as $i => $parameter) {
+            $arguments[$i] = $connector->escape($arguments[$i]);
+        }
+
+        $this->_wheresql = call_user_func_array('sprintf', $arguments);
+
+        return $this;
     }
 
     /**
