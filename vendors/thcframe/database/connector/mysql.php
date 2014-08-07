@@ -4,6 +4,7 @@ namespace THCFrame\Database\Connector;
 
 use THCFrame\Database as Database;
 use THCFrame\Database\Exception as Exception;
+use THCFrame\Profiler\Profiler;
 
 /**
  * Description of Mysql
@@ -58,11 +59,6 @@ class Mysql extends Database\Connector
      * @readwrite
      */
     protected $_isConnected = false;
-
-    /**
-     * @readwrite
-     */
-    protected $_profiler = false;
 
     /**
      * @read
@@ -124,10 +120,6 @@ class Mysql extends Database\Connector
             $this->_service->set_charset('utf8');
             $this->_service->query("SET NAMES 'utf8' COLLATE 'utf8_general_ci'");
 
-            if ($this->getProfiler()) {
-                $this->_service->query("SET profiling = 1");
-            }
-
             $this->isConnected = true;
             unset($this->_password);
         }
@@ -174,10 +166,14 @@ class Mysql extends Database\Connector
             throw new Exception\Service('Not connected to a valid database service');
         }
 
+        $profiler = Profiler::getProfiler();
+        $profiler->dbQueryStart($sql);
         $args = func_get_args();
 
         if (count($args) == 1) {
-            return $this->_service->query($sql);
+            $result = $this->_service->query($sql);
+            $profiler->dbQueryEnd($this->getAffectedRows());
+            return $result;
         }
 
         if (!$stmt = $this->_service->prepare($sql)) {
@@ -203,6 +199,7 @@ class Mysql extends Database\Connector
         $bindParamsMethod->invokeArgs($stmt, $bindParamsReferences);
 
         $stmt->execute();
+        $profiler->dbQueryEnd($stmt->affected_rows);
         $meta = $stmt->result_metadata();
 
         if ($meta) {

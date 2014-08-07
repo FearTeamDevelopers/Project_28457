@@ -8,6 +8,10 @@ jQuery(document).ready(function() {
 
     jQuery(window).load(function() {
         jQuery("#loader, .loader").hide();
+        
+        jQuery.post('/system/showProfiler', function(msg){
+            jQuery('body').append(msg);
+        });
     });
     
     jQuery('a.view').lightBox();

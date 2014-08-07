@@ -205,10 +205,10 @@ class Core
      * @param type $message
      * @param type $file
      */
-    public static function log($message, $file = null, $profiler = null)
+    public static function log($message, $file = null, $profiler = null, $persist = true)
     {
         if ($profiler !== null) {
-            $messageE = '[' . date('Y-m-d H:i:s', time()) . '] PROFILER: ' . $message . PHP_EOL;
+            $messageE = $message . PHP_EOL;
         } else {
             $messageE = '[' . date('Y-m-d H:i:s', time()) . '] DEBUG: ' . $message . PHP_EOL;
         }
@@ -222,7 +222,11 @@ class Core
             if (!file_exists($path)) {
                 file_put_contents($path, $messageE);
             } elseif (file_exists($path) && filesize($path) < 10000000) {
-                file_put_contents($path, $messageE, FILE_APPEND);
+                if($persist){
+                    file_put_contents($path, $messageE, FILE_APPEND);
+                }else{
+                    file_put_contents($path, $messageE);
+                }
             } elseif (file_exists($path) && filesize($path) > 10000000) {
                 file_put_contents($path, $messageE);
             }
@@ -231,7 +235,11 @@ class Core
             if (!file_exists($path)) {
                 file_put_contents($path, $messageE);
             } elseif (file_exists($path) && filesize($path) < 10000000) {
-                file_put_contents($path, $messageE, FILE_APPEND);
+                if($persist){
+                    file_put_contents($path, $messageE, FILE_APPEND);
+                }else{
+                    file_put_contents($path, $messageE);
+                }
             } elseif (file_exists($path) && filesize($path) > 10000000) {
                 file_put_contents($path, $messageE);
             }
@@ -282,8 +290,7 @@ class Core
         self::$_errorLog = APP_PATH . '/application/logs/' . date('Y-m-d') . '-errorLog.txt';
 
         if (!is_dir(self::$_pathToLogs)) {
-            $fm = new FileManager();
-            $fm->mkdir(self::$_pathToLogs);
+            mkdir(self::$_pathToLogs, 0755);
         }
 
         // remove old log files

@@ -7,6 +7,7 @@ use THCFrame\Events\Events as Event;
 use THCFrame\Filesystem\FileManager;
 use THCFrame\Database\Mysqldump;
 use THCFrame\Configuration\Model\Config;
+use THCFrame\Profiler\Profiler;
 
 /**
  * Description of App_Controller_System
@@ -118,4 +119,15 @@ class App_Controller_System extends Controller
         }
     }
 
+    /**
+     * 
+     */
+    public function showProfiler()
+    {
+        $this->_willRenderActionView = false;
+        $this->_willRenderLayoutView = false;
+        
+        $profiler = Profiler::getProfiler();
+        echo $profiler->printProfilerRecord();
+    }
 }
