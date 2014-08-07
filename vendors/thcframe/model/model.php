@@ -748,7 +748,7 @@ class Model extends Base
         $class = get_class($this);
 
         if ($first) {
-            return new $class($query->first());
+            return new $class($first);
         }
 
         return null;
