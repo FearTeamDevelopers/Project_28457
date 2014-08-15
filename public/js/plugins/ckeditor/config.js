@@ -36,7 +36,12 @@ CKEDITOR.editorConfig = function(config) {
     // Simplify the dialog windows.
     config.removeDialogTabs = 'image:advanced;link:advanced';
 
-    config.extraPlugins = 'wordcount';
+    config.entities_latin = false;
+    config.allowedContent = true;
+    config.enterMode = CKEDITOR.ENTER_BR;
+
+    config.extraPlugins = 'wordcount,justify';
+
     config.wordcount = {
         showWordCount: false,
         showCharCount: true,

@@ -178,7 +178,6 @@ class Base
      */
     public function __get($name)
     {
-
         $function = 'get' . ucfirst($name);
         return $this->$function();
     }

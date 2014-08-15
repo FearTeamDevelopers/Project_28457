@@ -27,6 +27,7 @@ class Mysqldump extends Base
     private $_defaultSettings = array(
         'include-tables' => array(),
         'exclude-tables' => array(),
+        'exclude-tables-reqex' => array(),
         'no-data' => false,
         'add-drop-table' => true,
         'single-transaction' => true,
@@ -266,6 +267,13 @@ class Mysqldump extends Base
             if (in_array($table, $this->_settings['exclude-tables'], true)) {
                 continue;
             }
+            
+            foreach ($this->_settings['exclude-tables-reqex'] as $regex) {
+                if(mb_ereg_match($regex, $table)){
+                    continue 2;
+                }
+            }
+            
             $is_table = $this->_getTableStructure($table);
             if (true === $is_table && false === $this->_settings['no-data']) {
                 $this->_listValues($table);

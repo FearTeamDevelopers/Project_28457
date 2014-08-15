@@ -18,7 +18,6 @@ class Profiler
     private $_dbData = array();
     private $_dbLastIdentifier;
     private $_logging;
-    private $_winos;
 
     /**
      * 
@@ -58,15 +57,7 @@ class Profiler
         $this->_enabled = (bool) $configuration->profiler->active;
         $this->_logging = $configuration->profiler->logging;
 
-        if ($this->_enabled) {
-            if (strtolower(substr(php_uname('s'), 0, 7)) == 'windows') {
-                $this->_winos = true;
-            } elseif (strtolower(substr(php_uname('s'), 0, 5)) == 'linux') {
-                $this->_winos = false;
-            } else {
-                $this->_winos = false;
-            }
-        } else {
+        if (!$this->_enabled) {
             return;
         }
     }
@@ -94,9 +85,6 @@ class Profiler
             $this->_data[$identifier]['startMemoryPeakUsage'] = memory_get_peak_usage();
             $this->_data[$identifier]['startMomoryUsage'] = memory_get_usage();
 
-            if (!$this->_winos) {
-                $this->_data[$identifier]['startRusage'] = getrusage();
-            }
         } else {
             return;
         }
@@ -110,50 +98,47 @@ class Profiler
     {
         if ($this->_enabled) {
             $startTime = $this->_data[$identifier]['startTime'];
-            $startMemoryPeakUsage = $this->convert($this->_data[$identifier]['startMemoryPeakUsage']);
-            $startMomoryUsage = $this->convert($this->_data[$identifier]['startMomoryUsage']);
-
             $endMemoryPeakUsage = $this->convert(memory_get_peak_usage());
             $endMemoryUsage = $this->convert(memory_get_usage());
             $time = round(microtime(true) - $startTime, 8);
 
-            if (!$this->_winos) {
-                $startRusage = $this->_data[$identifier]['startRusage'];
-                $endRusage = getrusage();
 
-                $usageStr = "<td>{$startRusage['ru_nswap']}</td><td>{$endRusage['ru_nswap']}</td>"
-                . "<td>{$startRusage['ru_majflt']}</td><td>{$endRusage['ru_majflt']}</td>"
-                . "<td>{$startRusage['ru_utime.tv_sec']}</td><td>{$endRusage['ru_utime.tv_sec']}</td>";
-            } else {
-                $usageStr = "<td></td><td></td><td></td><td></td><td></td><td></td>";
-            }
-
-            $str = '<table><tr style="font-weight:bold;">';
-            $str .= '<td>Request URI</td><td>Execution time [s]</td><td>Memory peak usage - start</td><td>Memory peak usage - end</td>'
-                    . '<td>Memory usage - start</td><td>Memory usage - end</td><td>Number of swaps - start</td><td>Number of swaps - end</td>'
-                    . '<td>Number of page faults - start</td><td>Number of page faults - end</td><td>User time used (seconds) - start</td>'
-                    . '<td>User time used (seconds) - end</td></tr>';
-            $str .= '<tr>';
-            $str .= "<td>{$_SERVER['REQUEST_URI']}</td><td>{$time}</td><td>{$startMemoryPeakUsage}</td><td>{$endMemoryPeakUsage}</td>"
-            . "<td>{$startMomoryUsage}</td><td>{$endMemoryUsage}</td>";
-            $str .= $usageStr;
-            $str .= '</tr>';
-            $str .= '<tr style="font-weight:bold; border-top:1px solid black;"><td colspan=4>Query</td><td>Execution time [s]</td><td>Returned rows</td><td colspan=6>Backtrace</td></tr>';
+            $str = '<link href="/public/css/profiler.min.css" media="screen" rel="stylesheet" type="text/css" /><div id="profiler">';
+            $str .= "<div id='profiler-basic'><span title='Request URI'>{$_SERVER['REQUEST_URI']}</span><span title='Execution time [s]'>{$time}</span>"
+                    . "<span title='Memory peak usage'>{$endMemoryPeakUsage}</span><span title='Memory usage'>{$endMemoryUsage}</span>"
+                    . '<span title="SQL Query"><a href="#" class="profiler-show-query">SQL Query:</a> '.  count($this->_dbData).'</span>'
+                            . '<span><a href="#" class="profiler-show-globalvar">Global variables</a></span></div>';
+            $str .= '<div id="profiler-query"><table><tr style="font-weight:bold; border-top:1px solid black;">'
+                    . '<td colspan=5>Query</td><td>Execution time [s]</td><td>Returned rows</td><td colspan=6>Backtrace</td></tr>';
             
             foreach ($this->_dbData as $key => $value) {
                 $str .= '<tr>';
-                $str .= "<td colspan=4 width='40%'>{$value['query']}</td>";
+                $str .= "<td colspan=5 width='40%'>{$value['query']}</td>";
                 $str .= "<td>{$value['execTime']}</td>";
                 $str .= "<td>{$value['totalRows']}</td>";
-                $str .= "<td colspan=6>";
+                $str .= "<td colspan=6 class=\"backtrace\"><div>";
                 foreach ($value['backTrace'] as $key => $trace){
-                    $str .= $key.' '.$trace['file'].':'.$trace['line'].':'.$trace['class'].':'.$trace['function']."<br/>";
+                    isset($trace['file'])? $file = $trace['file']: $file = '';
+                    isset($trace['line'])? $line = $trace['line']: $line = '';
+                    isset($trace['class'])? $class = $trace['class']: $class = '';
+                    $str .= $key.' '.$file.':'.$line.':'.$class.':'.$trace['function']."<br/>";
                 }
-                $str .= "</td>";
-                $str .= '</tr>';
+                $str .= "</div></td></tr>";
             }
+            $str .= '</table></div>';
             
-            $str .= '</table>'.PHP_EOL;
+            $str .= '<div id="profiler-globalvar"><table>';
+            $str .= '<tr><td colspan=2>POST</td></tr>';
+            foreach ($_POST as $key => $value) {
+                $str .= '<tr><td>'.$key.'</td><td>'.$value.'</td></tr>';
+            }
+            $str .= '</table><table>';
+            $str .= '<tr><td colspan=2>GET</td></tr>';
+            foreach ($_GET as $key => $value) {
+                $str .= '<tr><td>'.$key.'</td><td>'.$value.'</td></tr>';
+            }
+            $str .= '</table></div>';
+            $str .= '</div><script type="text/javascript" src="/public/js/custom/profiler.min.js"></script>';
             \THCFrame\Core\Core::log($str, 'profiler.log', true, false);
 
         } else {

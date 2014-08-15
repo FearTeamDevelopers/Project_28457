@@ -9,7 +9,7 @@ jQuery(document).ready(function() {
     jQuery(window).load(function() {
         jQuery("#loader, .loader").hide();
         
-        jQuery.post('/system/showProfiler', function(msg){
+        jQuery.post('/system/showprofiler', function(msg){
             jQuery('body').append(msg);
         });
     });

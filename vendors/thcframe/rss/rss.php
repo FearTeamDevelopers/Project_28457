@@ -6,6 +6,7 @@ use THCFrame\Core\Base;
 use THCFrame\Events\Events;
 use THCFrame\Rss\RssItem;
 use THCFrame\Request\RequestMethods;
+use THCFrame\Rss\Exception;
 
 /**
  * 
@@ -97,13 +98,14 @@ class Rss extends Base
      * 
      * @return type
      */
-    public function getFeed()
+    public function createFeed()
     {
         if ($this->getStatus()) {
             Events::fire('framework.rss.getFeed', array($this->getTitle()));
-            return $this->getDetails() . $this->getFeedItems() . $this->getFeedEnd();
+            $content = $this->getDetails() . $this->getFeedItems() . $this->getFeedEnd();
+            file_put_contents('./temp/rss/rss.xml', $content);
         } else {
-            return 'Some error occured while feed was generating';
+            throw new Exception('Some error occured while feed was generating');
         }
     }
 
@@ -126,7 +128,7 @@ class Rss extends Base
             $this->_items[] = $item;
         } catch (Exception\InvalidItem $e) {
             $this->status = false;
-            //throw new Exception\InvalidItem($e->getMessage());
+            throw new Exception\InvalidItem($e->getMessage());
         }
 
         
@@ -183,8 +185,7 @@ class Rss extends Base
      */
     private function getFeedEnd()
     {
-        $items = '</channel></rss>';
-        return $items;
+        return '</channel></rss>';
     }
 
     /**

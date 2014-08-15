@@ -42,4 +42,6 @@ abstract class Driver extends Base
     abstract function erase($key);
 
     abstract function clearCache();
+    
+    abstract function invalidate();
 }

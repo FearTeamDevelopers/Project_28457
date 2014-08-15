@@ -134,4 +134,12 @@ class Filecache extends Cache\Driver
         return;
     }
 
+    /**
+     * 
+     */
+    public function invalidate()
+    {
+        $this->clearCache();
+    }
+
 }
