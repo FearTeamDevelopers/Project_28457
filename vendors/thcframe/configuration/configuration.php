@@ -2,10 +2,9 @@
 
 namespace THCFrame\Configuration;
 
-use THCFrame\Core\Base as Base;
-use THCFrame\Events\Events as Events;
-//use THCFrame\Configuration as Configuration;
-use THCFrame\Configuration\Exception as Exception;
+use THCFrame\Core\Base;
+use THCFrame\Events\Events as Event;
+use THCFrame\Configuration\Exception;
 
 /**
  * Factory class
@@ -26,16 +25,15 @@ class Configuration extends Base
     protected $_options;
 
     /**
-     * Throw exception if specific method is not implemented
      * 
-     * @param string $method
+     * @param type $method
      * @return \THCFrame\Configuration\Exception\Implementation
      */
     protected function _getImplementationException($method)
     {
         return new Exception\Implementation(sprintf('%s method not implemented', $method));
     }
-
+    
     /**
      * Factory method
      * It accepts initialization options and selects the type of returned object, 
@@ -46,13 +44,13 @@ class Configuration extends Base
      */
     public function initialize()
     {
-        Events::fire('framework.configuration.initialize.before', array($this->type, $this->options));
+        Event::fire('framework.configuration.initialize.before', array($this->type, $this->options));
 
         if (!$this->type) {
             throw new Exception\Argument('Invalid type');
         }
 
-        Events::fire('framework.configuration.initialize.after', array($this->type, $this->options));
+        Event::fire('framework.configuration.initialize.after', array($this->type, $this->options));
 
         switch ($this->type) {
             case 'ini': {

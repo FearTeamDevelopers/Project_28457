@@ -2,11 +2,11 @@
 
 namespace THCFrame\Router;
 
-use THCFrame\Core\Base as Base;
-use THCFrame\Events\Events as Events;
-use THCFrame\Registry\Registry as Registry;
-use THCFrame\Core\Inspector as Inspector;
-use THCFrame\Router\Exception as Exception;
+use THCFrame\Core\Base;
+use THCFrame\Events\Events as Event;
+use THCFrame\Registry\Registry;
+use THCFrame\Core\Inspector;
+use THCFrame\Router\Exception;
 
 /**
  * Description of Dispatcher
@@ -91,9 +91,9 @@ final class Dispatcher extends Base
      */
     public function initialize()
     {
-        Events::fire('framework.dispatcher.initialize.before', array());
+        Event::fire('framework.dispatcher.initialize.before', array());
 
-        $configuration = Registry::get('config');
+        $configuration = Registry::get('configuration');
 
         if (!empty($configuration->dispatcher)) {
             $this->_setSuffix($configuration->dispatcher->suffix);
@@ -101,7 +101,7 @@ final class Dispatcher extends Base
             throw new \Exception('Error in configuration file');
         }
 
-        Events::fire('framework.dispatcher.initialize.after', array());
+        Event::fire('framework.dispatcher.initialize.after', array());
 
         return $this;
     }
@@ -160,7 +160,7 @@ final class Dispatcher extends Base
 
         $this->_activeModule = $module;
 
-        Events::fire('framework.dispatcher.controller.before', array($class, $parameters));
+        Event::fire('framework.dispatcher.controller.before', array($class, $parameters));
 
         try {
             $instance = new $class(array(
@@ -171,7 +171,7 @@ final class Dispatcher extends Base
             throw new Exception\Controller(sprintf('Controller %s error: %s', $class, $e->getMessage()));
         }
 
-        Events::fire('framework.dispatcher.controller.after', array($class, $parameters));
+        Event::fire('framework.dispatcher.controller.after', array($class, $parameters));
 
         if (!method_exists($instance, $action)) {
             $instance->willRenderLayoutView = false;
@@ -204,22 +204,22 @@ final class Dispatcher extends Base
             }
         };
 
-        Events::fire('framework.dispatcher.beforehooks.before', array($action, $parameters));
+        Event::fire('framework.dispatcher.beforehooks.before', array($action, $parameters));
 
         $hooks($methodMeta, '@before');
 
-        Events::fire('framework.dispatcher.beforehooks.after', array($action, $parameters));
-        Events::fire('framework.dispatcher.action.before', array($action, $parameters));
-
+        Event::fire('framework.dispatcher.beforehooks.after', array($action, $parameters));
+        Event::fire('framework.dispatcher.action.before', array($action, $parameters));
+        
         call_user_func_array(array(
             $instance, $action), is_array($parameters) ? $parameters : array());
 
-        Events::fire('framework.dispatcher.action.after', array($action, $parameters));
-        Events::fire('framework.dispatcher.afterhooks.before', array($action, $parameters));
-
+        Event::fire('framework.dispatcher.action.after', array($action, $parameters));
+        Event::fire('framework.dispatcher.afterhooks.before', array($action, $parameters));
+        
         $hooks($methodMeta, '@after');
 
-        Events::fire('framework.dispatcher.afterhooks.after', array($action, $parameters));
+        Event::fire('framework.dispatcher.afterhooks.after', array($action, $parameters));
 
         // unset controller
 

@@ -3,7 +3,7 @@
 namespace THCFrame\Cache\Driver;
 
 use THCFrame\Cache as Cache;
-use THCFrame\Cache\Exception as Exception;
+use THCFrame\Cache\Exception;
 
 /**
  * Memcached stores data in memory, in hash lookup tables so the data is 

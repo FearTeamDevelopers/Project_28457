@@ -96,23 +96,26 @@ class App_Controller_System extends Controller
         $view->set('config', $config);
         
         if(RequestMethods::post('submitEditSet')){
-            $this->checkToken();
+            if($this->checkToken() !== true){
+                self::redirect('/system');
+            }
+            
             $errors = array();
             
             foreach($config as $conf){
                 $conf->value = RequestMethods::post($conf->getXkey(), '');
                 if($conf->validate()){
-                    Event::fire('admin.log', array('success', $conf->getXkey().': ' . $conf->getValue()));
+                    Event::fire('app.log', array('success', $conf->getXkey().': ' . $conf->getValue()));
                     $conf->save();
                 }else{
-                    Event::fire('admin.log', array('fail', $conf->getXkey().': ' . $conf->getValue()));
+                    Event::fire('app.log', array('fail', $conf->getXkey().': ' . $conf->getValue()));
                     $errors[$conf->xkey] = array_shift($conf->getErrors());
                 }
             }
 
             if(empty($errors)){
                 $view->successMessage('Settings have been successfully changed');
-                self::redirect('/admin/system/');
+                self::redirect('/system');
             }else{
                 $view->set('errors', $errors);
             }

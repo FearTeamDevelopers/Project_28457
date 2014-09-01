@@ -3,10 +3,9 @@
 namespace THCFrame\View;
 
 use THCFrame\Core\Base as Base;
-use THCFrame\Events\Events as Events;
+use THCFrame\Events\Events as Event;
 use THCFrame\Template as Template;
 use THCFrame\View\Exception as Exception;
-use THCFrame\Registry\Registry as Registry;
 
 /**
  * Description of View
@@ -44,7 +43,7 @@ class View extends Base
     {
         parent::__construct($options);
 
-        Events::fire('framework.view.construct.before', array($this->file));
+        Event::fire('framework.view.construct.before', array($this->file));
 
         $this->_template = new Template\Template(array(
             'implementation' => new Template\Implementation\Extended()
@@ -52,7 +51,7 @@ class View extends Base
 
         $this->_checkMessage();
 
-        Events::fire('framework.view.construct.after', array($this->file, $this->template));
+        Event::fire('framework.view.construct.after', array($this->file, $this->template));
     }
 
     /**
@@ -112,7 +111,7 @@ class View extends Base
      */
     public function render()
     {
-        Events::fire('framework.view.render.before', array($this->file));
+        Event::fire('framework.view.render.before', array($this->file));
 
         if (!file_exists($this->file)) {
             return '';

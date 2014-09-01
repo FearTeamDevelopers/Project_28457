@@ -2,8 +2,8 @@
 
 namespace THCFrame\Session;
 
-use THCFrame\Core\Base as Base;
-use THCFrame\Session\Exception as Exception;
+use THCFrame\Core\Base;
+use THCFrame\Session\Exception;
 
 /**
  * Description of Driver
@@ -32,9 +32,11 @@ abstract class Driver extends Base
         return new Exception\Implementation(sprintf('%s method not implemented', $method));
     }
 
-    abstract function get($key, $default = null);
+    public abstract function get($key, $default = null);
 
-    abstract function set($key, $value);
+    public abstract function set($key, $value);
 
-    abstract function erase($key);
+    public abstract function erase($key);
+    
+    public abstract function clear();
 }

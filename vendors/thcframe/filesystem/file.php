@@ -31,7 +31,7 @@ class File extends Base
         parent::__construct();
 
         $this->_file = $file;
-        $this->getMetaData();
+        $this->_getMetaData();
     }
 
     /**
@@ -45,7 +45,7 @@ class File extends Base
     /**
      * 
      */
-    protected function getMetaData()
+    protected function _getMetaData()
     {
         clearstatcache();
 

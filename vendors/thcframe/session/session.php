@@ -2,10 +2,10 @@
 
 namespace THCFrame\Session;
 
-use THCFrame\Core\Base as Base;
-use THCFrame\Events\Events as Events;
-use THCFrame\Registry\Registry as Registry;
-use THCFrame\Session\Exception as Exception;
+use THCFrame\Core\Base;
+use THCFrame\Events\Events as Event;
+use THCFrame\Registry\Registry;
+use THCFrame\Session\Exception;
 
 /**
  * Factory class
@@ -42,14 +42,13 @@ class Session extends Base
      */
     public function initialize()
     {
-        Events::fire('framework.session.initialize.before', array($this->type, $this->options));
+        Event::fire('framework.session.initialize.before', array($this->type, $this->options));
 
         if (!$this->type) {
-            $configuration = Registry::get('config');
+            $configuration = Registry::get('configuration');
 
             if (!empty($configuration->session) && !empty($configuration->session->type)) {
                 $this->type = $configuration->session->type;
-                unset($configuration->session->type);
                 $this->options = (array) $configuration->session;
             } else {
                 throw new \Exception('Error in configuration file');
@@ -60,7 +59,7 @@ class Session extends Base
             throw new Exception\Argument('Invalid type');
         }
 
-        Events::fire('framework.session.initialize.after', array($this->type, $this->options));
+        Event::fire('framework.session.initialize.after', array($this->type, $this->options));
 
         switch ($this->type) {
             case 'server': {

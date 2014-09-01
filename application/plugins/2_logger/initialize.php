@@ -5,7 +5,7 @@ if (ENV == 'dev') {
     require_once 'logger.php';
 
     $logger = new Logger(array(
-        'file' => APP_PATH . '/application/logs/' . date('Y-m-d') . '.txt'
+        'file' => APP_PATH . '/application/logs/' . date('Y-m-d') . '.log'
     ));
 
 // log cache events

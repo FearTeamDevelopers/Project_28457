@@ -2,11 +2,11 @@
 
 namespace THCFrame\Model;
 
-use THCFrame\Core\Base as Base;
-use THCFrame\Registry\Registry as Registry;
-use THCFrame\Core\Inspector as Inspector;
-use THCFrame\Core\StringMethods as StringMethods;
-use THCFrame\Model\Exception as Exception;
+use THCFrame\Core\Base;
+use THCFrame\Registry\Registry;
+use THCFrame\Core\Inspector;
+use THCFrame\Core\StringMethods;
+use THCFrame\Model\Exception;
 
 /**
  * This class allow us to isolate all the direct database communication, 
@@ -143,7 +143,7 @@ class Model extends Base
         if ($value == '') {
             return true;
         } else {
-            return StringMethods::match($value, '#^([a-zA-Zá-žÁ-Ž_-\s\?\.,!:()+=\"\'&@\*\/°\´\`%~\[\]]*)$#');
+            return StringMethods::match($value, '#^([a-zA-Zá-žÁ-Ž_-\s\?\.,!:()+=|\"\'&@\*\/°\´\`%~\[\]]*)$#');
         }
     }
 
@@ -171,7 +171,7 @@ class Model extends Base
         if ($value == '') {
             return true;
         } else {
-            return StringMethods::match($value, '#^([a-zA-Zá-žÁ-Ž0-9_-\s\?\.,!:()+=\"\'&@\*\/°\´\`%~\[\]]*)$#');
+            return StringMethods::match($value, '#^([a-zA-Zá-žÁ-Ž0-9_-\s\?\.,!:()+=|\"\'&@\*\/°\´\`%~\[\]]*)$#');
         }
     }
 
@@ -186,7 +186,7 @@ class Model extends Base
             return true;
         } else {
             return StringMethods::match($value, '#((<|&lt;)(strong|em|s|p|div|a|img|table|tr|td|thead|tbody|ol|li|ul|caption|span)(>|&gt;)'
-                            . '([a-zA-Zá-žÁ-Ž0-9_-\s\?\.,!:()+=\"\'&@\*\/°\´\`%~\[\]]*)</\2>)*'
+                            . '([a-zA-Zá-žÁ-Ž0-9_-\s\?\.,!:()+=\"\'&@\*\/°\´\`%~\[\]]*)(<|&lt;)/\2(<|&gt;))*'
                             . '([a-zA-Zá-žÁ-Ž0-9_-\s\?\.,!:()+=\"\'&@\*\/°\´\`%~\[\]]*)#');
         }
     }
@@ -289,7 +289,8 @@ class Model extends Base
             return true;
         }
         
-        $format = Registry::get('dateformat');
+        $config = Registry::get('configuration');
+        $format = $config->system->dateformat;
 
         if (strlen($value) >= 6 && strlen($format) == 10) {
 
@@ -533,7 +534,7 @@ class Model extends Base
     public function getTable()
     {
         if (empty($this->_table)) {
-            $tablePrefix = Registry::get('config')->database->tablePrefix;
+            $tablePrefix = Registry::get('configuration')->database->tablePrefix;
 
             if (strpos(get_class($this), '_') !== false) {
                 list($module, $type, $name) = explode('_', get_class($this));

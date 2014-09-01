@@ -2,10 +2,10 @@
 
 namespace THCFrame\Cache;
 
-use THCFrame\Core\Base as Base;
-use THCFrame\Events\Events as Events;
-use THCFrame\Registry\Registry as Registry;
-use THCFrame\Cache\Exception as Exception;
+use THCFrame\Core\Base;
+use THCFrame\Events\Events as Event;
+use THCFrame\Registry\Registry;
+use THCFrame\Cache\Exception;
 
 /**
  * Factory class
@@ -26,16 +26,15 @@ class Cache extends Base
     protected $_options;
 
     /**
-     * Throw exception if specific method is not implemented
      * 
-     * @param string $method
+     * @param type $method
      * @return \THCFrame\Cache\Exception\Implementation
      */
     protected function _getImplementationException($method)
     {
         return new Exception\Implementation(sprintf('%s method not implemented', $method));
     }
-
+    
     /**
      * Factory method
      * It accepts initialization options and selects the type of returned object, 
@@ -46,17 +45,21 @@ class Cache extends Base
      */
     public function initialize()
     {
-        Events::fire('framework.cache.initialize.before', array($this->type, $this->options));
+        Event::fire('framework.cache.initialize.before', array($this->type, $this->options));
 
         if (!$this->type) {
-            $configuration = Registry::get('config');
+            $configuration = Registry::get('configuration');
 
             if (!empty($configuration->cache) && !empty($configuration->cache->type)) {
                 $this->type = $configuration->cache->type;
-                unset($configuration->cache->type);
                 $this->options = (array) $configuration->cache;
             } else {
-                throw new \Exception('Error in configuration file');
+                $this->type = 'filecache';
+                $this->options = array(
+                    'mode' => 'active',
+                    'duration' => 1800,
+                    'suffix' => 'tmp',
+                    'path' => 'temp/cache');
             }
         }
 
@@ -64,7 +67,7 @@ class Cache extends Base
             throw new Exception\Argument('Invalid type');
         }
 
-        Events::fire('framework.cache.initialize.after', array($this->type, $this->options));
+        Event::fire('framework.cache.initialize.after', array($this->type, $this->options));
 
         switch ($this->type) {
             case 'memcached': {

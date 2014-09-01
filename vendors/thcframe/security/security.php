@@ -2,27 +2,32 @@
 
 namespace THCFrame\Security;
 
-use THCFrame\Core\Base as Base;
-use THCFrame\Events\Events as Events;
-use THCFrame\Registry\Registry as Registry;
-use THCFrame\Security\Exception as Exception;
+use THCFrame\Core\Base;
+use THCFrame\Events\Events as Event;
+use THCFrame\Registry\Registry;
+use THCFrame\Security\Exception;
 use THCFrame\Security\UserInterface;
-use THCFrame\Security\AdvancedUserInterface;
-use THCFrame\Security\RoleManager;
+use THCFrame\Security\SecurityInterface;
 
 /**
  * Description of Security
  *
  * @author Tomy
  */
-class Security extends Base
+class Security extends Base implements SecurityInterface
 {
 
     /**
      * @read
      * @var type 
      */
-    protected $_accessControl;
+    protected $_authentication;
+
+    /**
+     * @read
+     * @var type 
+     */
+    protected $_authorization;
 
     /**
      * @read
@@ -32,27 +37,15 @@ class Security extends Base
 
     /**
      * @read
-     * @var type 
-     */
-    protected $_roleManager;
-
-    /**
-     * @read
      * @var type
      */
-    protected $_acl;
+    protected $_userToken;
 
     /**
      * @read
      * @var type
      */
     protected $_csrfToken;
-
-    /**
-     * @read
-     * @var type 
-     */
-    protected $_loginCredentials = array();
 
     /**
      * @read
@@ -81,13 +74,13 @@ class Security extends Base
      * This token has to be placed in hidden field in every form. Value from
      * form has to be same as value stored in session.
      */
-    private function createCsrfToken()
+    public function createCsrfToken()
     {
         $session = Registry::get('session');
         $token = $session->get('csrftoken');
 
         if ($token === null) {
-            $this->_csrfToken = bin2hex(openssl_random_pseudo_bytes(15));
+            $this->_csrfToken = base64_encode(bin2hex(openssl_random_pseudo_bytes(15)));
             $session->set('csrftoken', $this->_csrfToken);
         } else {
             $this->_csrfToken = $token;
@@ -100,17 +93,13 @@ class Security extends Base
      */
     public function initialize()
     {
-        Events::fire('framework.security.initialize.before', array($this->accessControll));
+        Event::fire('framework.security.initialize.before', array($this->accessControll));
 
-        $configuration = Registry::get('config');
+        $configuration = Registry::get('configuration');
 
         if (!empty($configuration->security)) {
-            $rolesOptions = (array) $configuration->security->roles;
-            $this->_loginCredentials = $configuration->security->loginCredentials;
             $this->_passwordEncoder = $configuration->security->encoder;
-            $this->_accessControl = $configuration->security->accessControl;
             $this->_secret = $configuration->security->secret;
-            $this->_twoFactorAuth = (boolean) $configuration->security->twoFactorAuth;
         } else {
             throw new \Exception('Error in configuration file');
         }
@@ -120,24 +109,48 @@ class Security extends Base
 
         $this->createCsrfToken();
 
-        if ($this->_accessControl == 'role_based') {
-            $this->_roleManager = new RoleManager($rolesOptions);
-        } elseif ($this->_accessControl == 'acl') {
-//            if ($user) {
-//                $this->_acl = new Acl($user);
-//            }
-        } else {
-            throw new Exception\Implementation('Access controll is not supported');
-        }
+        $authentication = new Authentication\Authentication();
+        $this->_authentication = $authentication->initialize($this);
 
-        if ($user) {
+        $authorization = new Authorization\Authorization();
+        $this->_authorization = $authorization->initialize();
+
+        if ($user instanceof UserInterface) {
             $this->_user = $user;
-            Events::fire('framework.security.initialize.user', array($user));
+            Event::fire('framework.security.initialize.user', array($user));
         }
 
-        Events::fire('framework.security.initialize.after', array($this->accessControll));
+        if ($this->_authorization->type == 'resourcebase') {
+            Event::add('framework.router.findroute.after', function($path) {
+                $role = $this->getAuthorization()->checkForResource($path);
+
+                if ($role !== null) {
+                    if ($this->isGranted($role) !== true) {
+                        throw new \THCFrame\Security\Exception\Unauthorized();
+                    }
+                }
+            });
+        }
+
+        Event::fire('framework.security.initialize.after', array($this->accessControll));
 
         return $this;
+    }
+
+    /**
+     * 
+     * @param type $postToken
+     */
+    public function checkCsrfToken($postToken)
+    {
+        $session = Registry::get('session');
+        $originalToken = $session->get('csrftoken');
+
+        if (base64_decode($postToken) === base64_decode($originalToken)) {
+            return true;
+        } else {
+            return false;
+        }
     }
 
     /**
@@ -153,26 +166,16 @@ class Security extends Base
                 ->set('lastActive', time());
 
         $this->_user = $user;
+        return;
     }
 
     /**
-     * Method returns user object of logged user
      * 
-     * @return \THCFrame\Security\UserInterface
+     * @return type
      */
     public function getUser()
     {
         return $this->_user;
-    }
-
-    /**
-     * Method returns actual csrf token
-     * 
-     * @return string
-     */
-    public function getCsrfToken()
-    {
-        return base64_encode($this->_csrfToken);
     }
 
     /**
@@ -182,8 +185,7 @@ class Security extends Base
     public function logout()
     {
         $session = Registry::get('session');
-        $session->erase('authUser')
-                ->erase('lastActive');
+        $session->clear();
 
         $this->_user = NULL;
         @session_regenerate_id();
@@ -212,10 +214,10 @@ class Security extends Base
                             "salt = ?" => $newSalt
                 ));
 
-                if($i == 99){
+                if ($i == 99) {
                     throw new Exception('Salt could not be created');
                 }
-                
+
                 if ($user === null) {
                     return $newSalt;
                 } else {
@@ -254,105 +256,67 @@ class Security extends Base
     }
 
     /**
-     * Method checks if logged user has required role
      * 
-     * @param type $requiredRole
-     * @return boolean
-     * @throws Exception\Role
+     * @param type $name
+     * @param type $pass
+     * @return type
      */
-    public function isGranted($requiredRole)
+    public function authenticate($name, $pass)
     {
-        if ($this->_user) {
-            $userRole = strtolower($this->_user->getRole());
-        } else {
-            $userRole = 'role_guest';
-        }
-
-        $requiredRole = strtolower(trim($requiredRole));
-
-        if (substr($requiredRole, 0, 5) != 'role_') {
-            throw new Exception\Role(sprintf('Role %s is not valid', $requiredRole));
-        } elseif (!$this->_roleManager->roleExist($requiredRole)) {
-            throw new Exception\Role(sprintf('Role %s is not deffined', $requiredRole));
-        } else {
-            $userRoles = $this->_roleManager->getRole($userRole);
-
-            if (NULL !== $userRoles) {
-                if (in_array($requiredRole, $userRoles)) {
-                    return true;
-                } else {
-                    return false;
-                }
-            } else {
-                throw new Exception\Role(sprintf('User role %s is not valid role', $userRole));
-            }
+        try {
+            return $this->_authentication->authenticate($name, $pass);
+        } catch (Exception $ex) {
+            return $ex->getMessage();
         }
     }
 
     /**
-     * Main authentication method which is used for user authentication
-     * based on two credentials such as username and password. These login
-     * credentials are set in configuration file.
      * 
-     * @param type $loginCredential
-     * @param type $password
-     * @return boolean
-     * @throws Exception\UserInactive
-     * @throws Exception\UserExpired
-     * @throws Exception\UserPassExpired
-     * @throws Exception\Implementation
+     * @param type $requiredRole
+     * @return type
      */
-    public function authenticate($loginCredential, $password)
+    public function isGranted($requiredRole)
     {
-        $user = \App_Model_User::first(array(
-                    "{$this->_loginCredentials->login} = ?" => $loginCredential
-        ));
-                    
-        if($user === null){
-            throw new Exception('Email address and/or password are incorrect');
+        try {
+            return $this->_authorization->isGranted($this->getUser(), $requiredRole);
+        } catch (Exception $ex) {
+            return $ex->getMessage();
         }
-        
-        $hash = $this->getSaltedHash($password, $user->getSalt());
+    }
 
-        if ($user->getPassword() === $hash) {
-            unset($user->_password);
-            unset($user->_salt);
+    /**
+     * 
+     * @param type $text
+     * @return type
+     */
+    public function encrypt($text)
+    {
+        $key = pack('H*', '0df9cf7ce4fbde15dc3e9303da18208e485ea44797a2795b239dda8e546845d4');
+        $iv_size = mcrypt_get_iv_size(MCRYPT_RIJNDAEL_256, MCRYPT_MODE_CBC);
+        $iv = mcrypt_create_iv($iv_size, MCRYPT_RAND);
 
-            if ($user instanceof AdvancedUserInterface) {
-                if (!$user->isActive()) {
-                    $message = 'User account is not active';
-                    Events::fire('framework.security.authenticate.failure', array($user, $message));
-                    throw new Exception\UserInactive($message);
-                } elseif ($user->isExpired()) {
-                    $message = 'User account has expired';
-                    Events::fire('framework.security.authenticate.failure', array($user, $message));
-                    throw new Exception\UserExpired($message);
-                } elseif ($user->isPassExpired()) {
-                    $message = 'User password has expired';
-                    Events::fire('framework.security.authenticate.failure', array($user, $message));
-                    throw new Exception\UserPassExpired($message);
-                } else {
-                    $user->setLastLogin(date('Y-m-d H:i:s'));
-                    $user->save();
+        $ciphertext = mcrypt_encrypt(MCRYPT_RIJNDAEL_256, $key, $text, MCRYPT_MODE_CBC, $iv);
+        $ciphertext = $iv . $ciphertext;
+        $ciphertext_base64 = base64_encode($ciphertext);
 
-                    $this->setUser($user);
-                    return true;
-                }
-            } elseif ($user instanceof UserInterface) {
-                if (!$user->isActive()) {
-                    $message = 'User account is not active';
-                    Events::fire('framework.security.authenticate.failure', array($user, $message));
-                    throw new Exception\UserInactive($message);
-                } else {
-                    $this->setUser($user);
-                    return true;
-                }
-            } else {
-                throw new Exception\Implementation(sprintf('%s is not implementing UserInterface', get_class($user)));
-            }
-        } else {
-            return false;
-        }
+        return $ciphertext_base64;
+    }
+
+    /**
+     * 
+     * @param type $encryptedText
+     */
+    public function decrypt($encryptedText)
+    {
+        $key = pack('H*', '0df9cf7ce4fbde15dc3e9303da18208e485ea44797a2795b239dda8e546845d4');
+        $ciphertext_dec = base64_decode($encryptedText);
+        $iv_size = mcrypt_get_iv_size(MCRYPT_RIJNDAEL_256, MCRYPT_MODE_CBC);
+        $iv_dec = substr($ciphertext_dec, 0, $iv_size);
+
+        $ciphertext_dec = substr($ciphertext_dec, $iv_size);
+        $plaintext_dec = mcrypt_decrypt(MCRYPT_RIJNDAEL_256, $key, $ciphertext_dec, MCRYPT_MODE_CBC, $iv_dec);
+
+        echo $plaintext_dec . "\n";
     }
 
     /**

@@ -2,8 +2,7 @@
 
 namespace THCFrame\Profiler;
 
-use THCFrame\Profiler\Exception as Exception;
-use THCFrame\Registry\Registry as Registry;
+use THCFrame\Registry\Registry;
 use THCFrame\Events\Events as Event;
 
 /**
@@ -53,7 +52,7 @@ class Profiler
     {
         Event::fire('framework.profiler.construct');
 
-        $configuration = Registry::get('config');
+        $configuration = Registry::get('configuration');
         $this->_enabled = (bool) $configuration->profiler->active;
         $this->_logging = $configuration->profiler->logging;
 
@@ -84,7 +83,6 @@ class Profiler
             $this->_data[$identifier]['startTime'] = microtime(true);
             $this->_data[$identifier]['startMemoryPeakUsage'] = memory_get_peak_usage();
             $this->_data[$identifier]['startMomoryUsage'] = memory_get_usage();
-
         } else {
             return;
         }
@@ -103,44 +101,53 @@ class Profiler
             $time = round(microtime(true) - $startTime, 8);
 
 
-            $str = '<link href="/public/css/profiler.min.css" media="screen" rel="stylesheet" type="text/css" /><div id="profiler">';
+            $str = '<link href="/public/css/plugins/profiler.min.css" media="screen" rel="stylesheet" type="text/css" /><div id="profiler">';
             $str .= "<div id='profiler-basic'><span title='Request URI'>{$_SERVER['REQUEST_URI']}</span><span title='Execution time [s]'>{$time}</span>"
                     . "<span title='Memory peak usage'>{$endMemoryPeakUsage}</span><span title='Memory usage'>{$endMemoryUsage}</span>"
-                    . '<span title="SQL Query"><a href="#" class="profiler-show-query">SQL Query:</a> '.  count($this->_dbData).'</span>'
-                            . '<span><a href="#" class="profiler-show-globalvar">Global variables</a></span></div>';
+                    . '<span title="SQL Query"><a href="#" class="profiler-show-query">SQL Query:</a> ' . count($this->_dbData) . '</span>'
+                    . '<span><a href="#" class="profiler-show-globalvar">Global variables</a></span></div>';
             $str .= '<div id="profiler-query"><table><tr style="font-weight:bold; border-top:1px solid black;">'
                     . '<td colspan=5>Query</td><td>Execution time [s]</td><td>Returned rows</td><td colspan=6>Backtrace</td></tr>';
-            
+
             foreach ($this->_dbData as $key => $value) {
                 $str .= '<tr>';
                 $str .= "<td colspan=5 width='40%'>{$value['query']}</td>";
                 $str .= "<td>{$value['execTime']}</td>";
                 $str .= "<td>{$value['totalRows']}</td>";
                 $str .= "<td colspan=6 class=\"backtrace\"><div>";
-                foreach ($value['backTrace'] as $key => $trace){
-                    isset($trace['file'])? $file = $trace['file']: $file = '';
-                    isset($trace['line'])? $line = $trace['line']: $line = '';
-                    isset($trace['class'])? $class = $trace['class']: $class = '';
-                    $str .= $key.' '.$file.':'.$line.':'.$class.':'.$trace['function']."<br/>";
+                foreach ($value['backTrace'] as $key => $trace) {
+                    isset($trace['file']) ? $file = $trace['file'] : $file = '';
+                    isset($trace['line']) ? $line = $trace['line'] : $line = '';
+                    isset($trace['class']) ? $class = $trace['class'] : $class = '';
+                    $str .= $key . ' ' . $file . ':' . $line . ':' . $class . ':' . $trace['function'] . "<br/>";
                 }
                 $str .= "</div></td></tr>";
             }
             $str .= '</table></div>';
-            
+
             $str .= '<div id="profiler-globalvar"><table>';
+            $str .= '<tr><td colspan=2>SESSION</td></tr>';
+            foreach ($_SESSION as $key => $value) {
+                if (is_array($value)) {
+                    $str .= '<tr><td>' . $key . '</td><td>' . $value[0] . '</td></tr>';
+                } else {
+                    $str .= '<tr><td>' . $key . '</td><td>' . $value . '</td></tr>';
+                }
+            }
+            $str .= '</table><table>';
             $str .= '<tr><td colspan=2>POST</td></tr>';
             foreach ($_POST as $key => $value) {
-                $str .= '<tr><td>'.$key.'</td><td>'.$value.'</td></tr>';
+                $str .= '<tr><td>' . $key . '</td><td>' . $value . '</td></tr>';
             }
             $str .= '</table><table>';
             $str .= '<tr><td colspan=2>GET</td></tr>';
             foreach ($_GET as $key => $value) {
-                $str .= '<tr><td>'.$key.'</td><td>'.$value.'</td></tr>';
+                $str .= '<tr><td>' . $key . '</td><td>' . $value . '</td></tr>';
             }
             $str .= '</table></div>';
-            $str .= '</div><script type="text/javascript" src="/public/js/custom/profiler.min.js"></script>';
-            \THCFrame\Core\Core::log($str, 'profiler.log', true, false);
+            $str .= '</div><script type="text/javascript" src="/public/js/plugins/profiler.min.js"></script>';
 
+            file_put_contents('./application/logs/profiler.log', $str);
         } else {
             return;
         }
@@ -185,7 +192,7 @@ class Profiler
             return;
         }
     }
-    
+
     /**
      * 
      */
@@ -194,17 +201,9 @@ class Profiler
         if ($this->_enabled) {
             $fileContent = file_get_contents('./application/logs/profiler.log');
             return $fileContent;
-        }else{
+        } else {
             return '';
         }
-    }
-
-    /**
-     * 
-     */
-    public function __destruct()
-    {
-        Event::fire('framework.profiler.destruct');
     }
 
 }

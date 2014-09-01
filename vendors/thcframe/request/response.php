@@ -2,8 +2,8 @@
 
 namespace THCFrame\Request;
 
-use THCFrame\Core\Base as Base;
-use THCFrame\Request\Exception as Exception;
+use THCFrame\Core\Base;
+use THCFrame\Request\Exception;
 
 /**
  * Class accepts a response constructor option, which is the result of an HTTP request. 

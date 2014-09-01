@@ -54,6 +54,7 @@
             {if $isPM}
                 <li><a href="#assignedUsers">Assigned users</a></li>
                 <li><a href="#financial">Expences</a></li>
+                <li><a href="#timelog">Logged time</a></li>
             {/if}
         </ul>
 
@@ -125,6 +126,11 @@
                 <div class="form-row">
                     <p class="form-label">Planned end date</p>
                     <div class="form-item">{echo $project->getPlannedEnd()}</div>
+                </div>
+                <div class="form-row">
+                    <p class="form-label">Spent time [d h:m]</p>
+                    {script $time = $project->getTotalSpentTime()}
+                    <div class="form-item">{echo date("d H:i", mktime(0, $time->sptime, 0, 0, 0, 0))}</div>
                 </div>
                 <div class="form-row">
                     <p class="form-label">Priority [1 - Low]</p>
@@ -276,9 +282,10 @@
                     <thead>
                         <tr>
                             <th>Title</th>
-                            <th>Created</th><th>Quantity</th>
-                            <th>Measure units</th><th>Total price</th>
-                            <th>Created by</th><th>&nbsp;</th>
+                            <th>Created</th>
+                            <th>Total price</th>
+                            <th>Created by</th>
+                            <th>&nbsp;</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -288,8 +295,6 @@
                                 <tr>
                                     <td>{echo $budget->getTitle()}</td>
                                     <td>{echo $budget->getCreated()}</td>
-                                    <td>{echo $budget->getQuantity()}</td>
-                                    <td>{echo $budget->getMu()}</td>
                                     <td>{echo $budget->getTotalPrice()}</td>
                                     <td>{echo $budget->fname." ".$budget->lname}</td>
                                     <td>
@@ -297,6 +302,32 @@
                                         <a class="button-edit" href="/budget/edit/{echo $budget->getId()}">Edit</a>
                                         <a class="button-delete ajax-dialog" href="/budget/delete/{echo $budget->getId()}">Delete</a>
                                     </td>
+                                </tr>
+                            {/foreach}
+                        {/if}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div id="timelog">
+            <div class="box-head"><h2>Logged time</h2></div>
+            <div class="box-content no-pad">
+                <table class="stdtable display">
+                    <thead>
+                        <tr>
+                            <th>Firstname</th>
+                            <th>Lastname</th>
+                            <th>Spent time [d h:m]</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {script $sptime = $project->getTimePerUser()}
+                        {if !empty($sptime)}
+                            {foreach $tm in $sptime}
+                                <tr>
+                                    <td>{echo $tm->getFirstname()}</td>
+                                    <td>{echo $tm->getLastname()}</td>
+                                    <td>{echo date("d H:i", mktime(0, $tm->getSptime(), 0, 0, 0, 0))}</td>
                                 </tr>
                             {/foreach}
                         {/if}

@@ -1,9 +1,9 @@
 <?php
 
-namespace THCFrame\Security;
+namespace THCFrame\Security\Authorization;
 
-use THCFrame\Core\Base as Base;
-use THCFrame\Security\Exception as Exception;
+use THCFrame\Core\Base;
+use THCFrame\Security\Exception;
 
 /**
  * Description of RoleManager

@@ -2,10 +2,11 @@
 
 namespace THCFrame\Database;
 
-use THCFrame\Core\Base as Base;
-use THCFrame\Core\ArrayMethods as ArrayMethods;
-use THCFrame\Core\StringMethods as StringMethods;
+use THCFrame\Core\Base;
+use THCFrame\Core\ArrayMethods;
+use THCFrame\Core\StringMethods;
 use THCFrame\Database\Exception as Exception;
+use THCFrame\Core\Core;
 
 /**
  * Description of Query
@@ -364,9 +365,10 @@ class Query extends Base
 
         if ($result === false) {
             if (ENV == 'dev') {
-                \THCFrame\Core\Core::log($sql);
+                Core::getLogger()->logError($sql);
                 throw new Exception\Sql(sprintf('SQL: %s', $this->connector->getLastError()));
             } else {
+                Core::getLogger()->logError($sql);
                 throw new Exception\Sql('There was an error with your SQL query');
             }
         }
@@ -390,8 +392,10 @@ class Query extends Base
 
         if ($result === false) {
             if (ENV == 'dev') {
+                Core::getLogger()->logError($sql);
                 throw new Exception\Sql(sprintf('SQL: %s', $this->connector->getLastError()));
             } else {
+                Core::getLogger()->logError($sql);
                 throw new Exception\Sql('There was an error with your SQL query');
             }
         }
@@ -431,11 +435,7 @@ class Query extends Base
      */
     public function join($join, $on, $alias = null, $fields = array('*'))
     {
-        if (empty($join)) {
-            throw new Exception\Argument('Invalid argument');
-        }
-
-        if (empty($on)) {
+        if (empty($join) || empty($on)) {
             throw new Exception\Argument('Invalid argument');
         }
 
@@ -450,6 +450,56 @@ class Query extends Base
         return $this;
     }
 
+    /**
+     * 
+     * @param type $join
+     * @param type $on
+     * @param type $fields
+     * @return \THCFrame\Database\Query
+     * @throws Exception\Argument
+     */
+    public function leftjoin($join, $on, $alias = null, $fields = array('*'))
+    {
+        if (empty($join) || empty($on)) {
+            throw new Exception\Argument('Invalid argument');
+        }
+
+        if (NULL !== $alias) {
+            $this->_fields += array($alias => $fields);
+            $this->_join[] = "LEFT JOIN {$join} {$alias} ON {$on}";
+        } else {
+            $this->_fields += array($join => $fields);
+            $this->_join[] = "LEFT JOIN {$join} ON {$on}";
+        }
+
+        return $this;
+    }
+
+    /**
+     * 
+     * @param type $join
+     * @param type $on
+     * @param type $fields
+     * @return \THCFrame\Database\Query
+     * @throws Exception\Argument
+     */
+    public function rightjoin($join, $on, $alias = null, $fields = array('*'))
+    {
+        if (empty($join) || empty($on)) {
+            throw new Exception\Argument('Invalid argument');
+        }
+
+        if (NULL !== $alias) {
+            $this->_fields += array($alias => $fields);
+            $this->_join[] = "RIGHT JOIN {$join} {$alias} ON {$on}";
+        } else {
+            $this->_fields += array($join => $fields);
+            $this->_join[] = "RIGHT JOIN {$join} ON {$on}";
+        }
+
+        return $this;
+    }
+    
     /**
      * 
      * @param type $limit

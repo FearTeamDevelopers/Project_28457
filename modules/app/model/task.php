@@ -354,7 +354,8 @@ class App_Model_Task extends Model
                 ->where('tk.taskType = ?', (string) $this->getTaskType())
                 ->where('tk.projectId = ?', $this->getProjectId())
                 ->where('tk.active = ?', true)
-                ->where('tk.deleted = ?', false);
+                ->where('tk.deleted = ?', false)
+                ->order('tk.title', 'ASC');
         $tasks = self::initialize($taskQuery);
 
         return $tasks;

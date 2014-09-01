@@ -4,7 +4,6 @@ use App\Etc\Controller;
 use THCFrame\Request\RequestMethods;
 use THCFrame\Events\Events as Event;
 use THCFrame\Registry\Registry;
-use THCFrame\Core\StringMethods;
 use THCFrame\Filesystem\FileManager;
 use THCFrame\Core\ArrayMethods;
 
@@ -14,6 +13,22 @@ use THCFrame\Core\ArrayMethods;
 class App_Controller_Project extends Controller
 {
 
+    /**
+     * 
+     * @param type $key
+     * @return boolean
+     */
+    private function _checkUrlKey($key)
+    {
+        $status = App_Model_Project::first(array('urlKey = ?' => $key));
+
+        if ($status === null) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+    
     /**
      * @before _secured, _developer
      */
@@ -95,7 +110,9 @@ class App_Controller_Project extends Controller
                 ->set('nextstates', $nextStates);
 
         if (RequestMethods::post('submitSendMess')) {
-            $this->checkToken();
+            if($this->checkToken() !== true){
+                self::redirect('/project');
+            }
             
             $chatMessage = new App_Model_ProjectChat(array(
                 'projectId' => $project->getId(),
@@ -133,10 +150,16 @@ class App_Controller_Project extends Controller
                 ->set('clients', $clients);
 
         if (RequestMethods::post('submitAddProject')) {
-            $this->checkToken();
+            if($this->checkToken() !== true){
+                self::redirect('/project');
+            }
+            $errors = array();
             
-            $urlKey = strtolower(
-                    str_replace(' ', '-', StringMethods::removeDiacriticalMarks(RequestMethods::post('projname'))));
+            $urlKey = $this->_createUrlKey(RequestMethods::post('projname'));
+            
+            if (!$this->_checkUrlKey($urlKey)) {
+                $errors['title'] = array('This title is already used');
+            }
 
             $project = new App_Model_Project(array(
                 'managerId' => RequestMethods::post('manager'),
@@ -154,7 +177,7 @@ class App_Controller_Project extends Controller
                 'priority' => RequestMethods::post('priority', 1)
             ));
 
-            if ($project->validate()) {
+            if (empty($errors) && $project->validate()) {
                 $prId = $project->save();
 
                 $projectUser = new App_Model_ProjectUser(array(
@@ -182,7 +205,7 @@ class App_Controller_Project extends Controller
             } else {
                 Event::fire('app.log', array('fail'));
                 $view->set('project', $project)
-                        ->set('errors', $project->getErrors());
+                        ->set('errors', $errors + $project->getErrors());
             }
         }
     }
@@ -210,7 +233,9 @@ class App_Controller_Project extends Controller
         $view->set('projectid', $project->getId());
         
         if (RequestMethods::post('uploadFile')) {
-            $this->checkToken();
+            if($this->checkToken() !== true){
+                self::redirect('/project');
+            }
             
             $fileManager = new FileManager(array(
                 'thumbWidth' => $this->loadConfigFromDb('thumb_width'),
@@ -291,10 +316,16 @@ class App_Controller_Project extends Controller
                 ->set('clients', $clients);
 
         if (RequestMethods::post('submitEditProject')) {
-            $this->checkToken();
+            if($this->checkToken() !== true){
+                self::redirect('/project');
+            }
+            $errors = array();
             
-            $urlKey = strtolower(
-                    str_replace(' ', '-', StringMethods::removeDiacriticalMarks(RequestMethods::post('projname'))));
+            $urlKey = $this->_createUrlKey(RequestMethods::post('projname'));
+            
+            if($project->urlKey != $urlKey && !$this->_checkUrlKey($urlKey)){
+                $errors['title'] = array('This title is already used');
+            }
 
             $project->managerId = RequestMethods::post('manager');
             $project->clientId = RequestMethods::post('client');
@@ -310,7 +341,7 @@ class App_Controller_Project extends Controller
             $project->plannedEnd = RequestMethods::post('plannedEnd');
             $project->priority = RequestMethods::post('priority', 1);
 
-            if ($project->validate()) {
+            if (empty($errors) && $project->validate()) {
                 $project->save();
 
                 Event::fire('app.log', array('success', 'Project id: ' . $project->getId()));
@@ -319,7 +350,7 @@ class App_Controller_Project extends Controller
             } else {
                 Event::fire('app.log', array('fail', 'Project id: ' . $project->getId()));
                 $view->set('project', $project)
-                        ->set('errors', $project->getErrors());
+                        ->set('errors', $errors + $project->getErrors());
             }
         }
     }
@@ -338,7 +369,9 @@ class App_Controller_Project extends Controller
         }
 
         if (RequestMethods::post('performProjectUserAction')) {
-            $this->checkToken();
+            if($this->checkToken() !== true){
+                self::redirect('/project');
+            }
             
             $errors = array();
             $uids = RequestMethods::post('projectusersids');
@@ -390,7 +423,7 @@ class App_Controller_Project extends Controller
             return;
         }
         
-        if ($this->checkTokenAjax()) {
+        if ($this->checkToken()) {
             $projectUser = App_Model_ProjectUser::first(
                             array(
                                 'projectId = ?' => $projectId,
@@ -409,7 +442,7 @@ class App_Controller_Project extends Controller
                 echo 'An error has occured';
             }
         } else {
-            echo 'Security token is not valid';
+            echo 'Oops, something went wrong';
         }
     }
 
@@ -472,7 +505,9 @@ class App_Controller_Project extends Controller
         $view->set('project', $project);
         
         if(RequestMethods::post('submitDeleteProject')){
-            $this->checkToken();
+            if($this->checkToken() !== true){
+                self::redirect('/project');
+            }
             $project->deleted = true;
             
             if($project->validate()){
@@ -497,7 +532,7 @@ class App_Controller_Project extends Controller
         $this->willRenderActionView = false;
         $this->willRenderLayoutView = false;
 
-        if ($this->checkTokenAjax()) {
+        if ($this->checkToken()) {
             $project = App_Model_Project::first(array('id = ?' => (int) $id));
 
             if ($project === null) {
@@ -516,7 +551,7 @@ class App_Controller_Project extends Controller
                 echo 'An error occured while undeleting the project';
             }
         } else {
-            echo 'Security token is not valid';
+            echo 'Oops, something went wrong';
         }
     }
 
@@ -530,7 +565,10 @@ class App_Controller_Project extends Controller
         $errorsIds = array();
 
         if (RequestMethods::post('performProjectAction')) {
-            $this->checkToken();
+            if($this->checkToken() !== true){
+                self::redirect('/project');
+            }
+            
             $ids = RequestMethods::post('projectsids');
             $action = RequestMethods::post('action');
 
@@ -553,10 +591,10 @@ class App_Controller_Project extends Controller
                     }
 
                     if (empty($errors)) {
-                        Event::fire('admin.log', array('activate success', 'Project ids: ' . join(',', $ids)));
+                        Event::fire('app.log', array('activate success', 'Project ids: ' . join(',', $ids)));
                         $view->successMessage('Projects have been activated successfully');
                     } else {
-                        Event::fire('admin.log', array('activate fail', 'Project ids: ' . join(',', $errorsIds)));
+                        Event::fire('app.log', array('activate fail', 'Project ids: ' . join(',', $errorsIds)));
                         $message = join(PHP_EOL, $errors);
                         $view->longFlashMessage($message);
                     }
@@ -581,10 +619,10 @@ class App_Controller_Project extends Controller
                     }
 
                     if (empty($errors)) {
-                        Event::fire('admin.log', array('deactivate success', 'Project ids: ' . join(',', $ids)));
+                        Event::fire('app.log', array('deactivate success', 'Project ids: ' . join(',', $ids)));
                         $view->successMessage('Projects have been deactivated successfully');
                     } else {
-                        Event::fire('admin.log', array('deactivate fail', 'Project ids: ' . join(',', $errorsIds)));
+                        Event::fire('app.log', array('deactivate fail', 'Project ids: ' . join(',', $errorsIds)));
                         $message = join(PHP_EOL, $errors);
                         $view->longFlashMessage($message);
                     }

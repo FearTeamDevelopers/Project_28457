@@ -2,11 +2,10 @@
 
 namespace THCFrame\Core;
 
-use THCFrame\Core\Inspector as Inspector;
-use THCFrame\Core\ArrayMethods as ArrayMethods;
-use THCFrame\Core\StringMethods as StringMethods;
+use THCFrame\Core\Inspector;
+use THCFrame\Core\StringMethods;
 use THCFrame\Core\Exception as Exception;
-use THCFrame\Registry\Registry as Registry;
+use THCFrame\Registry\Registry;
 use THCFrame\Configuration\Model\Config as Config;
 
 /**

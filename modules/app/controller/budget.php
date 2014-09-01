@@ -51,7 +51,9 @@ class App_Controller_Budget extends Controller
         $view->set('projectid', $project->getId());
 
         if(RequestMethods::post('submitAddBudget')){
-            $this->checkToken();
+            if($this->checkToken() !== true){
+                self::redirect('/project');
+            }
             
             $budget = new App_Model_ProjectBudget(array(
                 'projectId' => $project->getId(),
@@ -96,7 +98,9 @@ class App_Controller_Budget extends Controller
         $view->set('budget', $budgetRec);
         
         if(RequestMethods::post('submitEditBudget')){
-            $this->checkToken();
+            if($this->checkToken() !== true){
+                self::redirect('/project');
+            }
             
             $budgetRec->title = RequestMethods::post('title');
             $budgetRec->description = RequestMethods::post('description');
@@ -137,7 +141,10 @@ class App_Controller_Budget extends Controller
         $view->set('budget', $budget);
         
         if(RequestMethods::post('submitDeleteBudget')){
-            $this->checkToken();
+            if($this->checkToken() !== true){
+                self::redirect('/project');
+            }
+            
             $budget->deleted = true;
             
             if($budget->validate()){
@@ -182,7 +189,7 @@ class App_Controller_Budget extends Controller
                 echo 'An error occured while undeleting the record';
             }
         } else {
-            echo 'Security token is not valid';
+            echo 'Oops, something went wrong';
         }
     }
 

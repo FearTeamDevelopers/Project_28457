@@ -2,8 +2,8 @@
 
 namespace THCFrame\Filesystem;
 
-use THCFrame\Core\Base as Base;
-use THCFrame\Filesystem\Exception as Exception;
+use THCFrame\Core\Base;
+use THCFrame\Filesystem\Exception;
 use THCFrame\Registry\Registry;
 use THCFrame\Filesystem\Image;
 use THCFrame\Filesystem\File;
@@ -69,7 +69,7 @@ class FileManager extends Base
     {
         parent::__construct($options);
 
-        $configuration = Registry::get('config');
+        $configuration = Registry::get('configuration');
 
         if (!empty($configuration->files)) {
             $this->_pathToDocs = trim($configuration->files->pathToDocuments, '/');

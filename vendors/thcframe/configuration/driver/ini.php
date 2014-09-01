@@ -2,10 +2,10 @@
 
 namespace THCFrame\Configuration\Driver;
 
-use THCFrame\Registry\Registry as Registry;
-use THCFrame\Core\ArrayMethods as ArrayMethods;
 use THCFrame\Configuration as Configuration;
-use THCFrame\Configuration\Exception as Exception;
+use THCFrame\Configuration\Exception;
+use THCFrame\Core\ArrayMethods;
+use THCFrame\Registry\Registry;
 
 /**
  * Description of Ini
@@ -15,8 +15,18 @@ use THCFrame\Configuration\Exception as Exception;
 class Ini extends Configuration\Driver
 {
 
-    private $_defaultConfig;
+    /**
+     * @readwrite
+     * @var type 
+     */
+    private $_parsed;
 
+    /**
+     * @readwrite
+     * @var type 
+     */
+    private $_defaultConfig;
+    
     /**
      * Class constructor
      * 
@@ -26,22 +36,25 @@ class Ini extends Configuration\Driver
     {
         parent::__construct($options);
 
-        $this->parseDefaultCofiguration('./vendors/thcframe/configuration/default/defaultConfig.ini');
+        $this->_parseDefault('./vendors/thcframe/configuration/default/defaultConfig.ini');
 
         switch ($this->getEnv()) {
             case 'dev': {
-                    $this->parse('./application/configuration/config_dev.ini');
+                    $this->_parse('./application/configuration/config_dev.ini');
                     break;
                 }
             case 'qa': {
-                    $this->parse('./application/configuration/config_qa.ini');
+                    $this->_parse('./application/configuration/config_qa.ini');
                     break;
                 }
             case 'live': {
-                    $this->parse('./application/configuration/config_live.ini');
+                    $this->_parse('./application/configuration/config_live.ini');
                     break;
                 }
         }
+
+        $config = $this->_mergeConfiguration();
+        Registry::set('configuration', ArrayMethods::toObject($config));
     }
 
     /**
@@ -50,7 +63,7 @@ class Ini extends Configuration\Driver
      * 
      * @return type
      */
-    private function mergeConfiguration()
+    protected function _mergeConfiguration()
     {
         return array_replace_recursive($this->_defaultConfig, $this->_parsed);
     }
@@ -61,7 +74,7 @@ class Ini extends Configuration\Driver
      * 
      * @param string $path
      */
-    protected function parseDefaultCofiguration($path)
+    protected function _parseDefault($path)
     {
         if (empty($path) || !file_exists($path)) {
             throw new Exception\Argument('Path argument is not valid');
@@ -134,7 +147,7 @@ class Ini extends Configuration\Driver
      * @throws Exception\Argument
      * @throws Exception\Syntax
      */
-    public function parse($path)
+    protected function _parse($path)
     {
         if (empty($path) || !file_exists($path)) {
             throw new Exception\Argument('Path argument is not valid');
@@ -160,14 +173,6 @@ class Ini extends Configuration\Driver
 
             $this->_parsed = $config;
         }
-
-        $merged = $this->mergeConfiguration();
-        $configObject = ArrayMethods::toObject($merged);
-
-        Registry::set('config', $configObject);
-        Registry::set('dateformat', $configObject->system->dateformat);
-
-        return $configObject;
     }
 
 }

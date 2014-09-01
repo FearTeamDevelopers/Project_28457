@@ -104,4 +104,37 @@ class App_Model_TaskTime extends Model
         $this->setModified(date('Y-m-d H:i:s'));
     }
 
+    /**
+     * 
+     * @param type $projectId
+     */
+    public static function fetchTotalUserTimeByProject($projectId)
+    {
+        $timeQuery = self::getQuery(array('SUM(tt.spentTime)' => 'sptime'))
+                ->join('tb_task', 'tt.taskId = tk.id', 'tk', 
+                        array('tk.projectId'))
+                ->join('tb_user', 'tt.userId = us.id', 'us', 
+                        array('us.id' => 'usId', 'us.firstname', 'us.lastname'))
+                ->where('tk.projectId = ?', (int)$projectId)
+                ->where('tk.deleted = ?', false)
+                ->groupby('usId');
+        
+        return self::initialize($timeQuery);
+    }
+    
+        /**
+     * 
+     * @param type $projectId
+     */
+    public static function fetchTotalTimeByProject($projectId)
+    {
+        $timeQuery = self::getQuery(array('SUM(tt.spentTime)' => 'sptime'))
+                ->join('tb_task', 'tt.taskId = tk.id', 'tk', 
+                        array('tk.projectId'))
+                ->where('tk.projectId = ?', (int)$projectId)
+                ->where('tk.deleted = ?', false);
+
+        $time = self::initialize($timeQuery);
+        return array_shift($time);
+    }
 }

@@ -2,11 +2,10 @@
 
 namespace THCFrame\Router;
 
-use THCFrame\Core\Base as Base;
-use THCFrame\Core\Core as Core;
-use THCFrame\Events\Events as Events;
-use THCFrame\Router\Exception as Exception;
-use THCFrame\Router\Route as Route;
+use THCFrame\Core\Base;
+use THCFrame\Events\Events as Event;
+use THCFrame\Router\Exception;
+use THCFrame\Router\Route;
 
 /**
  * Description of Router
@@ -94,15 +93,12 @@ class Router extends Base
     {
         parent::__construct($options);
 
+        Event::fire('framework.router.construct.before');
+
         $this->_createRoutes(self::$_defaultRoutes);
 
-        $modules = Core::getModules();
-
-        foreach ($modules as $module) {
-            $routes = $module->getModuleRoutes();
-            $this->_createRoutes($routes);
-        }
-
+        Event::fire('framework.router.construct.after', array($this));
+        
         $this->_findRoute($this->_url);
     }
 
@@ -119,7 +115,7 @@ class Router extends Base
     /**
      * Method creates routes based on Module routes variable
      */
-    private function _createRoutes($routes)
+    private function _createRoutes(array $routes)
     {
         foreach ($routes as $route) {
             $new_route = new Route\Dynamic(array('pattern' => $route['pattern']));
@@ -165,7 +161,7 @@ class Router extends Base
      */
     private function _findRoute($path)
     {
-        Events::fire('framework.router.findroute.before', array($path));
+        Event::fire('framework.router.findroute.before', array($path));
 
         foreach ($this->_routes as $route) {
             if (TRUE === $route->matchMap($path)) {
@@ -174,7 +170,7 @@ class Router extends Base
             }
         }
 
-        Events::fire('framework.router.findroute.after', array(
+        Event::fire('framework.router.findroute.after', array(
             $path,
             $this->_lastRoute->getModule(),
             $this->_lastRoute->getController(),
@@ -225,6 +221,15 @@ class Router extends Base
         }
 
         return $list;
+    }
+
+    /**
+     * 
+     * @param array $routes
+     */
+    public function createRoutes(array $routes)
+    {
+        $this->_createRoutes($routes);
     }
 
 }

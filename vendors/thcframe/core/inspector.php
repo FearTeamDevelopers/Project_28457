@@ -2,8 +2,8 @@
 
 namespace THCFrame\Core;
 
-use THCFrame\Core\ArrayMethods as ArrayMethods;
-use THCFrame\Core\StringMethods as StringMethods;
+use THCFrame\Core\ArrayMethods;
+use THCFrame\Core\StringMethods;
 
 /**
  * Description of Inspector

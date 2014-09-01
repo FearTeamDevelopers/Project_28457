@@ -23,7 +23,10 @@ class App_Controller_Note extends Controller
         $view->set('notes', $notes);
         
         if(RequestMethods::post('submitAddNote')){
-            $this->checkToken();
+            if($this->checkToken() !== true){
+                self::redirect('/note');
+            }
+            
             $note = new App_Model_Note(array(
                 'userId' => $this->getUser()->getId(),
                 'title' => RequestMethods::post('title'),
@@ -63,7 +66,9 @@ class App_Controller_Note extends Controller
         $view->set('note', $note);
         
         if(RequestMethods::post('submitEditNote')){
-            $this->checkToken();
+            if($this->checkToken() !== true){
+                self::redirect('/note');
+            }
             
             $note->title = RequestMethods::post('title');
             $note->body = RequestMethods::post('text');
@@ -91,7 +96,7 @@ class App_Controller_Note extends Controller
         $this->willRenderActionView = false;
         $this->willRenderLayoutView = false;
 
-        if ($this->checkTokenAjax()) {
+        if ($this->checkToken()) {
             $note = App_Model_Note::first(
                             array('id = ?' => (int) $id, 'userId = ?' => $this->getUser()->getId()));
 
@@ -107,7 +112,7 @@ class App_Controller_Note extends Controller
                 echo 'An error occured while deleting the note';
             }
         } else {
-            echo 'Security token is not valid';
+            echo 'Oops, something went wrong';
         }
     }
 

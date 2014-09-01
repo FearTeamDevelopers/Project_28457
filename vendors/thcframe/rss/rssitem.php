@@ -2,8 +2,7 @@
 
 namespace THCFrame\Rss;
 
-use THCFrame\Core\Base as Base;
-use THCFrame\Events\Events as Events;
+use THCFrame\Core\Base;
 
 /**
  * 

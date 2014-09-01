@@ -2,8 +2,8 @@
 
 namespace THCFrame\Router;
 
-use THCFrame\Core\Base as Base;
-use THCFrame\Router\Exception as Exception;
+use THCFrame\Core\Base;
+use THCFrame\Router\Exception;
 
 /**
  * Description of Route

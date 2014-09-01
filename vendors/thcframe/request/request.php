@@ -2,11 +2,11 @@
 
 namespace THCFrame\Request;
 
-use THCFrame\Core\Base as Base;
-use THCFrame\Events\Events as Events;
-use THCFrame\Core\StringMethods as StringMethods;
-use THCFrame\Request\RequestMethods as RequestMethods;
-use THCFrame\Request\Exception as Exception;
+use THCFrame\Core\Base;
+use THCFrame\Events\Events as Event;
+use THCFrame\Core\StringMethods;
+use THCFrame\Request\RequestMethods;
+use THCFrame\Request\Exception;
 
 /**
  * Class represents the different types of request methods, but ultimately they all call the
@@ -253,7 +253,7 @@ class Request extends Base
     {
         session_write_close();
 
-        Events::fire('framework.request.request.before', array($method, $url, $parameters));
+        Event::fire('framework.request.request.before', array($method, $url, $parameters));
 
         $request = $this->_request = curl_init();
 
@@ -279,7 +279,7 @@ class Request extends Base
             throw new Exception\Response(ucfirst(curl_error($request)));
         }
 
-        Events::fire('framework.request.request.after', array($method, $url, $parameters, $response));
+        Event::fire('framework.request.request.after', array($method, $url, $parameters, $response));
 
         curl_close($request);
         return $response;

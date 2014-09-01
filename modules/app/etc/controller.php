@@ -2,10 +2,11 @@
 
 namespace App\Etc;
 
-use THCFrame\Events\Events as Events;
-use THCFrame\Registry\Registry as Registry;
+use THCFrame\Events\Events;
+use THCFrame\Registry\Registry;
 use THCFrame\Controller\Controller as BaseController;
 use THCFrame\Request\RequestMethods;
+use THCFrame\Core\StringMethods;
 
 /**
  * Module specific controller class extending framework controller class
@@ -19,14 +20,26 @@ class Controller extends BaseController
 
     /**
      * 
+     * @param type $string
+     * @return type
+     */
+    protected function _createUrlKey($string)
+    {
+        $string = StringMethods::removeDiacriticalMarks($string);
+        $string = str_replace(array('.', ',', '_', '(', ')', '[', ']', '|', ' '), '-', $string);
+        $string = str_replace(array('?', '!', '@', '&', '*', ':', '+', '=', '~', '°', '´', '`', '%', "'", '"'), '', $string);
+        $string = trim($string);
+        $string = trim($string, '-');
+        return strtolower($string);
+    }
+    
+    /**
+     * 
      * @param type $options
      */
     public function __construct($options = array())
     {
         parent::__construct($options);
-
-        $database = Registry::get('database');
-        $database->connect();
 
         $this->_security = Registry::get('security');
 
@@ -43,8 +56,6 @@ class Controller extends BaseController
     public function _secured()
     {
         $session = Registry::get('session');
-        $lastActive = $session->get('lastActive');
-
         $user = $this->getUser();
 
         if (!$user) {
@@ -52,7 +63,7 @@ class Controller extends BaseController
         }
 
         //6h inactivity till logout
-        if ($lastActive > time() - 21600) {
+        if ($session->get('lastActive') > time() - 300) {
             $session->set('lastActive', time());
         } else {
             $view = $this->getActionView();
@@ -70,8 +81,8 @@ class Controller extends BaseController
     {
         $view = $this->getActionView();
 
-        if ($this->_security->getUser() && !$this->_security->isGranted('role_client')) {
-            $view->infoMessage('Access denied! Client access level required.');
+        if ($this->_security->getUser() && $this->_security->isGranted('role_client') !== true) {
+            $view->infoMessage('Access denied');
             $this->_security->logout();
             self::redirect('/login');
         }
@@ -83,7 +94,7 @@ class Controller extends BaseController
      */
     protected function isClient()
     {
-        if ($this->_security->getUser() && $this->_security->isGranted('role_client')) {
+        if ($this->_security->getUser() && $this->_security->isGranted('role_client') === true) {
             return true;
         } else {
             return false;
@@ -97,8 +108,8 @@ class Controller extends BaseController
     {
         $view = $this->getActionView();
 
-        if ($this->_security->getUser() && !$this->_security->isGranted('role_developer')) {
-            $view->infoMessage('Access denied! Developer access level required.');
+        if ($this->_security->getUser() && $this->_security->isGranted('role_developer') !== true) {
+            $view->infoMessage('Access denied');
             $this->_security->logout();
             self::redirect('/login');
         }
@@ -110,7 +121,7 @@ class Controller extends BaseController
      */
     protected function isDeveloper()
     {
-        if ($this->_security->getUser() && $this->_security->isGranted('role_developer')) {
+        if ($this->_security->getUser() && $this->_security->isGranted('role_developer') === true) {
             return true;
         } else {
             return false;
@@ -124,8 +135,8 @@ class Controller extends BaseController
     {
         $view = $this->getActionView();
 
-        if ($this->_security->getUser() && !$this->_security->isGranted('role_projectmanager')) {
-            $view->infoMessage('Access denied! Project manager access level required.');
+        if ($this->_security->getUser() && $this->_security->isGranted('role_projectmanager') !== true) {
+            $view->infoMessage('Access denied');
             $this->_security->logout();
             self::redirect('/login');
         }
@@ -137,7 +148,7 @@ class Controller extends BaseController
      */
     protected function isProjectManager()
     {
-        if ($this->_security->getUser() && $this->_security->isGranted('role_projectmanager')) {
+        if ($this->_security->getUser() && $this->_security->isGranted('role_projectmanager') === true) {
             return true;
         } else {
             return false;
@@ -151,8 +162,8 @@ class Controller extends BaseController
     {
         $view = $this->getActionView();
 
-        if ($this->_security->getUser() && !$this->_security->isGranted('role_admin')) {
-            $view->infoMessage('Access denied! Administrator access level required.');
+        if ($this->_security->getUser() && $this->_security->isGranted('role_admin') !== true) {
+            $view->infoMessage('Access denied');
             $this->_security->logout();
             self::redirect('/login');
         }
@@ -164,7 +175,7 @@ class Controller extends BaseController
      */
     protected function isAdmin()
     {
-        if ($this->_security->getUser() && $this->_security->isGranted('role_admin')) {
+        if ($this->_security->getUser() && $this->_security->isGranted('role_admin') === true) {
             return true;
         } else {
             return false;
@@ -178,8 +189,8 @@ class Controller extends BaseController
     {
         $view = $this->getActionView();
 
-        if ($this->_security->getUser() && !$this->_security->isGranted('role_superadmin')) {
-            $view->infoMessage('Access denied! Super admin access level required.');
+        if ($this->_security->getUser() && $this->_security->isGranted('role_superadmin') !== true) {
+            $view->infoMessage('Access denied');
             $this->_security->logout();
             self::redirect('/login');
         }
@@ -191,7 +202,7 @@ class Controller extends BaseController
      */
     protected function isSuperAdmin()
     {
-        if ($this->_security->getUser() && $this->_security->isGranted('role_superadmin')) {
+        if ($this->_security->getUser() && $this->_security->isGranted('role_superadmin') === true) {
             return true;
         } else {
             return false;
@@ -240,28 +251,56 @@ class Controller extends BaseController
     /**
      * 
      */
-    public function checkToken()
+    public function mutliSubmissionProtectionToken()
     {
         $session = Registry::get('session');
-        //$security = Registry::get('security');
-        $view = $this->getActionView();
+        $token = $session->get('submissionprotection');
 
-        if (base64_decode(RequestMethods::post('tk')) !== $session->get('csrftoken')) {
-            $view->errorMessage('Security token is not valid');
-            //$security->logout();
-            self::redirect('/');
+        if ($token === null) {
+            $token = md5(microtime());
+            $session->set('submissionprotection', $token);
         }
+
+        return $token;
     }
-    
+
     /**
      * 
-     * @return boolean
+     * @return type
      */
-    public function checkTokenAjax()
+    public function revalidateMutliSubmissionProtectionToken()
     {
         $session = Registry::get('session');
+        $session->erase('submissionprotection');
+        $token = md5(microtime());
+        $session->set('submissionprotection', $token);
+        
+        return $token;
+    }
 
-        if (base64_decode(RequestMethods::post('tk')) === $session->get('csrftoken')) {
+    /**
+     * 
+     * @param type $token
+     */
+    public function checkMutliSubmissionProtectionToken($token)
+    {
+        $session = Registry::get('session');
+        $sessionToken = $session->get('submissionprotection');
+
+        if ($token == $sessionToken) {
+            $session->erase('submissionprotection');
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    /**
+     * 
+     */
+    public function checkToken()
+    {
+        if($this->_security->checkCsrfToken(RequestMethods::post('tk'))){
             return true;
         }else{
             return false;
@@ -279,21 +318,21 @@ class Controller extends BaseController
 
         if ($view) {
             $view->set('authUser', $user);
-            $view->set('isClient', $this->_security->isGranted('role_client'))
-                    ->set('isDeveloper', $this->_security->isGranted('role_developer'))
-                    ->set('isPM', $this->_security->isGranted('role_projectmanager'))
-                    ->set('isAdmin', $this->_security->isGranted('role_admin'))
-                    ->set('isSuperAdmin', $this->_security->isGranted('role_superadmin'))
+            $view->set('isClient', $this->isClient())
+                    ->set('isDeveloper', $this->isDeveloper())
+                    ->set('isPM', $this->isProjectManager())
+                    ->set('isAdmin', $this->isAdmin())
+                    ->set('isSuperAdmin', $this->isSuperAdmin())
                     ->set('token', $this->_security->getCsrfToken());
         }
 
         if ($layoutView) {
             $layoutView->set('authUser', $user);
-            $layoutView->set('isClient', $this->_security->isGranted('role_client'))
-                    ->set('isDeveloper', $this->_security->isGranted('role_developer'))
-                    ->set('isPM', $this->_security->isGranted('role_projectmanager'))
-                    ->set('isAdmin', $this->_security->isGranted('role_admin'))
-                    ->set('isSuperAdmin', $this->_security->isGranted('role_superadmin'))
+            $layoutView->set('isClient', $this->isClient())
+                    ->set('isDeveloper', $this->isDeveloper())
+                    ->set('isPM', $this->isProjectManager())
+                    ->set('isAdmin', $this->isAdmin())
+                    ->set('isSuperAdmin', $this->isSuperAdmin())
                     ->set('token', $this->_security->getCsrfToken());
         }
 

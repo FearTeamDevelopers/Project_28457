@@ -65,11 +65,11 @@ class App_Model_Project extends Model
      * @column
      * @readwrite
      * @type text
-     * @length 100
+     * @length 200
      * @index
      * @unique
      *
-     * @validate required, alphanumeric, max(100)
+     * @validate required, alphanumeric, max(200)
      * @label url key
      */
     protected $_urlKey;
@@ -91,7 +91,7 @@ class App_Model_Project extends Model
      * @type text
      * @length 256
      *
-     * @validate required, html, max(4096)
+     * @validate required, html, max(5000)
      * @label description
      */
     protected $_description;
@@ -258,15 +258,29 @@ class App_Model_Project extends Model
     protected $_inquiries;
     
     /**
+     * @readwrite
+     * @var type 
+     */
+    protected $_timePerUser;
+    
+    /**
+     * @readwrite
+     * @var type 
+     */
+    protected $_totalSpentTime;
+    
+    /**
      * 
      */
     protected function loadProgress()
     {
         $done = App_Model_Task::count(array(
             'stateId = ?' => 15,
+            'projectId = ?' => $this->getId()
         ));
         $all = App_Model_Task::count(array(
-            'stateId IN ?' => array(9,10,11,12,13,14,15)
+            'stateId IN ?' => array(9,10,11,12,13,14,15),
+            'projectId = ?' => $this->getId()
         ));
 
         if ($all == 0 && $done == 0) {
@@ -555,6 +569,8 @@ class App_Model_Project extends Model
         $this->_tasks = App_Model_Task::fetchTaskByTypeByProject('task', $this->getId());
         $this->_bugs = App_Model_Task::fetchTaskByTypeByProject('bug', $this->getId());
         $this->_inquiries = App_Model_Task::fetchTaskByTypeByProject('inquiry', $this->getId());
+        $this->_timePerUser = App_Model_TaskTime::fetchTotalUserTimeByProject($this->getId());
+        $this->_totalSpentTime = App_Model_TaskTime::fetchTotalTimeByProject($this->getId());
         
         $this->_progress = $this->loadProgress();
         

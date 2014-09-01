@@ -2,8 +2,7 @@
 
 namespace THCFrame\Template\Implementation;
 
-use THCFrame\Template as Template;
-use THCFrame\Core\StringMethods as StringMethods;
+use THCFrame\Template;
 
 /**
  * Description of Standard

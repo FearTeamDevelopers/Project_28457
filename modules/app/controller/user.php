@@ -42,7 +42,7 @@ class App_Controller_User extends Controller
                     $security = Registry::get('security');
                     $status = $security->authenticate($email, $password);
 
-                    if ($status) {
+                    if ($status === true) {
                         $user = App_Model_User::first(array('id = ?' => $this->getUser()->getId()));
                         $user->lastLogin = date('Y-m-d H:i:s', time());
                         $user->save();
@@ -55,7 +55,7 @@ class App_Controller_User extends Controller
                     if (ENV == 'dev') {
                         $view->set('account_error', $e->getMessage());
                     } else {
-                        $view->set('account_error', 'Unknown error occured');
+                        $view->set('account_error', 'Email address and/or password are incorrect');
                     }
                 }
             }
@@ -113,7 +113,9 @@ class App_Controller_User extends Controller
                 ->set('roles', $roles);
         
         if (RequestMethods::post('submitAddUser')) {
-            $this->checkToken();
+            if($this->checkToken() !== true){
+                self::redirect('/user');
+            }
             
             if (RequestMethods::post('password') !== RequestMethods::post('password2')) {
                 $errors['password2'] = array('Paswords doesnt match');
@@ -234,7 +236,9 @@ class App_Controller_User extends Controller
         $view->set('user', $user);
         
         if (RequestMethods::post('submitUpdateProfile')) {
-            $this->checkToken();
+            if($this->checkToken() !== true){
+                self::redirect('/user');
+            }
             
             if (RequestMethods::post('password') !== RequestMethods::post('password2')) {
                 $errors['password2'] = array('Paswords doesnt match');
@@ -373,7 +377,9 @@ class App_Controller_User extends Controller
                 ->set('roles', $roles);
         
         if (RequestMethods::post('submitEditUser')) {
-            $this->checkToken();
+            if($this->checkToken() !== true){
+                self::redirect('/user');
+            }
             
             if (RequestMethods::post('password') !== RequestMethods::post('password2')) {
                 $errors['password2'] = array('Paswords doesnt match');
@@ -442,7 +448,10 @@ class App_Controller_User extends Controller
         $view->set('user', $user);
         
         if(RequestMethods::post('submitDeleteUser')){
-            $this->checkToken();
+            if($this->checkToken() !== true){
+                self::redirect('/user');
+            }
+            
             $user->deleted = true;
             
             if($user->validate()){
@@ -475,7 +484,7 @@ class App_Controller_User extends Controller
         $this->willRenderActionView = false;
         $this->willRenderLayoutView = false;
 
-        if ($this->checkTokenAjax()) {
+        if ($this->checkToken()) {
             $user = App_Model_User::first(array('id = ?' => (int) $id));
 
             if ($user === null) {
@@ -494,7 +503,7 @@ class App_Controller_User extends Controller
                 echo 'An error occured while undeleting the user';
             }
         } else {
-            echo 'Security token is not valid';
+            echo 'Oops, something went wrong';
         }
     }
     

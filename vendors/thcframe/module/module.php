@@ -2,11 +2,10 @@
 
 namespace THCFrame\Module;
 
-use THCFrame\Core\Base as Base;
-use THCFrame\Events\Events as Events;
-use THCFrame\Registry\Registry as Registry;
-use THCFrame\Module\Exception as Exception;
-use THCFrame\Router\Route as Route;
+use THCFrame\Core\Base;
+use THCFrame\Events\Events as Event;
+use THCFrame\Module\Exception;
+use THCFrame\Events\SubscriberInterface;
 
 /**
  * Description of Module
@@ -20,12 +19,12 @@ class Module extends Base
      * @read
      */
     protected $_moduleName;
-    
+
     /**
      * @read
      */
     protected $_observerClass;
-    
+
     /**
      * 
      * @param type $options
@@ -34,9 +33,43 @@ class Module extends Base
     {
         parent::__construct($options);
 
-        Events::fire('framework.module.initialize.before', array($this->moduleName));
+        Event::fire('framework.module.initialize.before', array($this->moduleName));
 
-        Events::fire('framework.module.initialize.after', array($this->moduleName));
+        $this->addModuleEvents();
+        
+        Event::add('framework.router.construct.after', function($router){
+            $router->createRoutes($this->getModuleRoutes());
+        });
+
+        Event::fire('framework.module.initialize.after', array($this->moduleName));
+    }
+
+    /**
+     * 
+     */
+    private function addModuleEvents()
+    {
+        $mo = $this->getObserverClass();
+
+        if (isset($mo) && $mo != '') {
+            $moduleObserver = new $mo();
+
+            if ($moduleObserver instanceof SubscriberInterface) {
+                $events = $moduleObserver->getSubscribedEvents();
+
+                foreach ($events as $name => $callback) {
+                    if(is_array($callback)){
+                        foreach ($callback as $call){
+                            Event::add($name, array($moduleObserver, $call));
+                        }
+                    }else{
+                        Event::add($name, array($moduleObserver, $callback));
+                    }
+
+                    
+                }
+            }
+        }
     }
 
     /**
@@ -56,42 +89,6 @@ class Module extends Base
     public function getModuleRoutes()
     {
         return $this->_routes;
-    }
-
-    /**
-     * nepouzivana
-     */
-    public function loadModuleRoutes()
-    {
-        $router = Registry::get('router');
-
-        foreach ($this->_routes as $route) {
-            $new_route = new Route\Dynamic(array('pattern' => $route['pattern']));
-
-            if (preg_match('/^:/', $route['module'])) {
-                $new_route->addDynamicElement(':module', ':module');
-            } else {
-                $new_route->setModule($route['module']);
-            }
-
-            if (preg_match('/^:/', $route['controller'])) {
-                $new_route->addDynamicElement(':controller', ':controller');
-            } else {
-                $new_route->setController($route['controller']);
-            }
-
-            if (preg_match('/^:/', $route['action'])) {
-                $new_route->addDynamicElement(':action', ':action');
-            } else {
-                $new_route->setAction($route['action']);
-            }
-
-            if (isset($route['args']) && preg_match('/^:/', $route['args'])) {
-                $new_route->addDynamicElement($route['args'], $route['args']);
-            }
-
-            $router->addRoute($new_route);
-        }
     }
 
 }

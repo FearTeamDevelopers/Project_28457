@@ -53,7 +53,9 @@ class App_Controller_Client extends Controller
         $view = $this->getActionView();
         
         if(RequestMethods::post('submitAddClient')){
-            $this->checkToken();
+            if($this->checkToken() !== true){
+                self::redirect('/client');
+            }
             
             $client = new App_Model_Client(array(
                 'contactPerson' => RequestMethods::post('contperson'),
@@ -95,7 +97,9 @@ class App_Controller_Client extends Controller
         $view->set('client', $client);
         
         if(RequestMethods::post('submitEditClient')){
-            $this->checkToken();
+            if($this->checkToken() !== true){
+                self::redirect('/client');
+            }
             
             $client->contactPerson = RequestMethods::post('contperson');
             $client->contactEmail = RequestMethods::post('contemail');
@@ -135,10 +139,11 @@ class App_Controller_Client extends Controller
         $view->set('client', $client);
 
         if (RequestMethods::post('submitDeleteClient')) {
-            $this->checkToken();
+            if($this->checkToken() !== true){
+                self::redirect('/client');
+            }
 
             if ($client->delete()) {
-
                 Event::fire('app.log', array('success', 'Client id: ' . $client->getId()));
                 $view->successMessage('Client has been deleted successfully');
                 self::redirect('/client');
@@ -162,10 +167,11 @@ class App_Controller_Client extends Controller
         $view->set('projects', $clientProjects);
 
         if(RequestMethods::post('submitReportIssue')){
-            $this->checkToken();
+            if($this->checkToken() !== true){
+                self::redirect('/client');
+            }
             
-            $urlKey = strtolower(
-                    str_replace(' ', '-', StringMethods::removeDiacriticalMarks(RequestMethods::post('title'))));
+            $urlKey = $this->_createUrlKey(RequestMethods::post('title'));
             
             $task = new App_Model_Task(array(
                 'stateId' => 8,

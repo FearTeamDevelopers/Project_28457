@@ -2,11 +2,11 @@
 
 namespace THCFrame\Template\Implementation;
 
-use THCFrame\Request\Request as Request;
-use THCFrame\Registry\Registry as Registry;
-use THCFrame\Template\Template as Template;
-use THCFrame\Core\StringMethods as StringMethods;
-use THCFrame\Request\RequestMethods as RequestMethods;
+use THCFrame\Request\Request;
+use THCFrame\Registry\Registry;
+use THCFrame\Template\Template;
+use THCFrame\Core\StringMethods;
+use THCFrame\Request\RequestMethods;
 
 /**
  * Description of Extended

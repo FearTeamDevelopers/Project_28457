@@ -2,10 +2,10 @@
 
 namespace THCFrame\Database;
 
-use THCFrame\Core\Base as Base;
-use THCFrame\Events\Events as Events;
-use THCFrame\Registry\Registry as Registry;
-use THCFrame\Database\Exception as Exception;
+use THCFrame\Core\Base;
+use THCFrame\Events\Events as Event;
+use THCFrame\Registry\Registry;
+use THCFrame\Database\Exception;
 
 /**
  * Description of mysqldump
@@ -247,7 +247,7 @@ class Mysqldump extends Base
             throw new Exception\Backup(sprintf('Output file %s is not writable', $this->_filename), 2);
         }
 
-        Events::fire('framework.mysqldump.create.before', array($this->_filename));
+        Event::fire('framework.mysqldump.create.before', array($this->_filename));
 
         $this->_write($this->_getHeader());
         $this->_tables = array();
@@ -280,7 +280,7 @@ class Mysqldump extends Base
             }
         }
 
-        Events::fire('framework.mysqldump.create.after', array($this->_filename));
+        Event::fire('framework.mysqldump.create.after', array($this->_filename));
 
         $this->_close();
 

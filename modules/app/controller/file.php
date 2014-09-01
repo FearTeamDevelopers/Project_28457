@@ -51,7 +51,7 @@ class App_Controller_File extends Controller
         $this->willRenderLayoutView = false;
         $this->willRenderActionView = false;
 
-        if ($this->checkTokenAjax()) {
+        if ($this->checkToken()) {
             $security = Registry::get('security');
 
             if ($security->isGranted('role_admin')) {
@@ -77,7 +77,7 @@ class App_Controller_File extends Controller
                 echo 'An error occured while deleting the file';
             }
         } else {
-            echo 'Security token is not valid';
+            echo 'Oops, something went wrong';
         }
     }
 

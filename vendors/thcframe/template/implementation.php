@@ -2,8 +2,8 @@
 
 namespace THCFrame\Template;
 
-use THCFrame\Core\Base as Base;
-use THCFrame\Core\StringMethods as StringMethods;
+use THCFrame\Core\Base;
+use THCFrame\Core\StringMethods;
 use THCFrame\Template\Exception as Exception;
 
 /**

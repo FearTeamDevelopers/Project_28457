@@ -2,11 +2,10 @@
 
 namespace THCFrame\Database;
 
-use THCFrame\Core\Base as Base;
-use THCFrame\Events\Events as Events;
-use THCFrame\Registry\Registry as Registry;
-//use THCFrame\Database\Database as Database;
-use THCFrame\Database\Exception as Exception;
+use THCFrame\Core\Base;
+use THCFrame\Events\Events as Event;
+use THCFrame\Registry\Registry;
+use THCFrame\Database\Exception;
 
 /**
  * Factory class returns a Database\Connector subclass 
@@ -30,16 +29,15 @@ class Database extends Base
     protected $_options;
 
     /**
-     * Throw exception if specific method is not implemented
      * 
-     * @param string $method
-     * @return \THCFrame\Database\Exception\Implementation
+     * @param type $method
+     * @return \THCFrame\Session\Exception\Implementation
      */
     protected function _getImplementationException($method)
     {
         return new Exception\Implementation(sprintf('%s method not implemented', $method));
     }
-
+    
     /**
      * Factory method
      * It accepts initialization options and selects the type of returned object, 
@@ -50,26 +48,21 @@ class Database extends Base
      */
     public function initialize()
     {
-        Events::fire('framework.database.initialize.before', array($this->type, $this->options));
+        Event::fire('framework.database.initialize.before', array($this->type, $this->options));
 
         if (!$this->type) {
-            $configuration = Registry::get('config');
+            $configuration = Registry::get('configuration');
 
             if (!empty($configuration->database) && !empty($configuration->database->type)) {
                 $this->type = $configuration->database->type;
-                unset($configuration->database->type);
                 $this->options = (array) $configuration->database;
             } else {
                 throw new \Exception('Error in configuration file');
             }
         }
 
-        if (!$this->type) {
-            throw new Exception\Argument('Invalid type');
-        }
-
-        Events::fire('framework.database.initialize.after', array($this->type, $this->options));
-
+        Event::fire('framework.database.initialize.after', array($this->type, $this->options));
+        
         switch ($this->type) {
             case 'mysql': {
                     return new Connector\Mysql($this->options);

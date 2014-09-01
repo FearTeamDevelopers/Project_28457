@@ -1,12 +1,10 @@
 <?php
 
 use App\Etc\Controller;
-use THCFrame\Registry\Registry;
 use THCFrame\Request\RequestMethods;
 use THCFrame\Events\Events as Event;
 use THCFrame\Filesystem\FileManager;
 use THCFrame\Core\ArrayMethods;
-use THCFrame\Core\StringMethods;
 
 /**
  * Description of App_Controller_Task
@@ -16,6 +14,22 @@ use THCFrame\Core\StringMethods;
 class App_Controller_Task extends Controller
 {
 
+    /**
+     * 
+     * @param type $key
+     * @return boolean
+     */
+    private function _checkUrlKey($key)
+    {
+        $status = App_Model_Task::first(array('urlKey = ?' => $key));
+
+        if ($status === null) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+    
     /**
      * @before _secured, _developer
      */
@@ -45,17 +59,14 @@ class App_Controller_Task extends Controller
                 ->set('users', $users);
 
         if (RequestMethods::post('submitAddTask')) {
-            $this->checkToken();
+            if($this->checkToken() !== true){
+                self::redirect('/project');
+            }
             $errors = array();
             
             $urlKey = $project->getTaskPrefix().'-'.$project->getNextTaskNumber();
 
-            $checkUrl = App_Model_Task::first(
-                            array('urlKey = ?' => $urlKey), 
-                            array('id')
-            );
-
-            if ($checkUrl !== null) {
+            if (!$this->_checkUrlKey($urlKey)) {
                 $errors['urlKey'] = array('This task already exists');
             }
             
@@ -177,7 +188,9 @@ class App_Controller_Task extends Controller
                 ->set('users', $users);
 
         if (RequestMethods::post('submitEditTask')) {
-            $this->checkToken();
+            if($this->checkToken() !== true){
+                self::redirect('/project');
+            }
 
             $task->stateId = RequestMethods::post('state');
             $task->active = RequestMethods::post('active');
@@ -236,7 +249,10 @@ class App_Controller_Task extends Controller
                 ->set('nextstates', $nextStates);
 
         if (RequestMethods::post('submitSendMess')) {
-            $this->checkToken();
+            if($this->checkToken() !== true){
+                self::redirect('/project');
+            }
+            
             $chatMessage = new App_Model_TaskChat(array(
                 'taskId' => $task->getId(),
                 'userId' => $this->getUser()->getId(),
@@ -288,7 +304,10 @@ class App_Controller_Task extends Controller
                 ->set('users', $users);
 
         if (RequestMethods::post('assigntouser')) {
-            $this->checkToken();
+            if($this->checkToken() !== true){
+                self::redirect('/project');
+            }
+            
             $task->assignedTo = RequestMethods::post('user', $this->getUser()->getId());
 
             if ($task->validate()) {
@@ -397,7 +416,9 @@ class App_Controller_Task extends Controller
         $view->set('task', $task);
 
         if (RequestMethods::post('submitDeleteTask')) {
-            $this->checkToken();
+            if($this->checkToken() !== true){
+                self::redirect('/project');
+            }
             $task->deleted = true;
 
             if ($task->validate()) {
@@ -422,7 +443,7 @@ class App_Controller_Task extends Controller
         $this->willRenderActionView = false;
         $this->willRenderLayoutView = false;
 
-        if ($this->checkTokenAjax()) {
+        if ($this->checkToken()) {
             $task = App_Model_Task::first(array('id = ?' => (int) $id));
 
             if ($task === null) {
@@ -441,7 +462,7 @@ class App_Controller_Task extends Controller
                 echo 'An error occured while undeleting the task';
             }
         } else {
-            echo 'Security token is not valid';
+            echo 'Oops, something went wrong';
         }
     }
 
@@ -457,13 +478,15 @@ class App_Controller_Task extends Controller
 
         if ($task === null) {
             $view->warningMessage('Task not found');
-            self::redirect('/');
+            self::redirect('/project');
         }
 
         $view->set('taskid', $task->getId());
 
         if (RequestMethods::post('uploadFile')) {
-            $this->checkToken();
+            if($this->checkToken() !== true){
+                self::redirect('/project');
+            }
 
             $fileManager = new FileManager(array(
                 'thumbWidth' => $this->loadConfigFromDb('thumb_width'),
@@ -520,7 +543,7 @@ class App_Controller_Task extends Controller
         $this->willRenderLayoutView = false;
         $this->willRenderActionView = false;
 
-        if ($this->checkTokenAjax()) {
+        if ($this->checkToken()) {
             $subTask = App_Model_TaskSubTask::first(array(
                         'taskId = ?' => (int) $taskId,
                         'subTaskId = ?' => (int) $subTaskId
@@ -538,7 +561,7 @@ class App_Controller_Task extends Controller
                 echo 'An error occured while deleting the subtask';
             }
         } else {
-            echo 'Security token is not valid';
+            echo 'Oops, something went wrong';
         }
     }
 
@@ -552,7 +575,7 @@ class App_Controller_Task extends Controller
         $this->willRenderLayoutView = false;
         $this->willRenderActionView = false;
 
-        if ($this->checkTokenAjax()) {
+        if ($this->checkToken()) {
             $relTask1 = App_Model_TaskSubTask::first(array(
                         'taskId = ?' => (int) $taskId,
                         'subTaskId = ?' => (int) $relTaskId
@@ -575,7 +598,7 @@ class App_Controller_Task extends Controller
                 echo 'An error occured while deleting the related task';
             }
         } else {
-            echo 'Security token is not valid';
+            echo 'Oops, something went wrong';
         }
     }
 
@@ -606,7 +629,9 @@ class App_Controller_Task extends Controller
                 ->set('taskid', $task->getId());
 
         if (RequestMethods::post('submitAddSubtask')) {
-            $this->checkToken();
+            if($this->checkToken() !== true){
+                self::redirect('/project');
+            }
 
             $subtask = new App_Model_TaskSubTask(array(
                 'taskId' => $task->getId(),
@@ -647,7 +672,9 @@ class App_Controller_Task extends Controller
                 ->set('taskid', $task->getId());
 
         if (RequestMethods::post('submitAddReltask')) {
-            $this->checkToken();
+            if($this->checkToken() !== true){
+                self::redirect('/project');
+            }
 
             $reltask1 = new App_Model_TaskRelated(array(
                 'taskId' => $task->getId(),
@@ -688,7 +715,9 @@ class App_Controller_Task extends Controller
         $view->set('task', $task);
 
         if (RequestMethods::post('submitLogTime')) {
-            $this->checkToken();
+            if($this->checkToken() !== true){
+                self::redirect('/project');
+            }
 
             $taskTimeExist = App_Model_TaskTime::first(
                             array(
@@ -737,7 +766,7 @@ class App_Controller_Task extends Controller
         $this->willRenderActionView = false;
         $this->willRenderLayoutView = false;
 
-        if ($this->checkTokenAjax()) {
+        if ($this->checkToken()) {
             $timelog = App_Model_TaskTime::first(
                             array('id = ?' => (int) $id, 'userId = ?' => $this->getUser()->getId()));
 
@@ -753,7 +782,7 @@ class App_Controller_Task extends Controller
                 echo 'An error occured while deleting the time log';
             }
         } else {
-            echo 'Security token is invalid';
+            echo 'Oops, something went wrong';
         }
     }
 
