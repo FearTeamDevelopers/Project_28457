@@ -176,6 +176,24 @@ class Controller extends Base
 
     /**
      * 
+     * @return View
+     */
+    public function getActionView()
+    {
+        return $this->_actionView;
+    }
+    
+    /**
+     * 
+     * @return View
+     */
+    public function getLayoutView()
+    {
+        return $this->_layoutView;
+    }
+    
+    /**
+     * 
      * @param type $model
      */
     public function getModel($model, $options = NULL)

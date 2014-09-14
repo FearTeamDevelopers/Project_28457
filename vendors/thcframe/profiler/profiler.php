@@ -137,12 +137,20 @@ class Profiler
             $str .= '</table><table>';
             $str .= '<tr><td colspan=2>POST</td></tr>';
             foreach ($_POST as $key => $value) {
-                $str .= '<tr><td>' . $key . '</td><td>' . $value . '</td></tr>';
+                if (is_array($value)) {
+                    $str .= '<tr><td>' . $key . '</td><td>' . $value[0] . '</td></tr>';
+                } else {
+                    $str .= '<tr><td>' . $key . '</td><td>' . $value . '</td></tr>';
+                }
             }
             $str .= '</table><table>';
             $str .= '<tr><td colspan=2>GET</td></tr>';
             foreach ($_GET as $key => $value) {
-                $str .= '<tr><td>' . $key . '</td><td>' . $value . '</td></tr>';
+                if (is_array($value)) {
+                    $str .= '<tr><td>' . $key . '</td><td>' . $value[0] . '</td></tr>';
+                } else {
+                    $str .= '<tr><td>' . $key . '</td><td>' . $value . '</td></tr>';
+                }
             }
             $str .= '</table></div>';
             $str .= '</div><script type="text/javascript" src="/public/js/plugins/profiler.min.js"></script>';
