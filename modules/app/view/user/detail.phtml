@@ -4,8 +4,8 @@
             {echo $user->getFirstname()." ".$user->getLastname()}
 
             {if isset($user->companyName)}
-                 - account for client: 
-                 <a href="/client/detail/{echo $user->clientId}">{echo $user->companyName}</a>
+            - account for client: 
+            <a href="/client/detail/{echo $user->clientId}">{echo $user->companyName}</a>
             {/if}
         </h3>
     </div>
@@ -37,56 +37,56 @@
                     <p class="form-label">Phone</p>
                     <div class="form-item">{echo $user->getPhone()}</div>
                 </div>
-                
+
                 {if $user->companyName != ""}
-                    <hr/>
-                    <div class="form-row">
-                        <p class="form-label">Client info</p>
-                        <div class="form-item"></div>
-                    </div>
-                    <div class="form-row">
-                        <p class="form-label">Company name</p>
-                        <div class="form-item">{echo $user->companyName}</div>
-                    </div>
-                    <div class="form-row">
-                        <p class="form-label">Contact person</p>
-                        <div class="form-item">{echo $user->contactPerson}</div>
-                    </div>
-                    <div class="form-row">
-                        <p class="form-label">Contact email</p>
-                        <div class="form-item">{echo $user->contactEmail}</div>
-                    </div>
+                <hr/>
+                <div class="form-row">
+                    <p class="form-label">Client info</p>
+                    <div class="form-item"></div>
+                </div>
+                <div class="form-row">
+                    <p class="form-label">Company name</p>
+                    <div class="form-item">{echo $user->companyName}</div>
+                </div>
+                <div class="form-row">
+                    <p class="form-label">Contact person</p>
+                    <div class="form-item">{echo $user->contactPerson}</div>
+                </div>
+                <div class="form-row">
+                    <p class="form-label">Contact email</p>
+                    <div class="form-item">{echo $user->contactEmail}</div>
+                </div>
                 {/if}
-                
+
                 {if $isAdmin}
-                    <hr/>
-                    <div class="form-row">
-                        <p class="form-label">Account info</p>
-                        <div class="form-item"></div>
-                    </div>
-                    <div class="form-row">
-                        <p class="form-label">Role</p>
-                        <div class="form-item">{echo $user->getRoleFormated()}</div>
-                    </div>
-                    <div class="form-row">
-                        <p class="form-label">Account created</p>
-                        <div class="form-item">{echo $user->getCreated()}</div>
-                    </div>
-                    <div class="form-row">
-                        <p class="form-label">Last login</p>
-                        <div class="form-item">{echo $user->getLastLogin()}</div>
-                    </div>
-                    <div class="form-row">
-                        <p class="form-label">Password expire</p>
-                        <div class="form-item">{echo $user->getPwdExpire()}</div>
-                    </div>
+                <hr/>
+                <div class="form-row">
+                    <p class="form-label">Account info</p>
+                    <div class="form-item"></div>
+                </div>
+                <div class="form-row">
+                    <p class="form-label">Role</p>
+                    <div class="form-item">{echo $user->getRoleFormated()}</div>
+                </div>
+                <div class="form-row">
+                    <p class="form-label">Account created</p>
+                    <div class="form-item">{echo $user->getCreated()}</div>
+                </div>
+                <div class="form-row">
+                    <p class="form-label">Last login</p>
+                    <div class="form-item">{echo $user->getLastLogin()}</div>
+                </div>
+                <div class="form-row">
+                    <p class="form-label">Password expire</p>
+                    <div class="form-item">{echo $user->getPwdExpire()}</div>
+                </div>
                 {/if}
-                
+
             </div>
         </div>
-        
+
         <div id="projects">
-            <div class="box-head"><h2>Projects</h2></div>
+            <div class="box-head-nohide"><h2>Projects</h2></div>
             <div class="box-content no-pad">
                 <table class="display">
                     <thead>
@@ -97,13 +97,13 @@
                     </thead>
                     <tbody>
                         {if !empty($assignedProjects)} 
-                            {foreach $project in $assignedProjects}
-                                <tr>
-                                    <td><a href="/project/{echo $project->pUrlKey}/">{echo $project->pTitle}</a></td>
-                                    <td>{echo $project->stateTitle}</td>
-                                    <td>{echo $project->pCreated}</td>
-                                </tr>
-                            {/foreach}
+                        {foreach $project in $assignedProjects}
+                        <tr>
+                            <td><a href="/project/{echo $project->pUrlKey}/">{echo $project->pTitle}</a></td>
+                            <td>{echo $project->stateTitle}</td>
+                            <td>{echo $project->pCreated}</td>
+                        </tr>
+                        {/foreach}
                         {/if}
                     </tbody>
                 </table>
@@ -111,7 +111,7 @@
         </div>
 
         <div id="tasks">
-            <div class="box-head"><h2>Tasks</h2></div>
+            <div class="box-head-nohide"><h2>Tasks</h2></div>
             <div class="box-content no-pad">
                 <table class="display">
                     <thead>
@@ -136,9 +136,24 @@
                 </table>
             </div>
         </div>
-        
+
         <div id="time">
-            <div class="box-head"><h2>Time</h2></div>
+            <div class="box-head-nohide"><h2 class="float-left-fixed">Timelog</h2>
+                <form action="/user/profile#time" method="post">
+                    <div>
+                        <select name="month">
+                            <option value="01">Jan</option><option value="02">Feb</option>
+                            <option value="03">Mar</option><option value="04">Apr</option>
+                            <option value="05">May</option><option value="06">Jun</option>
+                            <option value="07">Jul</option><option value="08">Aug</option>
+                            <option value="09">Sep</option><option value="10">Oct</option>
+                            <option value="11">Nov</option><option value="12">Dec</option>
+                        </select>
+                        <input type="submit" class="button grey" name="submitLoadUserTimelog" value="Load" />
+                    </div>
+                </form>
+            </div>
+
             <div class="box-content no-pad">
                 <table class="stdtable2">
                     <thead>
@@ -148,9 +163,9 @@
                         <tr>
                             <th>Task</th>
                             {if !empty($calendar)}
-                                {foreach $time in $calendar}
-                                    <th class="width50">{echo $time["day"]."<br/>".$time["dayname"]}</th>
-                                {/foreach}
+                            {foreach $time in $calendar}
+                            <th class="width50">{echo $time["day"]."<br/>".$time["dayname"]}</th>
+                            {/foreach}
                             {/if}
                         </tr>
                     </thead>
@@ -163,7 +178,6 @@
                                         <a href="/project/{echo $pident[0]}/">{echo $pident[1]}</a>
                                     </td>
                                 </tr>
-                                    
                                 {foreach $task in $project}
                                     <tr>
                                         {script $tident = explode("|", $task_i)}
@@ -183,7 +197,6 @@
                                             {/for}
 
                                             {script $j=$day[2]+1;}
-
                                             {if $log_i == $tt-1}
                                                 {for $i=$j $i<=$calendar[1]["daysofmonth"] $i++}
                                                     <td></td>

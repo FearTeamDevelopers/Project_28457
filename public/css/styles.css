@@ -153,12 +153,12 @@ body {
     margin-bottom: 20px;
     border-radius: 3px;
 }
-.box-head {
+.box-head, .box-head-nohide {
     background: url(../images/grad-overlay-s.png) #393939;
     border-radius: 2px;
     max-height: 40px;
 }
-.box-head:hover {
+.box-head:hover, .box-head-nohide:hover {
     background: url(../images/grad-overlay-s.png) #444;
 }
 .box-icon, .box-icon-16, .box-icon-24, .box-icon-32 { float: left; }
@@ -168,7 +168,7 @@ body {
 
 .box-iconR { float: right;}
 
-.box-head h2 {
+.box-head h2, .box-head-nohide h2 {
     padding: 10px 10px;
     color: #ddd;
     font-size: 15px;

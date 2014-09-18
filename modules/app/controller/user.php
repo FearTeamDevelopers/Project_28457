@@ -84,17 +84,15 @@ class App_Controller_User extends Controller
 
         $users = App_Model_User::all(
                         array(
-                            'deleted = ?' => false,
-                            'role <> ?' => 'role_superadmin'), 
-                        array('id', 'firstname', 'lastname', 'email', 'role', 
-                            'active', 'created', 'pwdExpire', 'lastLogin'), 
-                        array('id' => 'asc')
+                    'deleted = ?' => false,
+                    'role <> ?' => 'role_superadmin'), array('id', 'firstname', 'lastname', 'email', 'role',
+                    'active', 'created', 'pwdExpire', 'lastLogin'), array('id' => 'asc')
         );
 
         $view->set('users', $users)
                 ->set('superadmin', $superAdmin);
     }
-    
+
     /**
      * @before _secured, _projectmanager
      */
@@ -107,16 +105,16 @@ class App_Controller_User extends Controller
         $superAdmin = $security->isGranted('role_superadmin');
         $roles = array_keys($security->getRoleManager()->getRoles());
         $clients = App_Model_Client::all(array('active = ?' => true));
-        
+
         $view->set('superadmin', $superAdmin)
                 ->set('clients', $clients)
                 ->set('roles', $roles);
-        
+
         if (RequestMethods::post('submitAddUser')) {
-            if($this->checkToken() !== true){
+            if ($this->checkToken() !== true) {
                 self::redirect('/user');
             }
-            
+
             if (RequestMethods::post('password') !== RequestMethods::post('password2')) {
                 $errors['password2'] = array('Paswords doesnt match');
             }
@@ -139,13 +137,11 @@ class App_Controller_User extends Controller
                 'salt' => $salt,
                 'role' => RequestMethods::post('role', 'role_client'),
                 'phone' => RequestMethods::post('phone'),
-                'pwdExpire' => date('Y-m-d H:i:s', time()+12*30*24*60*60),
+                'pwdExpire' => date('Y-m-d H:i:s', time() + 12 * 30 * 24 * 60 * 60),
                 'taskStateFilter' => RequestMethods::post('taskStateFilter', 'a:0:{}'),
                 'taskPriorityFilter' => RequestMethods::post('taskPriorityFilter', 'a:0:{}'),
-                'projectStateFilter' => RequestMethods::post('projectStateFilter', 
-                        'a:7:{i:0;i:1;i:1;i:2;i:2;i:3;i:3;i:4;i:4;i:5;i:5;i:6;i:6;i:7;}'),
-                'projectPriorityFilter' => RequestMethods::post('projectPriorityFilter', 
-                        'a:5:{i:0;i:1;i:1;i:2;i:2;i:3;i:3;i:4;i:4;i:5;}'),
+                'projectStateFilter' => RequestMethods::post('projectStateFilter', 'a:7:{i:0;i:1;i:1;i:2;i:2;i:3;i:3;i:4;i:4;i:5;i:5;i:6;i:6;i:7;}'),
+                'projectPriorityFilter' => RequestMethods::post('projectPriorityFilter', 'a:5:{i:0;i:1;i:1;i:2;i:2;i:3;i:3;i:4;i:4;i:5;}'),
             ));
 
             if (empty($errors) && $user->validate()) {
@@ -161,16 +157,16 @@ class App_Controller_User extends Controller
             }
         }
     }
-    
+
     /**
      * @before _secured, _client
      */
     public function profile()
     {
         $view = $this->getActionView();
-        if((int)$this->getUser()->getClientId() == 0){
+        if ((int) $this->getUser()->getClientId() == 0) {
             $user = App_Model_User::first(array('id = ?' => $this->getUser()->getId()));
-        }else{
+        } else {
             $user = App_Model_User::fetchUserById($this->getUser()->getId());
         }
 
@@ -178,35 +174,35 @@ class App_Controller_User extends Controller
             $view->warningMessage('User not found');
             self::redirect('/user');
         }
-        
+
         $assignedTasks = App_Model_User::fetchAssignedToTasks($user->getId());
         $assignedProjects = App_Model_User::fetchAssignedToProjects($user->getId());
-        
-        $daysOfMonth = cal_days_in_month(CAL_GREGORIAN, date('m'), date('Y'));
+
+        $selectedMonth = RequestMethods::issetpost('month') ? RequestMethods::post('month') : date('m');
+
+        $daysOfMonth = cal_days_in_month(CAL_GREGORIAN, $selectedMonth, date('Y'));
         $days = array();
-        
-        for($i = 1; $i <= $daysOfMonth; $i++){
-            $tm = mktime(0, 0, 0, date('m'), $i, date('Y'));
+
+        for ($i = 1; $i <= $daysOfMonth; $i++) {
+            $tm = mktime(0, 0, 0, $selectedMonth, $i, date('Y'));
             $days[$i] = array(
                 'day' => date('d', $tm),
                 'dayname' => date('D', $tm),
                 'weekofyear' => date('W', $tm),
                 'month' => date('F', $tm),
                 'daysofmonth' => $daysOfMonth
-                    );
-            
+            );
         }
 
-        $timeLog = App_Model_User::fetchTimeLog($user->getId());
+        $timeLog = App_Model_User::fetchTimeLog($user->getId(), $selectedMonth);
 
         $view->set('user', $user)
-            ->set('calendar', $days)
-            ->set('assignedProjects', $assignedProjects)
-            ->set('assignedTasks', $assignedTasks)
-            ->set('timelog', $timeLog);
-        
+                ->set('calendar', $days)
+                ->set('assignedProjects', $assignedProjects)
+                ->set('assignedTasks', $assignedTasks)
+                ->set('timelog', $timeLog);
     }
-    
+
     /**
      * @before _secured, _client
      */
@@ -217,46 +213,45 @@ class App_Controller_User extends Controller
 
         $errors = array();
         $user = App_Model_User::first(
-                array('active = ?' => true, 'deleted = ?' => false,'id = ?' => $this->getUser()->getId()));
+                        array('active = ?' => true, 'deleted = ?' => false, 'id = ?' => $this->getUser()->getId()));
 
         if (NULL === $user) {
             $view->warningMessage('User not found');
             self::redirect('/user');
         }
-        
-        if($user->getClientId() != 0){
+
+        if ($user->getClientId() != 0) {
             $client = App_Model_Client::first(
-                    array('active = ?' => true, 'id = ?' => $user->getClientId()));
-            
-            if($client !== null){
+                            array('active = ?' => true, 'id = ?' => $user->getClientId()));
+
+            if ($client !== null) {
                 $view->set('client', $client);
             }
         }
-        
+
         $view->set('user', $user);
-        
+
         if (RequestMethods::post('submitUpdateProfile')) {
-            if($this->checkToken() !== true){
+            if ($this->checkToken() !== true) {
                 self::redirect('/user');
             }
-            
+
             if (RequestMethods::post('password') !== RequestMethods::post('password2')) {
                 $errors['password2'] = array('Paswords doesnt match');
             }
 
             if (RequestMethods::post('email') != $user->getEmail()) {
                 $email = App_Model_User::first(
-                            array('email = ?' => RequestMethods::post('email', $user->getEmail())), 
-                            array('email')
+                                array('email = ?' => RequestMethods::post('email', $user->getEmail())), array('email')
                 );
-                
+
                 if ($email) {
                     $errors['email'] = array('Email is already used');
                 }
             }
 
             $pass = RequestMethods::post('password');
-            
+
             if ($pass === null || $pass == '') {
                 $salt = $user->getSalt();
                 $hash = $user->getPassword();
@@ -271,19 +266,19 @@ class App_Controller_User extends Controller
             $user->password = $hash;
             $user->salt = $salt;
             $user->phone = RequestMethods::post('phone');
-            
-            if(isset($client)){
+
+            if (isset($client)) {
                 $client->contactPerson = RequestMethods::post('contperson');
                 $client->contactEmail = RequestMethods::post('contemail');
                 $client->companyName = RequestMethods::post('compname');
                 $client->companyAddress = RequestMethods::post('address');
                 $client->contactPhone = RequestMethods::post('contphone');
                 $client->www = RequestMethods::post('compwww');
-                
-                if($client->validate()){
+
+                if ($client->validate()) {
                     $client->save();
                     Event::fire('app.log', array('success', 'Client id: ' . $client->getId()));
-                }else{
+                } else {
                     Event::fire('app.log', array('fail', 'Client id: ' . $client->getId()));
                     $errors = $errors + $client->getErrors();
                 }
@@ -301,16 +296,16 @@ class App_Controller_User extends Controller
             }
         }
     }
-    
+
     /**
      * @before _secured, _projectmanager
      */
     public function detail($id)
     {
         $view = $this->getActionView();
-        $user = App_Model_User::first(array('id = ?' => (int)$id));
-        
-        if((int)$user->getClientId() != 0){
+        $user = App_Model_User::first(array('id = ?' => (int) $id));
+
+        if ((int) $user->getClientId() != 0) {
             $user = App_Model_User::fetchUserById($user->getId());
         }
 
@@ -318,35 +313,35 @@ class App_Controller_User extends Controller
             $view->warningMessage('User not found');
             self::redirect('/user');
         }
-        
+
         $assignedTasks = App_Model_User::fetchAssignedToTasks($user->getId());
         $assignedProjects = App_Model_User::fetchAssignedToProjects($user->getId());
-        
-        $daysOfMonth = cal_days_in_month(CAL_GREGORIAN, date('m'), date('Y'));
+
+        $selectedMonth = RequestMethods::issetpost('month') ? RequestMethods::post('month') : date('m');
+
+        $daysOfMonth = cal_days_in_month(CAL_GREGORIAN, $selectedMonth, date('Y'));
         $days = array();
-        
-        for($i = 1; $i <= $daysOfMonth; $i++){
-            $tm = mktime(0, 0, 0, date('m'), $i, date('Y'));
+
+        for ($i = 1; $i <= $daysOfMonth; $i++) {
+            $tm = mktime(0, 0, 0, $selectedMonth, $i, date('Y'));
             $days[$i] = array(
                 'day' => date('d', $tm),
                 'dayname' => date('D', $tm),
                 'weekofyear' => date('W', $tm),
                 'month' => date('F', $tm),
                 'daysofmonth' => $daysOfMonth
-                    );
-            
+            );
         }
-        
-        $timeLog = App_Model_User::fetchTimeLog($user->getId());
-        
+
+        $timeLog = App_Model_User::fetchTimeLog($user->getId(), $selectedMonth);
+
         $view->set('user', $user)
-            ->set('timelog', $timeLog)
-            ->set('calendar', $days)
-            ->set('assignedProjects', $assignedProjects)
-            ->set('assignedTasks', $assignedTasks);
-        
+                ->set('timelog', $timeLog)
+                ->set('calendar', $days)
+                ->set('assignedProjects', $assignedProjects)
+                ->set('assignedTasks', $assignedTasks);
     }
-    
+
     /**
      * @before _secured, _projectmanager
      */
@@ -358,7 +353,7 @@ class App_Controller_User extends Controller
         $errors = array();
         $superAdmin = $security->isGranted('role_superadmin');
         $user = App_Model_User::first(
-                array('deleted = ?' => false,'id = ?' => $id));
+                        array('deleted = ?' => false, 'id = ?' => $id));
 
         if (NULL === $user) {
             $view->warningMessage('User not found');
@@ -367,37 +362,36 @@ class App_Controller_User extends Controller
             $view->warningMessage('You dont have permissions to update this user');
             self::redirect('/user');
         }
-        
+
         $roles = array_keys($security->getRoleManager()->getRoles());
         $clients = App_Model_Client::all(array('active = ?' => true));
-        
+
         $view->set('superadmin', $superAdmin)
                 ->set('clients', $clients)
                 ->set('user', $user)
                 ->set('roles', $roles);
-        
+
         if (RequestMethods::post('submitEditUser')) {
-            if($this->checkToken() !== true){
+            if ($this->checkToken() !== true) {
                 self::redirect('/user');
             }
-            
+
             if (RequestMethods::post('password') !== RequestMethods::post('password2')) {
                 $errors['password2'] = array('Paswords doesnt match');
             }
 
             if (RequestMethods::post('email') != $user->email) {
                 $email = App_Model_User::first(
-                            array('email = ?' => RequestMethods::post('email', $user->email)), 
-                            array('email')
+                                array('email = ?' => RequestMethods::post('email', $user->email)), array('email')
                 );
-                
+
                 if ($email) {
                     $errors['email'] = array('Email is already used');
                 }
             }
 
             $pass = RequestMethods::post('password');
-            
+
             if ($pass === null || $pass == '') {
                 $salt = $user->getSalt();
                 $hash = $user->getPassword();
@@ -428,7 +422,7 @@ class App_Controller_User extends Controller
             }
         }
     }
-    
+
     /**
      * @before _secured, _admin
      */
@@ -436,46 +430,46 @@ class App_Controller_User extends Controller
     {
         $this->willRenderLayoutView = false;
         $view = $this->getActionView();
-        
+
         $user = App_Model_User::first(
-                array('deleted = ?' => false, 'id = ?' => (int) $id));
-        
-        if($user === null){
+                        array('deleted = ?' => false, 'id = ?' => (int) $id));
+
+        if ($user === null) {
             $view->warningMessage('User not found');
             self::redirect('/user');
         }
-        
+
         $view->set('user', $user);
-        
-        if(RequestMethods::post('submitDeleteUser')){
-            if($this->checkToken() !== true){
+
+        if (RequestMethods::post('submitDeleteUser')) {
+            if ($this->checkToken() !== true) {
                 self::redirect('/user');
             }
-            
+
             $user->deleted = true;
-            
-            if($user->validate()){
+
+            if ($user->validate()) {
                 $user->save();
-                
-                App_Model_ProjectUser::deleteAll(array('userId = ?' => (int)$id));
-                $taskUser = App_Model_Task::all(array('assignedTo = ?' => (int)$id));
-                
+
+                App_Model_ProjectUser::deleteAll(array('userId = ?' => (int) $id));
+                $taskUser = App_Model_Task::all(array('assignedTo = ?' => (int) $id));
+
                 foreach ($taskUser as $task) {
                     $task->assignedTo = 1;
                     $task->save();
                 }
-                
+
                 Event::fire('app.log', array('success', 'User id: ' . $user->getId()));
                 $view->successMessage('User has been deleted successfully');
                 self::redirect('/user');
-            }else{
+            } else {
                 Event::fire('app.log', array('fail', 'Project id: ' . $user->getId()));
                 $view->errorMessage('An error occured while deleting the user');
                 self::redirect('/user');
             }
         }
     }
-    
+
     /**
      * @before _secured, _admin
      */
@@ -506,7 +500,5 @@ class App_Controller_User extends Controller
             echo 'Oops, something went wrong';
         }
     }
-    
-    
 
 }

@@ -16,7 +16,7 @@ if (ENV == 'dev') {
     error_reporting(0);
 }
 
-if (version_compare(phpversion(), '5.4.0', '<')) {
+if (version_compare(phpversion(), '5.4', '<')) {
     header('Content-type: text/html');
     include(APP_PATH . '/phpversion.phtml');
     exit();

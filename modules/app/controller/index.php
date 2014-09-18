@@ -2,6 +2,9 @@
 
 use App\Etc\Controller;
 
+/**
+ * 
+ */
 class App_Controller_Index extends Controller
 {
 
@@ -15,7 +18,7 @@ class App_Controller_Index extends Controller
         
         if($this->isProjectManager()){
             $assignedTo = App_Model_User::fetchAssignedToProjects($userId);
-            $currentTasks = App_Model_User::fetchAssignedToTasks($userId);
+            $currentTasks = App_Model_User::fetchCurrentTasksPM($userId);
             $managedProjects = App_Model_User::fetchManagedProjects($userId);
             $deadlines = App_Model_Project::fetchDeadlineProjects();
             $notes = App_Model_Note::all(array('active = ?' => true, 'userId = ?' => $userId));
@@ -36,7 +39,7 @@ class App_Controller_Index extends Controller
                     ->set('projectsWaitingToApprove', $projectsWaitingForApproval);
         }elseif($this->isDeveloper()){
             $assignedTo = App_Model_User::fetchAssignedToProjects($userId);
-            $currentTasks = App_Model_User::fetchAssignedToTasks($userId);
+            $currentTasks = App_Model_User::fetchCurrentTasksDev($userId);
             $deadlines = App_Model_Project::fetchDeadlineProjects();
             $notes = App_Model_Note::all(array('active = ?' => true, 'userId = ?' => $userId));
             
@@ -45,6 +48,7 @@ class App_Controller_Index extends Controller
                     ->set('notes', $notes)
                     ->set('deadlines', $deadlines);
         }elseif($this->isClient()){
+            $currentTasks = App_Model_User::fetchCurrentTasksClient($userId);
             $clientProjects = App_Model_Project::fetchProjectsByClientId($this->getUser()->getClientId());
             
             $view->set('clientProjects', $clientProjects);
