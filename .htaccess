@@ -1,14 +1,168 @@
 RewriteEngine On
 RewriteBase /
 
+########## Begin - Rewrite rules to block out some common exploits
+## If you experience problems on your site block out the operations listed below
+#
+# Block out any script trying to base64_encode or base64_decode data within the URL
+RewriteCond %{QUERY_STRING} base64_(en|de)code[^(]*\([^)]*\) [OR]
+## IMPORTANT: If the above line throws an HTTP 500 error, replace it with these 2 lines:
+# RewriteCond %{QUERY_STRING} base64_encode\(.*\) [OR]
+# RewriteCond %{QUERY_STRING} base64_decode\(.*\) [OR]
+# Block out any script that includes a <script> tag in URL
+RewriteCond %{QUERY_STRING} (<|%3C)([^s]*s)+cript.*(>|%3E) [NC,OR]
+# Block out any script trying to set a PHP GLOBALS variable via URL
+RewriteCond %{QUERY_STRING} GLOBALS(=|\[|\%[0-9A-Z]{0,2}) [OR]
+# Block out any script trying to modify a _REQUEST variable via URL
+RewriteCond %{QUERY_STRING} _REQUEST(=|\[|\%[0-9A-Z]{0,2})
+# Return 403 Forbidden header and show the content of the root homepage
+RewriteRule .* index.php [F]
+########## End - Rewrite rules to block out some common exploits
+ 
+########## Begin - File injection protection, by SigSiu.net
+RewriteCond %{REQUEST_METHOD} GET
+RewriteCond %{QUERY_STRING} [a-zA-Z0-9_]=http:// [OR]
+RewriteCond %{QUERY_STRING} [a-zA-Z0-9_]=(\.\.//?)+ [OR]
+RewriteCond %{QUERY_STRING} [a-zA-Z0-9_]=/([a-z0-9_.]//?)+ [NC]
+RewriteRule .* - [F]
+########## End - File injection protection
+ 
+########## Begin - Basic antispam Filter, by SigSiu.net
+## This code uses PCRE and works only with Apache 2.x.
+RewriteCond %{QUERY_STRING} \b(ambien|blue\spill|cialis|cocaine|ejaculation|erectile)\b [NC,OR]
+RewriteCond %{QUERY_STRING} \b(erections|hoodia|huronriveracres|impotence|levitra|libido)\b [NC,OR]
+RewriteCond %{QUERY_STRING} \b(lipitor|phentermin|pro[sz]ac|sandyauer|tramadol|troyhamby)\b [NC,OR]
+RewriteCond %{QUERY_STRING} \b(ultram|unicauca|valium|viagra|vicodin|xanax|ypxaieo)\b [NC]
+## Note: The final RewriteCond must NOT use the [OR] flag.
+RewriteRule .* - [F]
+########## End - Basic antispam Filter, by SigSiu.net
+
+## Back-end protection
+## This also blocks fingerprinting attacks browsing for XML and INI files
+RewriteRule ^modules/admin/?$ - [L]
+RewriteRule ^modules/admin/index\.(php|html?)$ - [L]
+RewriteRule ^modules/admin/(controller|model|view|etc)/([^/]+/)*([^/.]+\.)+(jp(e?g|2)?|png|gif|bmp|css|js|swf|html?|mp(eg?|[34])|avi|wav|og[gv]|xlsx?|docx?|pptx?|zip|rar|pdf|xps|txt|7z|svg|od[tsp]|flv|mov)$ - [L]
+RewriteRule ^modules/admin/ - [F] 
+
+########## Block bad user agents
+ ## The following list may include bots that no longer exist or are not a problem
+ ## for your site. The list will always be incomplete and it is therefore wise to
+ ## follow discussions on one of the many "security" mailing lists or on a forum
+ ## such as http://www.webmasterworld.com/search_engine_spiders/
+ ## It is also unwise to rely on this list as your ONLY security mechanism.
+ RewriteCond %{HTTP_USER_AGENT} ^BlackWidow [OR]
+ RewriteCond %{HTTP_USER_AGENT} ^Bot\ mailto:craftbot@yahoo.com [OR]
+ RewriteCond %{HTTP_USER_AGENT} ^ChinaClaw [OR]
+ RewriteCond %{HTTP_USER_AGENT} ^Custo [OR]
+ RewriteCond %{HTTP_USER_AGENT} ^DISCo [OR]
+ RewriteCond %{HTTP_USER_AGENT} ^Download\ Demon [OR]
+ RewriteCond %{HTTP_USER_AGENT} ^eCatch [OR]
+ RewriteCond %{HTTP_USER_AGENT} ^EirGrabber [OR]
+ RewriteCond %{HTTP_USER_AGENT} ^EmailSiphon [OR]
+ RewriteCond %{HTTP_USER_AGENT} ^EmailWolf [OR]
+ RewriteCond %{HTTP_USER_AGENT} ^Express\ WebPictures [OR]
+ RewriteCond %{HTTP_USER_AGENT} ^ExtractorPro [OR]
+ RewriteCond %{HTTP_USER_AGENT} ^EyeNetIE [OR]
+ RewriteCond %{HTTP_USER_AGENT} ^FlashGet [OR]
+ RewriteCond %{HTTP_USER_AGENT} ^GetRight [OR]
+ RewriteCond %{HTTP_USER_AGENT} ^GetWeb! [OR]
+ RewriteCond %{HTTP_USER_AGENT} ^Go!Zilla [OR]
+ RewriteCond %{HTTP_USER_AGENT} ^Go-Ahead-Got-It [OR]
+ RewriteCond %{HTTP_USER_AGENT} ^GrabNet [OR]
+ RewriteCond %{HTTP_USER_AGENT} ^Grafula [OR]
+ RewriteCond %{HTTP_USER_AGENT} ^HMView [OR]
+ RewriteCond %{HTTP_USER_AGENT} HTTrack [NC,OR]
+ RewriteCond %{HTTP_USER_AGENT} ^Image\ Stripper [OR]
+ RewriteCond %{HTTP_USER_AGENT} ^Image\ Sucker [OR]
+ RewriteCond %{HTTP_USER_AGENT} Indy\ Library [NC,OR]
+ RewriteCond %{HTTP_USER_AGENT} ^InterGET [OR]
+ RewriteCond %{HTTP_USER_AGENT} ^Internet\ Ninja [OR]
+ RewriteCond %{HTTP_USER_AGENT} ^JetCar [OR]
+ RewriteCond %{HTTP_USER_AGENT} ^JOC\ Web\ Spider [OR]
+ RewriteCond %{HTTP_USER_AGENT} ^larbin [OR]
+ RewriteCond %{HTTP_USER_AGENT} ^LeechFTP [OR]
+ RewriteCond %{HTTP_USER_AGENT} ^Mass\ Downloader [OR]
+ RewriteCond %{HTTP_USER_AGENT} ^MIDown\ tool [OR]
+ RewriteCond %{HTTP_USER_AGENT} ^Mister\ PiX [OR]
+ RewriteCond %{HTTP_USER_AGENT} ^Navroad [OR]
+ RewriteCond %{HTTP_USER_AGENT} ^NearSite [OR]
+ RewriteCond %{HTTP_USER_AGENT} ^NetAnts [OR]
+ RewriteCond %{HTTP_USER_AGENT} ^NetSpider [OR]
+ RewriteCond %{HTTP_USER_AGENT} ^Net\ Vampire [OR]
+ RewriteCond %{HTTP_USER_AGENT} ^NetZIP [OR]
+ RewriteCond %{HTTP_USER_AGENT} ^Octopus [OR]
+ RewriteCond %{HTTP_USER_AGENT} ^Offline\ Explorer [OR]
+ RewriteCond %{HTTP_USER_AGENT} ^Offline\ Navigator [OR]
+ RewriteCond %{HTTP_USER_AGENT} ^PageGrabber [OR]
+ RewriteCond %{HTTP_USER_AGENT} ^Papa\ Foto [OR]
+ RewriteCond %{HTTP_USER_AGENT} ^pavuk [OR]
+ RewriteCond %{HTTP_USER_AGENT} ^pcBrowser [OR]
+ RewriteCond %{HTTP_USER_AGENT} ^RealDownload [OR]
+ RewriteCond %{HTTP_USER_AGENT} ^ReGet [OR]
+ RewriteCond %{HTTP_USER_AGENT} ^SiteSnagger [OR]
+ RewriteCond %{HTTP_USER_AGENT} ^SmartDownload [OR]
+ RewriteCond %{HTTP_USER_AGENT} ^SuperBot [OR]
+ RewriteCond %{HTTP_USER_AGENT} ^SuperHTTP [OR]
+ RewriteCond %{HTTP_USER_AGENT} ^Surfbot [OR]
+ RewriteCond %{HTTP_USER_AGENT} ^tAkeOut [OR]
+ RewriteCond %{HTTP_USER_AGENT} ^Teleport\ Pro [OR]
+ RewriteCond %{HTTP_USER_AGENT} ^VoidEYE [OR]
+ RewriteCond %{HTTP_USER_AGENT} ^Web\ Image\ Collector [OR]
+ RewriteCond %{HTTP_USER_AGENT} ^Web\ Sucker [OR]
+ RewriteCond %{HTTP_USER_AGENT} ^WebAuto [OR]
+ RewriteCond %{HTTP_USER_AGENT} ^WebCopier [OR]
+ RewriteCond %{HTTP_USER_AGENT} ^WebFetch [OR]
+ RewriteCond %{HTTP_USER_AGENT} ^WebGo\ IS [OR]
+ RewriteCond %{HTTP_USER_AGENT} ^WebLeacher [OR]
+ RewriteCond %{HTTP_USER_AGENT} ^WebReaper [OR]
+ RewriteCond %{HTTP_USER_AGENT} ^WebSauger [OR]
+ RewriteCond %{HTTP_USER_AGENT} ^Website\ eXtractor [OR]
+ RewriteCond %{HTTP_USER_AGENT} ^Website\ Quester [OR]
+ RewriteCond %{HTTP_USER_AGENT} ^WebStripper [OR]
+ RewriteCond %{HTTP_USER_AGENT} ^WebWhacker [OR]
+ RewriteCond %{HTTP_USER_AGENT} ^WebZIP [OR]
+ RewriteCond %{HTTP_USER_AGENT} ^Widow [OR]
+ RewriteCond %{HTTP_USER_AGENT} ^WWWOFFLE [OR]
+ RewriteCond %{HTTP_USER_AGENT} ^Xaldon\ WebSpider [OR]
+ RewriteCond %{HTTP_USER_AGENT} ^Zeus
+ ## Note: The final RewriteCond must NOT use the [OR] flag.
+ ## Return 403 Forbidden error
+ RewriteRule .* - [F]
+
+ #Block mySQL injects
+ RewriteCond %{QUERY_STRING} (;|<|>|â€™|â€ť|\)|%0A|%0D|%22|%27|%3C|%3E|%00).*(/\*|union|select|insert|cast|set|declare|drop|update|md5|benchmark) [NC,OR]
+ RewriteCond %{QUERY_STRING} \.\./\.\. [OR]
+ RewriteCond %{QUERY_STRING} (localhost|loopback|127\.0\.0\.1) [NC,OR]
+ RewriteCond %{QUERY_STRING} \.[a-z0-9] [NC,OR]
+ RewriteCond %{QUERY_STRING} (<|>|â€™|%0A|%0D|%27|%3C|%3E|%00) [NC]
+ # Return 403 Forbidden error.
+ RewriteRule .* index.php [F]
+
+## Disallow access to rogue PHP files throughout the site, unless they are explicitly allowed
+RewriteCond %{REQUEST_FILENAME} \.php$
+RewriteCond %{REQUEST_FILENAME} !/index[23]?\.php$
+RewriteCond %{REQUEST_FILENAME} -f
+RewriteRule ^([^/]+/)*([^/.]+\.)+php$ - [F]
+
+########## Begin - Redirect non-www to www
+##RewriteCond %{HTTP_HOST} !^www\. [NC]
+##RewriteRule ^(.*)$ http://www.%{HTTP_HOST}/$1 [R,L]
+########## End - Redirect non-www to www
+
+########## Begin - Preventing Bandwidth Image Theft
+RewriteCond %{HTTP_REFERER} !^$
+RewriteCond %{HTTP_REFERER} !^(http|https)://(www\.)?(projectmanager|manager\.fear-team)\.(cz|dev) [NC]
+RewriteRule \.(jpe?g|gif|bmp|png)$ - [F]
+########## End - Preventing Bandwidth Image Theft
+
 RewriteCond %{REQUEST_FILENAME} -s
-RewriteRule /public/(.*)/(.*)\.(css|jpe?g|gif|png|js|ico)$ - [NC,L]
+RewriteRule /public/(.*)/(.*)\.(css|jpe?g|gif|png|bmp|js|ico)$ - [NC,L]
 
 RewriteCond %{REQUEST_URI} (^/tests/(.*)$) 
-RewriteRule ^(.*)$ - [NC,L]
+RewriteRule .* - [F]
 
 RewriteCond %{REQUEST_URI} (^/application/(.*)$) 
-RewriteRule ^(.*)$ /index.php [NC,L]
+RewriteRule .* /index.php [NC,L]
 
 RewriteCond %{REQUEST_FILENAME} -s [OR]
 RewriteCond %{REQUEST_FILENAME} -l [OR]

@@ -352,7 +352,7 @@ class App_Model_User extends Model implements UserInterface
     public static function fetchAssignedToTasks($id)
     {
         $user = new self(array('id' => $id));
-        return $user->getAssignedToTasks();
+        return $user->getCurrentTasks('all');
     }
 
     /**
@@ -440,7 +440,7 @@ class App_Model_User extends Model implements UserInterface
     public function getUserById()
     {
         $query = self::getQuery(array('us.*'))
-                ->join('tb_client', 'us.clientId = cl.id', 'cl', 
+                ->join('tb_client', 'us.clientId = cl.id', 'cl',
                         array('cl.contactPerson', 'cl.contactEmail', 'cl.companyName'))
                 ->where('us.id = ?', $this->getId())
                 ->where('us.deleted = ?', false);
@@ -476,12 +476,14 @@ class App_Model_User extends Model implements UserInterface
         $query = App_Model_Task::getQuery(array('tk.*'))
                 ->join('tb_project', 'tk.projectId = p.id', 'p', 
                         array('p.id' => 'pId', 'p.title' => 'pTitle', 'p.urlKey' => 'pUrlKey'))
-                ->join('tb_state', 'tk.stateId = s.id', 's', 
-                        array('s.type' => 'stateType', 's.title' => 'stateTitle'))
-                ->join('tb_user', 'us.id = tk.createdBy', 'us', 
+                ->join('tb_state', 'tk.stateId = s.id', 's',
+                        array('s.id' => 'sId', 's.type' => 'stateType', 's.title' => 'stateTitle'))
+                ->join('tb_user', 'us.id = tk.createdBy', 'us',
                         array('us.firstname' => 'cFname', 'us.lastname' => 'cLname'))
                 ->where('tk.assignedTo = ?', $this->getId())
                 ->where('tk.deleted = ?', false)
+                ->order('p.title', 'ASC')
+                ->order('s.id', 'ASC')
                 ->order('tk.priority', 'DESC');
 
         if ($role === 'dev') {
@@ -490,6 +492,8 @@ class App_Model_User extends Model implements UserInterface
             $query->where('s.id IN ?', array(8, 9, 11, 12, 13));
         } elseif ($role === 'client') {
             $query->where('s.id IN ?', array(14));
+        } elseif ($role === 'all') {
+            $query->where('s.id IN ?', array(8, 9, 10, 11, 12, 13, 14, 15));
         }
 
         $result = self::initialize($query);
@@ -513,15 +517,15 @@ class App_Model_User extends Model implements UserInterface
         $lastDay = date('Y-m-d', $lastDayUTS);
 
         $projectQuery = App_Model_TaskTime::getQuery(array('tt.id'))
-                ->join('tb_task', 'tt.taskId = tk.id', 'tk', 
+                ->join('tb_task', 'tt.taskId = tk.id', 'tk',
                         array('tk.id' => 'tId'))
-                ->join('tb_project', 'tk.projectId = pr.id', 'pr', 
+                ->join('tb_project', 'tk.projectId = pr.id', 'pr',
                         array('pr.id' => 'pid', 'pr.title' => 'prTitle', 'pr.urlKey' => 'prUrlKey'))
                 ->where('pr.deleted = ?', false)
                 ->where('tt.logDate > ?', $firstDay)
                 ->where('tt.logDate < ?', $lastDay)
                 ->where('tt.userId = ?', $this->getId())
-                ->groupby('tk.title');
+                ->groupby('pr.urlKey');
         $projectTitles = App_Model_TaskTime::initialize($projectQuery);
 
         $returnArray = $taskArray = array();
@@ -529,7 +533,7 @@ class App_Model_User extends Model implements UserInterface
         if ($projectTitles !== null) {
             foreach ($projectTitles as $project) {
                 $taskQuery = App_Model_TaskTime::getQuery(array('tt.id'))
-                        ->join('tb_task', 'tt.taskId = tk.id', 'tk', 
+                        ->join('tb_task', 'tt.taskId = tk.id', 'tk',
                                 array('tk.title', 'tk.urlKey', 'tk.id' => 'tId'))
                         ->where('tk.deleted = ?', false)
                         ->where('tk.projectId = ?', $project->pid)
@@ -545,14 +549,20 @@ class App_Model_User extends Model implements UserInterface
                                 'tt.logDate > ?' => $firstDay,
                                 'tt.logDate < ?' => $lastDay,
                                 'tt.userId = ?' => $this->getId()
-                                    ), array('*'), array('tt.logDate' => 'asc'));
+                                    ),
+                            array('*'), 
+                            array('tt.logDate' => 'asc'));
 
                     $taskArray[$task->getUrlKey() . '|' . $task->getTitle()] = $time;
                 }
 
                 $returnArray[$project->prUrlKey . '|' . $project->prTitle] = $taskArray;
+                unset($taskQuery);
+                unset($taskTitles);
+                unset($taskArray);
             }
         }
+
         return $returnArray;
     }
 
@@ -565,12 +575,12 @@ class App_Model_User extends Model implements UserInterface
         $query = self::getQuery(array('us.id'))
                 ->join('tb_projectuser', 'us.id = pu.userId', 'pu', 
                         array('pu.userId', 'pu.projectId'))
-                ->join('tb_project', 'pu.projectId = p.id', 'p', 
+                ->join('tb_project', 'pu.projectId = p.id', 'p',
                         array('p.id' => 'pId', 'p.title' => 'pTitle', 'p.urlKey' => 'pUrlKey',
                     'p.priority' => 'pPriority', 'p.created' => 'pCreated'))
                 ->join('tb_state', 'p.stateId = s.id', 's', 
                         array('s.type' => 'stateType', 's.title' => 'stateTitle'))
-                ->join('tb_client', 'p.clientId = c.id', 'c', 
+                ->join('tb_client', 'p.clientId = c.id', 'c',
                         array('c.companyName', 'c.contactEmail', 'c.contactPerson'))
                 ->join('tb_user', 'uss.id = p.managerId', 'uss', 
                         array('uss.firstname' => 'managerFname', 'uss.lastname' => 'managerLname'))

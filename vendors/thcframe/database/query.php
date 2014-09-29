@@ -402,6 +402,29 @@ class Query extends Base
 
         return $this->connector->getAffectedRows();
     }
+    
+    /**
+     * 
+     * @return type
+     * @throws Exception\Sql
+     */
+    public function update($data)
+    {
+        $sql = $this->_buildUpdate($data);
+        $result = $this->connector->execute($sql);
+
+        if ($result === false) {
+            if (ENV == 'dev') {
+                Core::getLogger()->logError($sql);
+                throw new Exception\Sql(sprintf('SQL: %s', $this->connector->getLastError()));
+            } else {
+                Core::getLogger()->logError($sql);
+                throw new Exception\Sql('There was an error with your SQL query');
+            }
+        }
+
+        return $this->connector->getAffectedRows();
+    }
 
     /**
      * 

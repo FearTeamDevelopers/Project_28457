@@ -267,10 +267,10 @@ class Model extends Base
      */
     protected function _validateDatetime($value)
     {
-        if($value == ''){
+        if ($value == '') {
             return true;
         }
-        
+
         list($date, $time) = explode(' ', $value);
 
         $validDate = $this->_validateDate($date);
@@ -290,10 +290,10 @@ class Model extends Base
      */
     protected function _validateDate($value)
     {
-        if($value == ''){
+        if ($value == '') {
             return true;
         }
-        
+
         $config = Registry::get('configuration');
         $format = $config->system->dateformat;
 
@@ -330,10 +330,10 @@ class Model extends Base
      */
     protected function _validateTime($value)
     {
-        if($value == ''){
+        if ($value == '') {
             return true;
         }
-        
+
         return preg_match('/^([01]?[0-9]|2[0-3]):[0-5][0-9](:[0-5][0-9])?$/', $value);
     }
 
@@ -460,6 +460,37 @@ class Model extends Base
 
     /**
      * 
+     * @param type $where
+     * @param type $data
+     * @return type
+     */
+    public static function updateAll($where = array(), $data = array())
+    {
+        $instance = new static();
+
+        $query = $instance->connector
+                ->query()
+                ->from($instance->table);
+
+        foreach ($where as $clause => $value) {
+            $query->where($clause, $value);
+        }
+
+        $instance->connector->beginTransaction();
+
+        $state = $query->update($data);
+
+        if ($state != -1) {
+            $instance->connector->commitTransaction();
+            return $state;
+        } else {
+            $instance->connector->rollbackTransaction();
+            return $state;
+        }
+    }
+
+    /**
+     * 
      */
     public function preSave()
     {
@@ -543,7 +574,7 @@ class Model extends Base
 
             if (strpos(get_class($this), '_') !== false) {
                 list($module, $type, $name) = explode('_', get_class($this));
-                
+
                 if (strtolower($type) == 'model' && !empty($name)) {
                     $this->_table = strtolower($tablePrefix . $name);
                 } else {
@@ -890,7 +921,7 @@ class Model extends Base
         $model = new static();
         return $model->_count($where);
     }
-    
+
     /**
      * Method returns a count of the matched records
      * 
