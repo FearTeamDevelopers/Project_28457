@@ -324,6 +324,25 @@ jQuery(document).ready(function() {
             return true;
         }
     });
+    
+    //multi file upload
+    jQuery('.uploadFileForm .multi_upload').click(function() {
+        if (jQuery('.uploadFileForm .file_inputs input[type=file]').length < 7) {
+            jQuery('.uploadFileForm .file_inputs input[type=file]')
+                    .last()
+                    .after('<input type="file" name="files[]" />');
+        }
+    });
+
+    jQuery('.uploadFileForm .multi_upload_dec').click(function() {
+        if (jQuery('.uploadFileForm .file_inputs input[type=file]').length > 1) {
+            jQuery('.uploadFileForm .file_inputs input[type=file]').last().remove();
+        }
+    });
+
+    jQuery('.uploadFileForm').submit(function() {
+        jQuery('#loader').show();
+    });
 });
 
 CKEDITOR.replace('ckeditor');

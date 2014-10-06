@@ -496,11 +496,11 @@ class App_Model_Project extends Model
                         array('s.type' => 'stateType', 's.title' => 'stateTitle'))
                 ->join('tb_user', 'us.id = pr.managerId', 'us', 
                         array('us.firstname' => 'managerFname', 'us.lastname' => 'managerLname'))
-                ->where('pr.clientId', $this->getClientId())
+                ->where('pr.clientId = ?', $this->getClientId())
                 ->where('pr.deleted = ?', false)
                 ->order('pr.created', 'desc');
         $projects = self::initialize($projectsQuery);
-        
+
         return $projects;
     }
     /**

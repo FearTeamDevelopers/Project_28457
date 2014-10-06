@@ -48,17 +48,6 @@ class App_Model_Attachment extends Model
      * @type text
      * @length 150
      *
-     * @validate required, alphanumeric, max(150)
-     * @label title
-     */
-    protected $_title;
-
-    /**
-     * @column
-     * @readwrite
-     * @type text
-     * @length 150
-     *
      * @validate alphanumeric, max(60)
      * @label filename
      */

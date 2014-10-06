@@ -18,6 +18,11 @@ class ResourceBaseAuthorization extends Base implements AuthorizationInterface
      * @var type 
      */
     protected $_type = 'resourcebase';
+    
+    /**
+     * @read
+     * @var type
+     */
     protected $_roleManager;
     protected $_resources = array();
     

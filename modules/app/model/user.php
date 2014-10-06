@@ -210,6 +210,27 @@ class App_Model_User extends Model implements UserInterface
     /**
      * @column
      * @readwrite
+     * @type text
+     * @length 30
+     *
+     * @validate numeric, max(30)
+     * @label account lockdown time
+     */
+    protected $_loginLockdownTime;
+
+    /**
+     * @column
+     * @readwrite
+     * @type tinyint
+     *
+     * @validate numeric, max(2)
+     * @label login attemp counter
+     */
+    protected $_loginAttempCounter;
+    
+    /**
+     * @column
+     * @readwrite
      * @type boolean
      * 
      * @validate max(3)
@@ -430,21 +451,19 @@ class App_Model_User extends Model implements UserInterface
      */
     public static function fetchUserById($id)
     {
-        $user = new self(array('id' => (int) $id));
-        return array_shift($user->getUserById());
-    }
-
-    /**
-     * 
-     */
-    public function getUserById()
-    {
         $query = self::getQuery(array('us.*'))
                 ->join('tb_client', 'us.clientId = cl.id', 'cl',
                         array('cl.contactPerson', 'cl.contactEmail', 'cl.companyName'))
-                ->where('us.id = ?', $this->getId())
+                ->where('us.id = ?', (int) $id)
                 ->where('us.deleted = ?', false);
-        return self::initialize($query);
+        $userArr = self::initialize($query);
+
+        if($userArr !== null){
+            return array_shift($userArr);
+        }else{
+            return null;
+        }
+        
     }
 
     /**

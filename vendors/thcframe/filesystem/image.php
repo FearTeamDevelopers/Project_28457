@@ -26,6 +26,11 @@ class Image extends Base
      * @readwrite
      */
     protected $_filename;
+    
+    /**
+     * @readwrite
+     */
+    protected $_thumbname = '';
 
     /**
      * @readwrite
@@ -41,7 +46,17 @@ class Image extends Base
      * @readwrite
      */
     protected $_height;
-
+    
+    /**
+     * @readwrite
+     */
+    protected $_size;
+    
+    /**
+     * @readwrite
+     */
+    protected $_format;
+    
     /**
      * @readwrite
      */
@@ -59,12 +74,14 @@ class Image extends Base
      *
      * @return Image
      */
-    public function __construct($filename = null, $width = null, $height = null, $color = null)
+    public function __construct($filename = null, $base64 = null, $width = null, $height = null, $color = null)
     {
         parent::__construct();
 
         if ($filename) {
             $this->load($filename);
+        }elseif ($base64){
+            $this->loadBase64($base64);
         } elseif ($width) {
             $this->create($width, $height, $color);
         }
@@ -98,23 +115,6 @@ class Image extends Base
         }
 
         return 'square';
-    }
-
-    /**
-     * 
-     * @return type
-     */
-    public function getDataForDb()
-    {
-        return array(
-            'path' => $this->filename,
-            'filename' => pathinfo($this->filename, PATHINFO_FILENAME),
-            'size' => filesize($this->filename),
-            'width' => $this->getWidth(),
-            'height' => $this->getHeight(),
-            'ext' => strtolower(pathinfo($this->filename, PATHINFO_EXTENSION)),
-            'mime' => $this->_originalInfo['mime']
-        );
     }
 
     /**
@@ -634,8 +634,8 @@ class Image extends Base
         }
 
         //remove data URI scheme and spaces from base64 string then decode it
-        $this->imagestring = base64_decode(str_replace(' ', '+', preg_replace('#^data:image/[^;]+;base64,#', '', $base64string)));
-        $this->image = imagecreatefromstring($this->imagestring);
+        $this->_imagestring = base64_decode(str_replace(' ', '+', preg_replace('#^data:image/[^;]+;base64,#', '', $base64string)));
+        $this->image = imagecreatefromstring($this->_imagestring);
         return $this->_getMetaData();
     }
 
@@ -665,7 +665,7 @@ class Image extends Base
                 $mimetype = 'image/png';
                 break;
             default:
-                $info = (empty($this->imagestring)) ? getimagesize($this->filename) : getimagesizefromstring($this->imagestring);
+                $info = (empty($this->_imagestring)) ? getimagesize($this->filename) : getimagesizefromstring($this->_imagestring);
                 $mimetype = $info['mime'];
                 unset($info);
                 break;
@@ -985,7 +985,7 @@ class Image extends Base
     protected function _getMetaData()
     {
         //gather meta data
-        if (empty($this->imagestring)) {
+        if (empty($this->_imagestring)) {
             $info = getimagesize($this->filename);
 
             switch ($info['mime']) {
@@ -1003,7 +1003,7 @@ class Image extends Base
                     break;
             }
         } elseif (function_exists('getimagesizefromstring')) {
-            $info = getimagesizefromstring($this->imagestring);
+            $info = getimagesizefromstring($this->_imagestring);
         } else {
             throw new Exception\Version('PHP 5.4 is required to use method getimagesizefromstring');
         }
@@ -1012,13 +1012,14 @@ class Image extends Base
             'width' => $info[0],
             'height' => $info[1],
             'orientation' => $this->getOrientation(),
-            'exif' => function_exists('exif_read_data') && $info['mime'] === 'image/jpeg' && $this->imagestring === null ? $this->exif = @exif_read_data($this->filename) : null,
+            'exif' => function_exists('exif_read_data') && $info['mime'] === 'image/jpeg' && $this->_imagestring === null ? $this->exif = @exif_read_data($this->filename) : null,
             'format' => preg_replace('/^image\//', '', $info['mime']),
             'mime' => $info['mime']
         );
 
         $this->width = $info[0];
         $this->height = $info[1];
+        $this->format = $this->_originalInfo['format'];
 
         imagesavealpha($this->image, true);
         imagealphablending($this->image, true);

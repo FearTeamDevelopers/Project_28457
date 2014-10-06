@@ -1,0 +1,117 @@
+/*
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+*/
+/* 
+    Created on : 6.10.2014, 11:11:11
+    Author     : Tomy
+*/
+
+
+/* ========== 2. Open Source Icons ========== */
+
+.icon{display: inline-block; margin-left: 10px;}
+
+.opsrc { background: url('../images/icons/open-source.png') no-repeat top left; width: 32px; height: 32px; } 
+
+.opsrc.id{ background-position: 0 0;  } 
+.opsrc.scissors{ background-position: 0 -33px;  } 
+.opsrc.add-item{ background-position: 0 -66px;  } 
+.opsrc.addressbook{ background-position: 0 -99px;  } 
+.opsrc.agent{ background-position: 0 -132px;  } 
+.opsrc.apple{ background-position: 0 -165px;  } 
+.opsrc.arrow-round{ background-position: 0 -198px;  } 
+.opsrc.badge{ background-position: 0 -231px;  } 
+.opsrc.bar-chart-02{ background-position: 0 -264px;  } 
+.opsrc.bar-chart{ background-position: 0 -297px;  } 
+.opsrc.battery-full{ background-position: 0 -330px;  } 
+.opsrc.bird{ background-position: 0 -363px;  } 
+.opsrc.boat{ background-position: 0 -396px;  } 
+.opsrc.bookmark{ background-position: 0 -429px;  } 
+.opsrc.briefcase{ background-position: 0 -462px;  } 
+.opsrc.calculator{ background-position: 0 -495px;  } 
+.opsrc.calendar{ background-position: 0 -528px;  } 
+.opsrc.cassette{ background-position: 0 -561px;  } 
+.opsrc.chain{ background-position: 0 -594px;  } 
+.opsrc.chat-{ background-position: 0 -627px;  } 
+.opsrc.chat-02{ background-position: 0 -660px;  } 
+.opsrc.cloud-filled{ background-position: 0 -693px;  } 
+.opsrc.cloud-outline{ background-position: 0 -726px;  } 
+.opsrc.computer{ background-position: 0 -759px;  } 
+.opsrc.configuration{ background-position: 0 -792px;  } 
+.opsrc.configuration02{ background-position: 0 -825px;  } 
+.opsrc.connected{ background-position: 0 -858px;  } 
+.opsrc.connections{ background-position: 0 -891px;  } 
+.opsrc.container{ background-position: 0 -924px;  } 
+.opsrc.copy-item{ background-position: 0 -957px;  } 
+.opsrc.database{ background-position: 0 -990px;  } 
+.opsrc.delete-item{ background-position: 0 -1023px;  } 
+.opsrc.disc{ background-position: 0 -1056px;  } 
+.opsrc.dollar{ background-position: 0 -1089px;  } 
+.opsrc.download{ background-position: 0 -1122px;  } 
+.opsrc.edit{ background-position: 0 -1155px;  } 
+.opsrc.email{ background-position: 0 -1188px;  } 
+.opsrc.fan{ background-position: 0 -1221px;  } 
+.opsrc.fancy-globe{ background-position: 0 -1254px;  } 
+.opsrc.female-user{ background-position: 0 -1287px;  } 
+.opsrc.fire{ background-position: 0 -1320px;  } 
+.opsrc.first-aid{ background-position: 0 -1353px;  } 
+.opsrc.flag{ background-position: 0 -1386px;  } 
+.opsrc.flower{ background-position: 0 -1419px;  } 
+.opsrc.full-screen{ background-position: 0 -1452px;  } 
+.opsrc.glasses{ background-position: 0 -1485px;  } 
+.opsrc.globe{ background-position: 0 -1518px;  } 
+.opsrc.happy-face{ background-position: 0 -1551px;  } 
+.opsrc.headphone{ background-position: 0 -1584px;  } 
+.opsrc.heart{ background-position: 0 -1617px;  } 
+.opsrc.home{ background-position: 0 -1650px;  } 
+.opsrc.ipod{ background-position: 0 -1683px;  } 
+.opsrc.lab{ background-position: 0 -1716px;  } 
+.opsrc.lady{ background-position: 0 -1749px;  } 
+.opsrc.lamp{ background-position: 0 -1782px;  } 
+.opsrc.leaves{ background-position: 0 -1815px;  } 
+.opsrc.light{ background-position: 0 -1848px;  } 
+.opsrc.line-globe{ background-position: 0 -1881px;  } 
+.opsrc.lock{ background-position: 0 -1914px;  } 
+.opsrc.lookup{ background-position: 0 -1947px;  } 
+.opsrc.male-user{ background-position: 0 -1980px;  } 
+.opsrc.microphone{ background-position: -33px 0;  } 
+.opsrc.mobile{ background-position: -33px -33px;  } 
+.opsrc.mobile2{ background-position: -33px -66px;  } 
+.opsrc.mouse{ background-position: -33px -99px;  } 
+.opsrc.multi-agents{ background-position: -33px -132px;  } 
+.opsrc.music-node{ background-position: -33px -165px;  } 
+.opsrc.network-pc{ background-position: -33px -198px;  } 
+.opsrc.network{ background-position: -33px -231px;  } 
+.opsrc.next-item{ background-position: -33px -264px;  } 
+.opsrc.phone{ background-position: -33px -297px;  } 
+.opsrc.pie-chart{ background-position: -33px -330px;  } 
+.opsrc.pin{ background-position: -33px -363px;  } 
+.opsrc.plane{ background-position: -33px -396px;  } 
+.opsrc.print{ background-position: -33px -429px;  } 
+.opsrc.processing-02{ background-position: -33px -462px;  } 
+.opsrc.processing{ background-position: -33px -495px;  } 
+.opsrc.push-pin{ background-position: -33px -528px;  } 
+.opsrc.recycle-empty{ background-position: -33px -561px;  } 
+.opsrc.recycle-full{ background-position: -33px -594px;  } 
+.opsrc.reload{ background-position: -33px -627px;  } 
+.opsrc.rss{ background-position: -33px -660px;  } 
+.opsrc.satellite{ background-position: -33px -693px;  } 
+.opsrc.save{ background-position: -33px -726px;  } 
+.opsrc.scale{ background-position: -33px -759px;  } 
+.opsrc.screen{ background-position: -33px -792px;  } 
+.opsrc.search{ background-position: -33px -825px;  } 
+.opsrc.server{ background-position: -33px -858px;  } 
+.opsrc.shield{ background-position: -33px -891px;  } 
+.opsrc.shut-down{ background-position: -33px -924px;  } 
+.opsrc.star{ background-position: -33px -957px;  } 
+.opsrc.tag{ background-position: -33px -990px;  } 
+.opsrc.tap{ background-position: -33px -1023px;  } 
+.opsrc.tree{ background-position: -33px -1056px;  } 
+.opsrc.umbrella{ background-position: -33px -1089px;  } 
+.opsrc.unlock{ background-position: -33px -1122px;  } 
+.opsrc.usb{ background-position: -33px -1155px;  } 
+.opsrc.van{ background-position: -33px -1188px;  } 
+.opsrc.wifi{ background-position: -33px -1221px;  } 
+.opsrc.world{ background-position: -33px -1254px;  } 

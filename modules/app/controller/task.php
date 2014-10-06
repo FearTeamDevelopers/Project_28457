@@ -56,10 +56,12 @@ class App_Controller_Task extends Controller
 
         $view->set('projectid', $project->getId())
                 ->set('tasks', $tasks)
-                ->set('users', $users);
+                ->set('users', $users)
+                ->set('submstoken', $this->mutliSubmissionProtectionToken());
 
         if (RequestMethods::post('submitAddTask')) {
-            if($this->checkToken() !== true){
+            if ($this->checkToken() !== true &&
+                    $this->checkMutliSubmissionProtectionToken(RequestMethods::post('submstoken')) !== true) {
                 self::redirect('/project');
             }
             $errors = array();
@@ -154,6 +156,7 @@ class App_Controller_Task extends Controller
             } else {
                 Event::fire('app.log', array('fail'));
                 $view->set('newtask', $task)
+                        ->set('submstoken', $this->revalidateMutliSubmissionProtectionToken())
                         ->set('errors', $errors + $task->getErrors());
             }
         }
@@ -481,12 +484,15 @@ class App_Controller_Task extends Controller
             self::redirect('/project');
         }
 
-        $view->set('taskid', $task->getId());
+        $view->set('taskid', $task->getId())
+                ->set('submstoken', $this->mutliSubmissionProtectionToken());
 
         if (RequestMethods::post('uploadFile')) {
-            if($this->checkToken() !== true){
+            if ($this->checkToken() !== true &&
+                    $this->checkMutliSubmissionProtectionToken(RequestMethods::post('submstoken')) !== true) {
                 self::redirect('/project');
             }
+            $errors = array();
 
             $fileManager = new FileManager(array(
                 'thumbWidth' => $this->loadConfigFromDb('thumb_width'),
@@ -496,39 +502,44 @@ class App_Controller_Task extends Controller
                 'maxImageHeight' => $this->loadConfigFromDb('photo_maxheight')
             ));
 
-            try {
-                $data = $fileManager->upload('file', 'tk-' . $task->getId());
-                $uploadedFile = ArrayMethods::toObject($data);
-            } catch (Exception $ex) {
-                $view->set('uploadErr', array('file' => array($ex->getMessage())));
+            $fileErrors = $fileManager->upload('files', 'pr-' . $task->getProjectId().'/tk-'.$task->getId(), time().'_')->getUploadErrors();
+            $files = $fileManager->getUploadedFiles();
+            
+            if (!empty($files)) {
+                foreach ($files as $i => $file) {
+                    $attachment = new App_Model_Attachment(array(
+                        'userId' => $this->getUser()->getId(),
+                        'filename' => pathinfo($file->getFilename(), PATHINFO_FILENAME),
+                        'description' => RequestMethods::post('description'),
+                        'size' => $file->getSize(),
+                        'ext' => $file->getFormat(),
+                        'path' => trim($file->getFilename(), '.'),
+                    ));
+
+                    if ($attachment->validate()) {
+                        $aid = $attachment->save();
+
+                        $prAttch = new App_Model_TaskAttachment(array(
+                            'taskId' => $task->getId(),
+                            'attachmentId' => $aid
+                        ));
+                        $prAttch->save();
+
+                        Event::fire('app.log', array('success', 'Attachment id: ' . $aid . 'for task '.$task->getId().' in project ' . $task->getProjectId()));
+                    } else {
+                        $errors['attachment'][] = $attachment->getErrors();
+                    }
+                }
             }
 
-            $attachment = new App_Model_Attachment(array(
-                'userId' => $this->getUser()->getId(),
-                'title' => RequestMethods::post('title'),
-                'filename' => $uploadedFile->file->filename,
-                'description' => RequestMethods::post('description'),
-                'size' => $uploadedFile->file->size,
-                'ext' => $uploadedFile->file->ext,
-                'path' => trim($uploadedFile->file->path, '.'),
-            ));
-
-            if ($attachment->validate()) {
-                $aid = $attachment->save();
-
-                $prAttch = new App_Model_TaskAttachment(array(
-                    'taskId' => $task->getId(),
-                    'attachmentId' => $attachment->getId()
-                ));
-                $prAttch->save();
-
-                Event::fire('app.log', array('success', 'Attachment id: ' . $aid . ' for task ' . $task->getId()));
+            if (empty($errors) && empty($fileErrors)) {
                 $view->successMessage('Attachment has been successfully saved');
                 self::redirect('/task/' . $task->getUrlKey() . '/#files');
             } else {
-                Event::fire('app.log', array('fail', 'Attachment for task ' . $task->getId()));
-                $view->set('attachment', $attachment)
-                        ->set('errors', $attachment->getErrors());
+                $errors['files'] = $fileErrors;
+                Event::fire('app.log', array('fail', 'Attachment for task in project ' . $task->getId()));
+                $view->set('errors', $errors)
+                    ->set('submstoken', $this->revalidateMutliSubmissionProtectionToken());
             }
         }
     }

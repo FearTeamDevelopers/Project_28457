@@ -174,12 +174,12 @@
                                     <img src="{echo $attch->getThumbPath()}" alt="{echo $attch->getFilename()}" height="128px" />
                                 </a>
                             {/if}{else}
-                                <img src="/public/images/fileicon/{echo $attch->getExt()}.png" width="128px" alt="{echo $attch->getTitle()}"/>
+                                <img src="/public/images/fileicon/{echo $attch->getExt()}.png" width="128px" alt="{echo $attch->getDescription()}"/>
                             {/else}
                             <span>
-                                <span class="name">{echo $attch->getFilename()}</span><br/>
-                                <a class="view" href="/file/download/{echo $attch->getId()}">Download</a>
-                                {if $isPM}
+                                <span class="name">{echo substr($attch->getFilename(), 11, strlen($attch->getFilename()))}</span><br/>
+                                <a class="download" href="/file/download/{echo $attch->getId()}">Download</a>
+                                {if $attch->getUserId() == $authUser->getId() || $isPM}
                                     <a class="delete" href="/file/delete/{echo $attch->getId()}">Delete file</a></li>
                                 {/if}
                             </span>

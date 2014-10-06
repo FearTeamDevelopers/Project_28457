@@ -397,12 +397,12 @@ class App_Model_Task extends Model
                 ->where('tt.taskId = ?', $this->getId());
         $this->_timeLog = App_Model_TaskTime::initialize($taskTimeQuery);
         
-        $taskAttachQuery = App_Model_TaskAttachment::getQuery(array('ta.*'))
-                ->join('tb_attachment', 'ta.attachmentId = tk.id', 'tk', 
-                        array('tk.*'))
+        $taskAttachQuery = App_Model_Attachment::getQuery(array('at.*'))
+                ->join('tb_taskattachment', 'ta.attachmentId = at.id', 'ta', 
+                        array('ta.taskId', 'ta.attachmentId'))
                 ->where('ta.taskId = ?', $this->getId());
-        $this->_attachment = App_Model_TaskAttachment::initialize($taskAttachQuery);
-        
+        $this->_attachment = App_Model_Attachment::initialize($taskAttachQuery);
+
         return $this;
     }
     

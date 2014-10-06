@@ -40,6 +40,8 @@ class App_Etc_Observer implements SubscriberInterface
         $controller = $route->getController();
         $action = $route->getAction();
 
+        $paramStr = '';
+        
         if (!empty($params)) {
             $result = array_shift($params);
             
@@ -48,7 +50,6 @@ class App_Etc_Observer implements SubscriberInterface
             }
         } else {
             $result = 'fail';
-            $paramStr = '';
         }
 
         $log = new App_Model_AdminLog(array(

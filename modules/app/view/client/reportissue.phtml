@@ -2,31 +2,34 @@
     <div class="box-head"><h2>Report issue</h2></div>
     <div class="box-content">
         {if !empty($projects)}
-            <form class="form" action="#" method="post">
-                <input type="hidden" name="tk" value="{echo $token}" />
-                <div class="form-row">
-                    <p class="form-label">Project*</p>
-                    <div class="form-item">
-                        <select name="project">
-                            {foreach $project in $projects}
-                                <option value="{echo $project->getId()}">{echo $project->getTitle()}</option>
-                            {/foreach}
-                        </select>
-                    </div>
-                    {if isset($errors["projectId"])}
-                        <p class="form-label-error">{echo join("<br/>", $errors["projectId"])}</p>
-                    {/if}
+        <form class="form uploadFileForm" action="#" method="post" enctype="multipart/form-data">
+            <input type="hidden" name="tk" value="{echo $token}" />
+            <input type="hidden" name="submstoken" id="submstoken" value="{echo $submstoken}" />
+            <input type="hidden" name="MAX_FILE_SIZE" value="10000000"/>
+
+            <div class="form-row">
+                <p class="form-label">Project*</p>
+                <div class="form-item">
+                    <select name="project">
+                        {foreach $project in $projects}
+                        <option value="{echo $project->getId()}">{echo $project->getTitle()}</option>
+                        {/foreach}
+                    </select>
                 </div>
-                <div class="form-row">
-                    <p class="form-label">Title*</p>
-                    <div class="form-item">
-                        <input type="text" name="title" value="{echo isset($task)? $task->title: ""}" />
-                    </div>
-                    {if isset($errors["title"])}
-                        <p class="form-label-error">{echo join("<br/>", $errors["title"])}</p>
-                    {/if}
+                {if isset($errors["projectId"])}
+                <p class="form-label-error">{echo join("<br/>", $errors["projectId"])}</p>
+                {/if}
+            </div>
+            <div class="form-row">
+                <p class="form-label">Title*</p>
+                <div class="form-item">
+                    <input type="text" name="title" value="{echo isset($task)? $task->title: ""}" />
                 </div>
-                <div class="form-row">
+                {if isset($errors["title"])}
+                <p class="form-label-error">{echo join("<br/>", $errors["title"])}</p>
+                {/if}
+            </div>
+            <div class="form-row">
                 <p class="form-label">Type*</p>
                 <div class="form-item">
                     <select name="type">
@@ -35,48 +38,74 @@
                     </select>
                 </div>
                 {if isset($errors["taskType"])}
-                    <p class="form-label-error">{echo join("<br/>", $errors["taskType"])}</p>
+                <p class="form-label-error">{echo join("<br/>", $errors["taskType"])}</p>
                 {/if}
             </div>
-                <div class="form-row">
-                    <p class="form-label">Description*</p>
-                    <div class="form-item">
-                        <textarea cols="85" rows="5" name="description"  id="ckeditor">{echo isset($task)? $task->description: ""}</textarea>
-                    </div>
-                    {if isset($errors["description"])}
-                        <p class="form-label-error">{echo join("<br/>", $errors["description"])}</p>
-                    {/if}
+            <div class="form-row">
+                <p class="form-label">Description*</p>
+                <div class="form-item">
+                    <textarea cols="85" rows="5" name="description"  id="ckeditor">{echo isset($task)? $task->description: ""}</textarea>
                 </div>
+                {if isset($errors["description"])}
+                <p class="form-label-error">{echo join("<br/>", $errors["description"])}</p>
+                {/if}
+            </div>
 
-                <div class="form-row">
-                    <p class="form-label">Priority *</p>
-                    <div class="form-item">
-                        <select name="priority">
-                            <option value="1">1 - Low</option>
-                            <option value="2">2</option>
-                            <option value="3">3</option>
-                            <option value="4">4</option>
-                            <option value="5">5 - High</option>
-                        </select>
-                    </div>
-                    {if isset($errors["priority"])}
-                        <p class="form-label-error">{echo join("<br/>", $errors["priority"])}</p>
-                    {/if}
+            <div class="form-row">
+                <p class="form-label">Priority *</p>
+                <div class="form-item">
+                    <select name="priority">
+                        <option value="1">1 - Low</option>
+                        <option value="2">2</option>
+                        <option value="3">3</option>
+                        <option value="4">4</option>
+                        <option value="5">5 - High</option>
+                    </select>
                 </div>
+                {if isset($errors["priority"])}
+                <p class="form-label-error">{echo join("<br/>", $errors["priority"])}</p>
+                {/if}
+            </div>
 
-                <div class="form-row">
-                    <div class="form-item">
-                        <input type="button" class="button grey" onclick="history.back();" value="Back">
-                    </div>
+            <div class="form-row">
+                <p class="form-label">File Description*</p>
+                <div class="form-item">
+                    <textarea cols="85" rows="5" name="description">{echo isset($attachment)? $attachment->description: ""}</textarea>
                 </div>
-                <div class="form-row">
-                    <div class="form-item">
-                        <input type="submit" class="button blue" name="submitReportIssue" value="Report issue"/>
-                    </div>
+                {if isset($errors["description"])}
+                <p class="form-label-error">{echo join("<br/>", $errors["description"])}</p>
+                {/if}
+            </div>
+            <div class="form-row">
+                <p class="form-label">Multi-file upload</p>
+                <div class="form-item">
+                    <a href="#" class="multi_upload "><span class="icon opsrc add-item"></span></a>
+                    <a href="#" class="multi_upload_dec"><span class="icon opsrc delete-item"></span></a>
                 </div>
-            </form>
+            </div>
+            <div class="form-row">
+                <p class="form-label">Files</p>
+                <div class="form-item file_inputs">
+                    <input type="file" name="files[]" />
+                </div>
+                {if isset($errors["files"])}
+                <p class="form-label-error">{echo join("<br/>", $errors["files"])}</p>
+                {/if}
+            </div>
+
+            <div class="form-row">
+                <div class="form-item">
+                    <input type="button" class="button grey" onclick="history.back();" value="Back">
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-item">
+                    <input type="submit" class="button blue" name="submitReportIssue" value="Report issue"/>
+                </div>
+            </div>
+        </form>
         {/if}{else}
-            No project is matched with this client account
+        No project is matched with this client account
         {/else}
     </div>
 </div>

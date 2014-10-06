@@ -128,13 +128,20 @@ class App_Model_TaskTime extends Model
      */
     public static function fetchTotalTimeByProject($projectId)
     {
-        $timeQuery = self::getQuery(array('SUM(tt.spentTime)' => 'sptime'))
+        $timeQuery = self::getQuery(array("SUM(tt.spentTime)" => 'sptime'))
                 ->join('tb_task', 'tt.taskId = tk.id', 'tk', 
                         array('tk.projectId'))
                 ->where('tk.projectId = ?', (int)$projectId)
                 ->where('tk.deleted = ?', false);
 
-        $time = self::initialize($timeQuery);
-        return array_shift($time);
+        $timeArr = self::initialize($timeQuery);
+        $time = array_shift($timeArr);
+
+        $zero = new DateTime('@0');
+        $offset = new DateTime('@' . (int)$time->sptime * 60);
+        $diff = $zero->diff($offset);
+        $time->sptime = $diff->format('%d days, %h:%i');
+
+        return $time;
     }
 }

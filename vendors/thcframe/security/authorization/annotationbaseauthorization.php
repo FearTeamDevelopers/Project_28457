@@ -20,6 +20,11 @@ class AnnotationBaseAuthorization extends Base implements AuthorizationInterface
      * @var type 
      */
     protected $_type = 'annotationbase';
+    
+    /**
+     * @read
+     * @var type
+     */
     protected $_roleManager;
 
     /**

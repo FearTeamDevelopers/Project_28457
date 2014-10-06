@@ -103,7 +103,7 @@ class App_Controller_User extends Controller
 
         $errors = array();
         $superAdmin = $security->isGranted('role_superadmin');
-        $roles = array_keys($security->getRoleManager()->getRoles());
+        $roles = array_keys($security->getAuthorization()->getRoleManager()->getRoles());
         $clients = App_Model_Client::all(array('active = ?' => true));
 
         $view->set('superadmin', $superAdmin)
@@ -132,7 +132,7 @@ class App_Controller_User extends Controller
                 'firstname' => RequestMethods::post('firstname'),
                 'lastname' => RequestMethods::post('lastname'),
                 'email' => RequestMethods::post('email'),
-                'clientId' => RequestMethods::post('clientid'),
+                'clientId' => RequestMethods::post('clientid', 0),
                 'password' => $hash,
                 'salt' => $salt,
                 'role' => RequestMethods::post('role', 'role_client'),
@@ -142,6 +142,8 @@ class App_Controller_User extends Controller
                 'taskPriorityFilter' => RequestMethods::post('taskPriorityFilter', 'a:0:{}'),
                 'projectStateFilter' => RequestMethods::post('projectStateFilter', 'a:7:{i:0;i:1;i:1;i:2;i:2;i:3;i:3;i:4;i:4;i:5;i:5;i:6;i:6;i:7;}'),
                 'projectPriorityFilter' => RequestMethods::post('projectPriorityFilter', 'a:5:{i:0;i:1;i:1;i:2;i:2;i:3;i:3;i:4;i:4;i:5;}'),
+                'loginLockdownTime' => '',
+                'loginAttempCounter' => 0
             ));
 
             if (empty($errors) && $user->validate()) {
