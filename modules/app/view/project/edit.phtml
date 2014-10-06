@@ -149,6 +149,20 @@
                 {/if}
             </div>
             <div class="form-row">
+                <p class="form-label">Paid</p>
+                <div class="form-item">
+                    <select name="paid">
+                    {if $project->isPaid}
+                    <option value="0">Not yet</option>
+                    <option value="1" selected>Paid</option>
+                    {/if}{else}
+                    <option value="0" selected>Not yet</option>
+                    <option value="1">Paid</option>
+                    {/else}
+                </select>
+                </div>
+            </div>
+            <div class="form-row">
                 <p class="form-label">Active</p>
                 <div class="form-item">
                     <select name="active">

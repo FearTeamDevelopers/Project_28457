@@ -347,6 +347,7 @@ class App_Controller_Project extends Controller
             $project->urlKey = $urlKey;
             $project->description = RequestMethods::post('projdesc');
             $project->maxBudget = RequestMethods::post('budget');
+            $project->isPaid = RequestMethods::post('paid');
             $project->gitRepository = RequestMethods::post('repository');
             $project->taskPrefix = RequestMethods::post('taskprefix');
             $project->plannedStart = RequestMethods::post('plannedStart', date('Y-m-d'));
