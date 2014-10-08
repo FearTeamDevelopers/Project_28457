@@ -64,12 +64,12 @@ class Authentication extends Base
         
         switch ($this->type){
             case 'database':{
-                return new DatabaseAuthentication($this->options, $security);
+                return new DatabaseAuthentication($security, $this->options);
                 break;
             }
             case 'config':{
                 $users = (array) $configuration->security->authentication->users;
-                return new ConfigAuthentication($users, $security);
+                return new ConfigAuthentication($security, $users);
                 break;
             }
             default:{

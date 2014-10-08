@@ -50,7 +50,7 @@ class ConfigAuthentication extends Base implements AuthenticationInterface
      * @param type $users
      * @param type $securityContext
      */
-    public function __construct($users, $securityContext)
+    public function __construct($securityContext, $users = array())
     {
         parent::__construct();
         

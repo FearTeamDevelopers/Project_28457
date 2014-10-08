@@ -11,4 +11,6 @@ interface UserInterface
 {
 
     public function isActive();
+    
+    public function setLastLogin($datetime);
 }

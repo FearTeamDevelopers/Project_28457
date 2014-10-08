@@ -43,10 +43,6 @@ class App_Controller_User extends Controller
                     $status = $security->authenticate($email, $password);
 
                     if ($status === true) {
-                        $user = App_Model_User::first(array('id = ?' => $this->getUser()->getId()));
-                        $user->lastLogin = date('Y-m-d H:i:s', time());
-                        $user->save();
-
                         self::redirect('/');
                     } else {
                         $view->set('account_error', 'Email address and/or password are incorrect');
@@ -353,23 +349,21 @@ class App_Controller_User extends Controller
         $security = Registry::get('security');
 
         $errors = array();
-        $superAdmin = $security->isGranted('role_superadmin');
         $user = App_Model_User::first(
                         array('deleted = ?' => false, 'id = ?' => $id));
 
         if (NULL === $user) {
             $view->warningMessage('User not found');
             self::redirect('/user');
-        } elseif ($user->role == 'role_superadmin' && !$superAdmin) {
+        } elseif ($user->role == 'role_superadmin' && $this->getUser()->getRole() != 'role_superadmin') {
             $view->warningMessage('You dont have permissions to update this user');
             self::redirect('/user');
         }
 
-        $roles = array_keys($security->getRoleManager()->getRoles());
+        $roles = array_keys($security->getAuthorization()->getRoleManager()->getRoles());
         $clients = App_Model_Client::all(array('active = ?' => true));
 
-        $view->set('superadmin', $superAdmin)
-                ->set('clients', $clients)
+        $view->set('clients', $clients)
                 ->set('user', $user)
                 ->set('roles', $roles);
 
@@ -408,7 +402,7 @@ class App_Controller_User extends Controller
             $user->clientId = RequestMethods::post('clientid');
             $user->password = $hash;
             $user->salt = $salt;
-            $user->role = RequestMethods::post('role');
+            $user->role = RequestMethods::post('role', $user->getRole());
             $user->active = RequestMethods::post('active');
             $user->phone = RequestMethods::post('phone');
 

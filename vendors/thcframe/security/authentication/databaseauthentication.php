@@ -35,7 +35,7 @@ class DatabaseAuthentication extends Base implements AuthenticationInterface
     
     private $_securityContext;
 
-    public function __construct($options = array(), $securityContext)
+    public function __construct($securityContext, $options = array())
     {
         parent::__construct($options);
         $this->_securityContext = $securityContext;
@@ -108,8 +108,8 @@ class DatabaseAuthentication extends Base implements AuthenticationInterface
                     throw new Exception\UserPassExpired($errMessage);
                 } else {
                     $user->setLastLogin(date('Y-m-d H:i:s'));
-                    $user->loginAttempCounter = 0;
-                    $user->loginLockdownTime = 0;
+                    $user->setLoginAttempCounter(0);
+                    $user->setLoginLockdownTime(0);
                     $user->save();
 
                     $this->_securityContext->setUser($user);
@@ -120,8 +120,9 @@ class DatabaseAuthentication extends Base implements AuthenticationInterface
                     $this->accountLockdown($user, $counter);
                     throw new Exception\UserInactive($errMessage);
                 } else {
-                    $user->loginAttempCounter = 0;
-                    $user->loginLockdownTime = 0;
+                    $user->setLastLogin(date('Y-m-d H:i:s'));
+                    $user->setLoginAttempCounter(0);
+                    $user->setLoginLockdownTime(0);
                     $user->save();
                     
                     $this->_securityContext->setUser($user);
