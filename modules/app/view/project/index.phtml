@@ -6,7 +6,7 @@
     <div class="box-head"><h2>Filter</h2></div>
     <div class="box-content">
         <form action="#" method="post">
-            <input type="hidden" name="tk" value="{echo $token}" />
+            <input type="hidden" name="csrf" value="{echo $token}" />
             <div class="box-filter"><span>Filter by state:</span><br/>
             {if !empty($states)}
                 {foreach $state in $states}
@@ -42,7 +42,7 @@
     <div class="box-head"><h2>Projects</h2></div>
     <div class="box-content no-pad">
         <form method="post" class="massActionForm" action="/project/massAction">
-            <input type="hidden" name="tk" value="{echo $token}" />
+            <input type="hidden" name="csrf" value="{echo $token}" />
             <table class="stdtable display">
                 <thead>
                     <tr>

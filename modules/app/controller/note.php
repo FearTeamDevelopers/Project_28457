@@ -23,7 +23,7 @@ class App_Controller_Note extends Controller
         $view->set('notes', $notes);
         
         if(RequestMethods::post('submitAddNote')){
-            if($this->checkToken() !== true){
+            if($this->checkCSRFToken() !== true){
                 self::redirect('/note');
             }
             
@@ -59,14 +59,14 @@ class App_Controller_Note extends Controller
                 array('id = ?' => (int)$id, 'userId = ?' => $this->getUser()->getId()));
         
         if($note === null){
-            $view->warningMessage('Note not found');
+            $view->warningMessage(self::ERROR_MESSAGE_2);
             self::redirect('/note');
         }
         
         $view->set('note', $note);
         
         if(RequestMethods::post('submitEditNote')){
-            if($this->checkToken() !== true){
+            if($this->checkCSRFToken() !== true){
                 self::redirect('/note');
             }
             
@@ -77,7 +77,7 @@ class App_Controller_Note extends Controller
                 $note->save();
                 
                 Event::fire('app.log', array('success', 'Note id: ' . $note->getId()));
-                $view->successMessage('All changes were successfully saved');
+                $view->successMessage(self::SUCCESS_MESSAGE_2);
                 self::redirect('/note');
             }else{
                 Event::fire('app.log', array('fail', 'Note id: ' . $note->getId()));
@@ -96,12 +96,12 @@ class App_Controller_Note extends Controller
         $this->willRenderActionView = false;
         $this->willRenderLayoutView = false;
 
-        if ($this->checkToken()) {
+        if ($this->checkCSRFToken()) {
             $note = App_Model_Note::first(
                             array('id = ?' => (int) $id, 'userId = ?' => $this->getUser()->getId()));
 
             if ($note === null) {
-                echo 'Note not found';
+                echo self::ERROR_MESSAGE_2;
             }
 
             if ($note->delete()) {
@@ -109,10 +109,10 @@ class App_Controller_Note extends Controller
                 echo 'success';
             } else {
                 Event::fire('app.log', array('fail', 'Note id: ' . $note->getId()));
-                echo 'An error occured while deleting the note';
+                echo self::ERROR_MESSAGE_1;
             }
         } else {
-            echo 'Oops, something went wrong';
+            echo self::ERROR_MESSAGE_1;
         }
     }
 

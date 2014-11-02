@@ -6,16 +6,51 @@ use THCFrame\Registry\Registry;
 use THCFrame\Events\Events as Event;
 
 /**
- * 
+ * Application and database profiler class
  */
 class Profiler
 {
 
+    /**
+     * Profiler instance
+     * 
+     * @var Profiler
+     */
     private static $_instance = null;
+    
+    /**
+     * Profiler activity status
+     * 
+     * @var boolean
+     */
     private $_enabled = false;
+    
+    /**
+     * Application profiler informations
+     * 
+     * @var array
+     */
     private $_data = array();
+    
+    /**
+     * Database profiler informations
+     * 
+     * @var array
+     */
     private $_dbData = array();
+    
+    /**
+     * Last database profiler indentifier
+     * 
+     * @var string
+     */
     private $_dbLastIdentifier;
+    
+    /**
+     * Type of logging
+     * 
+     * @var string
+     */
     private $_logging;
 
     /**
@@ -35,9 +70,10 @@ class Profiler
     }
 
     /**
+     * Convert unit for better readyability
      * 
-     * @param type $size
-     * @return type
+     * @param mixed $size
+     * @return mixed
      */
     private function convert($size)
     {
@@ -46,7 +82,7 @@ class Profiler
     }
 
     /**
-     * 
+     * Object constructor
      */
     private function __construct()
     {
@@ -62,8 +98,9 @@ class Profiler
     }
 
     /**
+     * Get profiler instance. Create new if needed
      * 
-     * @return type
+     * @return Profiler
      */
     public static function getProfiler()
     {
@@ -74,8 +111,9 @@ class Profiler
     }
 
     /**
+     * Start application profiling
      * 
-     * @param type $identifier
+     * @param string $identifier
      */
     public function start($identifier = 'run')
     {
@@ -89,8 +127,9 @@ class Profiler
     }
 
     /**
+     * End of application profiling
      * 
-     * @param type $identifier
+     * @param string $identifier
      */
     public function end($identifier = 'run')
     {
@@ -162,7 +201,10 @@ class Profiler
     }
 
     /**
+     * Start of database query profiling
      * 
+     * @param string $query
+     * @return type
      */
     public function dbQueryStart($query)
     {
@@ -187,7 +229,10 @@ class Profiler
     }
 
     /**
+     * End of database query profiling
      * 
+     * @param mixed $totalRows
+     * @return type
      */
     public function dbQueryEnd($totalRows)
     {
@@ -202,7 +247,7 @@ class Profiler
     }
 
     /**
-     * 
+     * Save informations into file and return it
      */
     public function printProfilerRecord()
     {

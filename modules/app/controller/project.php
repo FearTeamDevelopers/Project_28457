@@ -45,7 +45,7 @@ class App_Controller_Project extends Controller
                 ->set('states', $states);
 
         if (RequestMethods::post('projectFilterSubmit')) {
-            $this->checkToken();
+            $this->checkCSRFToken();
             
             $filterStates = (array) RequestMethods::post('projectStateFilterVal');
             $filterPriority = (array) RequestMethods::post('projectPriorFilterVal');
@@ -77,7 +77,7 @@ class App_Controller_Project extends Controller
         $view = $this->getActionView();
 
         if (!$this->hasAccessToProject($id)) {
-            $view->warningMessage('You dont have access to this project');
+            $view->warningMessage(self::ERROR_MESSAGE_6);
             self::redirect('/');
         }
 
@@ -109,7 +109,7 @@ class App_Controller_Project extends Controller
                 ->set('nextstates', $nextStates);
 
         if (RequestMethods::post('submitSendMess')) {
-            if($this->checkToken() !== true){
+            if($this->checkCSRFToken() !== true){
                 self::redirect('/project');
             }
             
@@ -150,7 +150,7 @@ class App_Controller_Project extends Controller
                 ->set('submstoken', $this->mutliSubmissionProtectionToken());
 
         if (RequestMethods::post('submitAddProject')) {
-            if ($this->checkToken() !== true &&
+            if ($this->checkCSRFToken() !== true &&
                     $this->checkMutliSubmissionProtectionToken(RequestMethods::post('submstoken')) !== true) {
                 self::redirect('/project');
             }
@@ -220,7 +220,7 @@ class App_Controller_Project extends Controller
         $view = $this->getActionView();
         
         if (!$this->hasAccessToProject($id)) {
-            $view->warningMessage('You dont have access to this project');
+            $view->warningMessage(self::ERROR_MESSAGE_6);
             self::redirect('/');
         }
         
@@ -228,7 +228,7 @@ class App_Controller_Project extends Controller
                 array('active = ?' => true, 'deleted = ?' => false, 'id = ?' => (int)$id));
         
         if($project === null){
-            $view->warningMessage('Project not found');
+            $view->warningMessage(self::ERROR_MESSAGE_2);
             self::redirect('/');
         }
         
@@ -236,7 +236,7 @@ class App_Controller_Project extends Controller
                 ->set('submstoken', $this->mutliSubmissionProtectionToken());
 
         if (RequestMethods::post('uploadFile')) {
-            if ($this->checkToken() !== true &&
+            if ($this->checkCSRFToken() !== true &&
                     $this->checkMutliSubmissionProtectionToken(RequestMethods::post('submstoken')) !== true) {
                 self::redirect('/project');
             }
@@ -302,7 +302,7 @@ class App_Controller_Project extends Controller
         $view = $this->getActionView();
         
         if (!$this->hasAccessToProject($id)) {
-            $view->warningMessage('You dont have access to this project');
+            $view->warningMessage(self::ERROR_MESSAGE_6);
             self::redirect('/');
         }
         
@@ -310,7 +310,7 @@ class App_Controller_Project extends Controller
                 array('deleted = ?' => false, 'id = ?' => (int)$id));
 
         if($project === null){
-            $view->warningMessage('Project not found');
+            $view->warningMessage(self::ERROR_MESSAGE_2);
             self::redirect('/project');
         }
         
@@ -328,7 +328,7 @@ class App_Controller_Project extends Controller
                 ->set('clients', $clients);
 
         if (RequestMethods::post('submitEditProject')) {
-            if($this->checkToken() !== true){
+            if($this->checkCSRFToken() !== true){
                 self::redirect('/project');
             }
             $errors = array();
@@ -358,7 +358,7 @@ class App_Controller_Project extends Controller
                 $project->save();
 
                 Event::fire('app.log', array('success', 'Project id: ' . $project->getId()));
-                $view->successMessage('All changes were successfully saved');
+                $view->successMessage(self::SUCCESS_MESSAGE_2);
                 self::redirect('/project/' . $project->getUrlKey() . '/');
             } else {
                 Event::fire('app.log', array('fail', 'Project id: ' . $project->getId()));
@@ -377,12 +377,12 @@ class App_Controller_Project extends Controller
         $view = $this->getActionView();
         
         if (!$this->hasAccessToProject($id)) {
-            $view->warningMessage('You dont have access to this project');
+            $view->warningMessage(self::ERROR_MESSAGE_6);
             self::redirect('/');
         }
 
         if (RequestMethods::post('performProjectUserAction')) {
-            if($this->checkToken() !== true){
+            if($this->checkCSRFToken() !== true){
                 self::redirect('/project');
             }
             
@@ -412,12 +412,12 @@ class App_Controller_Project extends Controller
                 }
 
                 if (empty($errors)) {
-                    $view->successMessage('Project has been successfully updated');
+                    $view->successMessage(self::SUCCESS_MESSAGE_2);
                     Event::fire('app.log', array('success', 'Assign user: ' . join(', ', $assignedIds). ' to project: '.$id));
                     self::redirect('/project/detail/' . $id . '#assignedUsers');
                 } else {
                     Event::fire('app.log', array('fail', 'Assign user: ' . join(', ', $assignedIds). ' to project: '.$id));
-                    $view->errorMessage('An error occured while assignt user to the project');
+                    $view->errorMessage(self::ERROR_MESSAGE_1);
                 }
             }
         }
@@ -432,11 +432,11 @@ class App_Controller_Project extends Controller
         $this->willRenderLayoutView = false;
         
         if (!$this->hasAccessToProject($projectId)) {
-            echo 'You dont have access to this project';
+            echo self::ERROR_MESSAGE_6;
             return;
         }
         
-        if ($this->checkToken()) {
+        if ($this->checkCSRFToken()) {
             $projectUser = App_Model_ProjectUser::first(
                             array(
                                 'projectId = ?' => $projectId,
@@ -444,7 +444,7 @@ class App_Controller_Project extends Controller
             ));
 
             if ($projectUser === null) {
-                echo 'User is not assigned to this project';
+                echo self::ERROR_MESSAGE_1;
             }
 
             if ($projectUser->delete()) {
@@ -452,10 +452,10 @@ class App_Controller_Project extends Controller
                 echo 'User has been unassigned from project';
             } else {
                 Event::fire('app.log', array('fail', 'Unassign user: ' . $userId. ' from project: '.$projectId));
-                echo 'An error has occured';
+                echo self::ERROR_MESSAGE_1;
             }
         } else {
-            echo 'Oops, something went wrong';
+            echo self::ERROR_MESSAGE_1;
         }
     }
 
@@ -468,7 +468,7 @@ class App_Controller_Project extends Controller
         $view = $this->getActionView();
 
         if (!$this->hasAccessToProject($projectId)) {
-            $view->warningMessage('You dont have access to this project');
+            $view->warningMessage(self::ERROR_MESSAGE_6);
             self::redirect('/');
         }
         
@@ -476,7 +476,7 @@ class App_Controller_Project extends Controller
                 array('active = ?' => true, 'deleted = ?' => false, 'id = ?' => (int) $projectId));
 
         if ($project === null) {
-            $view->warningMessage('Project not found');
+            $view->warningMessage(self::ERROR_MESSAGE_2);
             self::redirect('/project');
         }
 
@@ -485,7 +485,7 @@ class App_Controller_Project extends Controller
             $project->save();
 
             Event::fire('app.log', array('success', 'Project id: ' . $projectId. ' new state '. $state));
-            $view->successMessage('Project state has been updated');
+            $view->successMessage(self::SUCCESS_MESSAGE_2);
             self::redirect('/project/' . $project->getUrlKey() . '/');
         } else {
             Event::fire('app.log', array('fail', 'Project id: ' . $projectId. ' new state '. $state));
@@ -503,7 +503,7 @@ class App_Controller_Project extends Controller
         $view = $this->getActionView();
         
         if (!$this->hasAccessToProject($id)) {
-            $view->warningMessage('You dont have access to this project');
+            $view->warningMessage(self::ERROR_MESSAGE_6);
             self::redirect('/');
         }
         
@@ -511,14 +511,14 @@ class App_Controller_Project extends Controller
                 array('deleted = ?' => false, 'id = ?' => (int) $id));
         
         if($project === null){
-            $view->warningMessage('Project not found');
+            $view->warningMessage(self::ERROR_MESSAGE_2);
             self::redirect('/project');
         }
         
         $view->set('project', $project);
         
         if(RequestMethods::post('submitDeleteProject')){
-            if($this->checkToken() !== true){
+            if($this->checkCSRFToken() !== true){
                 self::redirect('/project');
             }
             $project->deleted = true;
@@ -531,7 +531,7 @@ class App_Controller_Project extends Controller
                 self::redirect('/project');
             }else{
                 Event::fire('app.log', array('fail', 'Project id: ' . $project->getId()));
-                $view->errorMessage('An error occured while deleting the project');
+                $view->errorMessage(self::ERROR_MESSAGE_1);
                 self::redirect('/project');
             }
         }
@@ -545,11 +545,11 @@ class App_Controller_Project extends Controller
         $this->willRenderActionView = false;
         $this->willRenderLayoutView = false;
 
-        if ($this->checkToken()) {
+        if ($this->checkCSRFToken()) {
             $project = App_Model_Project::first(array('id = ?' => (int) $id));
 
             if ($project === null) {
-                echo 'Project not found';
+                echo self::ERROR_MESSAGE_2;
             }
 
             $project->deleted = false;
@@ -561,10 +561,10 @@ class App_Controller_Project extends Controller
                 echo 'success';
             } else {
                 Event::fire('app.log', array('fail', 'Project id: ' . $project->getId()));
-                echo 'An error occured while undeleting the project';
+                echo self::ERROR_MESSAGE_1;
             }
         } else {
-            echo 'Oops, something went wrong';
+            echo self::ERROR_MESSAGE_1;
         }
     }
 
@@ -578,7 +578,7 @@ class App_Controller_Project extends Controller
         $errorsIds = array();
 
         if (RequestMethods::post('performProjectAction')) {
-            if($this->checkToken() !== true){
+            if($this->checkCSRFToken() !== true){
                 self::redirect('/project');
             }
             
@@ -605,7 +605,7 @@ class App_Controller_Project extends Controller
 
                     if (empty($errors)) {
                         Event::fire('app.log', array('activate success', 'Project ids: ' . join(',', $ids)));
-                        $view->successMessage('Projects have been activated successfully');
+                        $view->successMessage(self::SUCCESS_MESSAGE_8);
                     } else {
                         Event::fire('app.log', array('activate fail', 'Project ids: ' . join(',', $errorsIds)));
                         $message = join(PHP_EOL, $errors);
@@ -633,7 +633,7 @@ class App_Controller_Project extends Controller
 
                     if (empty($errors)) {
                         Event::fire('app.log', array('deactivate success', 'Project ids: ' . join(',', $ids)));
-                        $view->successMessage('Projects have been deactivated successfully');
+                        $view->successMessage(self::SUCCESS_MESSAGE_8);
                     } else {
                         Event::fire('app.log', array('deactivate fail', 'Project ids: ' . join(',', $errorsIds)));
                         $message = join(PHP_EOL, $errors);

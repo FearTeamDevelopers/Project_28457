@@ -5,7 +5,6 @@ namespace App\Etc;
 use THCFrame\Events\Events;
 use THCFrame\Registry\Registry;
 use THCFrame\Controller\Controller as BaseController;
-use THCFrame\Request\RequestMethods;
 use THCFrame\Core\StringMethods;
 
 /**
@@ -18,6 +17,22 @@ class Controller extends BaseController
 
     private $_security;
 
+    const SUCCESS_MESSAGE_1 = ' has been successfully created';
+    const SUCCESS_MESSAGE_2 = 'All changes were successfully saved';
+    const SUCCESS_MESSAGE_3 = ' has been successfully deleted';
+    const SUCCESS_MESSAGE_4 = 'Everything has been successfully activated';
+    const SUCCESS_MESSAGE_5 = 'Everything has been successfully deactivated';
+    const SUCCESS_MESSAGE_6 = 'Everything has been successfully deleted';
+    const SUCCESS_MESSAGE_7 = 'Everything has been successfully uploaded';
+    const SUCCESS_MESSAGE_8 = 'Everything has been successfully saved';
+    const SUCCESS_MESSAGE_9 = 'Everything has been successfully added';
+    const ERROR_MESSAGE_1 = 'Oops, something went wrong';
+    const ERROR_MESSAGE_2 = 'Not found';
+    const ERROR_MESSAGE_3 = 'Unknown error eccured';
+    const ERROR_MESSAGE_4 = 'You dont have permissions to do this';
+    const ERROR_MESSAGE_5 = 'Required fields are not valid';
+    const ERROR_MESSAGE_6 = 'Access denied';
+    
     /**
      * 
      * @param type $string
@@ -62,15 +77,14 @@ class Controller extends BaseController
             self::redirect('/login');
         }
 
-        //6h inactivity till logout
-        if ($session->get('lastActive') > time() - 300) {
+        //5min inactivity till logout
+        if (time() - $session->get('lastActive') < 300) {
             $session->set('lastActive', time());
         } else {
             $view = $this->getActionView();
 
             $view->infoMessage('You has been logged out for long inactivity');
-            $this->_security->logout();
-            self::redirect('/login');
+            self::redirect('/logout');
         }
     }
 
@@ -82,9 +96,8 @@ class Controller extends BaseController
         $view = $this->getActionView();
 
         if ($this->_security->getUser() && $this->_security->isGranted('role_client') !== true) {
-            $view->infoMessage('Access denied');
-            $this->_security->logout();
-            self::redirect('/login');
+            $view->infoMessage(self::ERROR_MESSAGE_6);
+            self::redirect('/logout');
         }
     }
 
@@ -109,9 +122,8 @@ class Controller extends BaseController
         $view = $this->getActionView();
 
         if ($this->_security->getUser() && $this->_security->isGranted('role_developer') !== true) {
-            $view->infoMessage('Access denied');
-            $this->_security->logout();
-            self::redirect('/login');
+            $view->infoMessage(self::ERROR_MESSAGE_6);
+            self::redirect('/logout');
         }
     }
 
@@ -136,9 +148,8 @@ class Controller extends BaseController
         $view = $this->getActionView();
 
         if ($this->_security->getUser() && $this->_security->isGranted('role_projectmanager') !== true) {
-            $view->infoMessage('Access denied');
-            $this->_security->logout();
-            self::redirect('/login');
+            $view->infoMessage(self::ERROR_MESSAGE_6);
+            self::redirect('/logout');
         }
     }
 
@@ -163,9 +174,8 @@ class Controller extends BaseController
         $view = $this->getActionView();
 
         if ($this->_security->getUser() && $this->_security->isGranted('role_admin') !== true) {
-            $view->infoMessage('Access denied');
-            $this->_security->logout();
-            self::redirect('/login');
+            $view->infoMessage(self::ERROR_MESSAGE_6);
+            self::redirect('/logout');
         }
     }
 
@@ -190,9 +200,8 @@ class Controller extends BaseController
         $view = $this->getActionView();
 
         if ($this->_security->getUser() && $this->_security->isGranted('role_superadmin') !== true) {
-            $view->infoMessage('Access denied');
-            $this->_security->logout();
-            self::redirect('/login');
+            $view->infoMessage(self::ERROR_MESSAGE_6);
+            self::redirect('/logout');
         }
     }
 
@@ -242,10 +251,7 @@ class Controller extends BaseController
      */
     public function getUser()
     {
-        $this->_security = Registry::get('security');
-        $user = $this->_security->getUser();
-
-        return $user;
+        return $this->_security->getUser();
     }
 
     /**
@@ -298,11 +304,11 @@ class Controller extends BaseController
     /**
      * 
      */
-    public function checkToken()
+    public function checkCSRFToken()
     {
-        if($this->_security->checkCsrfToken(RequestMethods::post('tk'))){
+        if ($this->_security->getCSRF()->verifyRequest()) {
             return true;
-        }else{
+        } else {
             return false;
         }
     }
@@ -314,26 +320,28 @@ class Controller extends BaseController
     {
         $view = $this->getActionView();
         $layoutView = $this->getLayoutView();
-        $user = $this->getUser();
+        $user = $this->_security->getUser();
 
         if ($view) {
-            $view->set('authUser', $user);
+            $view->set('authUser', $user)
+                    ->set('env', ENV);
             $view->set('isClient', $this->isClient())
                     ->set('isDeveloper', $this->isDeveloper())
                     ->set('isPM', $this->isProjectManager())
                     ->set('isAdmin', $this->isAdmin())
                     ->set('isSuperAdmin', $this->isSuperAdmin())
-                    ->set('token', $this->_security->getCsrfToken());
+                    ->set('token', $this->_security->getCSRF()->getToken());
         }
 
         if ($layoutView) {
-            $layoutView->set('authUser', $user);
+            $layoutView->set('authUser', $user)
+                    ->set('env', ENV);
             $layoutView->set('isClient', $this->isClient())
                     ->set('isDeveloper', $this->isDeveloper())
                     ->set('isPM', $this->isProjectManager())
                     ->set('isAdmin', $this->isAdmin())
                     ->set('isSuperAdmin', $this->isSuperAdmin())
-                    ->set('token', $this->_security->getCsrfToken());
+                    ->set('token', $this->_security->getCSRF()->getToken());
         }
 
         parent::render();

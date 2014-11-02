@@ -6,12 +6,9 @@ use THCFrame\Core\Base;
 use THCFrame\Security\Exception;
 use THCFrame\Events\Events as Event;
 use THCFrame\Registry\Registry;
-use THCFrame\Security\SecurityInterface;
 
 /**
- * Description of Authentication
- *
- * @author Tomy
+ * Authentication factory class
  */
 class Authentication extends Base
 {
@@ -39,9 +36,11 @@ class Authentication extends Base
     }
 
     /**
-     * 
+     * Factory method
+     * It accepts initialization options and selects the type of returned object, 
+     * based on the internal $_type property
      */
-    public function initialize(SecurityInterface $security)
+    public function initialize()
     {
         Event::fire('framework.authentication.initialize.before', array($this->type));
         
@@ -50,7 +49,7 @@ class Authentication extends Base
         if (!$this->type) {
             if(!empty($configuration->security->authentication)){
                 $this->type = $configuration->security->authentication->type;
-                $this->options = (array) $configuration->security->authentication->credentials;
+                $this->options = (array) $configuration->security->authentication;
             }else{
                 throw new \Exception('Error in configuration file');
             }
@@ -64,12 +63,12 @@ class Authentication extends Base
         
         switch ($this->type){
             case 'database':{
-                return new DatabaseAuthentication($security, $this->options);
+                return new DatabaseAuthentication($this->options);
                 break;
             }
             case 'config':{
                 $users = (array) $configuration->security->authentication->users;
-                return new ConfigAuthentication($security, $users);
+                return new ConfigAuthentication($users);
                 break;
             }
             default:{

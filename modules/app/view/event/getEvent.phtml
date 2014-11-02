@@ -1,5 +1,5 @@
 <form class="form" action="/event/getEvent" method="post" id="ajaxEventForm">
-    <input type="hidden" name="tk" value="{echo $token}" />
+    <input type="hidden" name="csrf" value="{echo $token}" />
     <input type="hidden" name="event_id" value="{echo $calendar->getId()}"/>
     <div class="form-row">
         <p class="form-label">Creted by</p>

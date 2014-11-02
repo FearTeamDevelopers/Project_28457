@@ -3,7 +3,7 @@
     <div class="box-content">
         {if !empty($projects)}
         <form class="form uploadFileForm" action="#" method="post" enctype="multipart/form-data">
-            <input type="hidden" name="tk" value="{echo $token}" />
+            <input type="hidden" name="csrf" value="{echo $token}" />
             <input type="hidden" name="submstoken" id="submstoken" value="{echo $submstoken}" />
             <input type="hidden" name="MAX_FILE_SIZE" value="10000000"/>
 

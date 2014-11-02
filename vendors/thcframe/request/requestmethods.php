@@ -3,9 +3,7 @@
 namespace THCFrame\Request;
 
 /**
- * Description of RequestMethods
- *
- * @author Tomy
+ * Request methods wrapper class
  */
 class RequestMethods
 {
@@ -21,10 +19,11 @@ class RequestMethods
     }
 
     /**
+     * Get value from $_GET array
      * 
-     * @param type $key
-     * @param type $default
-     * @return type
+     * @param mixed $key
+     * @param mixed $default
+     * @return mixed
      */
     public static function get($key, $default = '')
     {
@@ -35,10 +34,11 @@ class RequestMethods
     }
 
     /**
+     * Get value from $_POST array
      * 
-     * @param type $key
-     * @param type $default
-     * @return type
+     * @param mixed $key
+     * @param mixed $default
+     * @return mixed
      */
     public static function post($key, $default = '')
     {
@@ -49,8 +49,9 @@ class RequestMethods
     }
     
     /**
+     * Check if key is in $_POST array
      * 
-     * @param type $key
+     * @param mixed $key
      * @return boolean
      */
     public static function issetpost($key)
@@ -62,10 +63,11 @@ class RequestMethods
     }
 
     /**
+     * Get value from $_SERVER array
      * 
-     * @param type $key
-     * @param type $default
-     * @return type
+     * @param mixed $key
+     * @param mixed $default
+     * @return mixed
      */
     public static function server($key, $default = '')
     {
@@ -76,10 +78,11 @@ class RequestMethods
     }
 
     /**
+     * Get value from $_COOKIE array
      * 
-     * @param type $key
-     * @param type $default
-     * @return type
+     * @param mixed $key
+     * @param mixed $default
+     * @return mixed
      */
     public static function cookie($key, $default = '')
     {

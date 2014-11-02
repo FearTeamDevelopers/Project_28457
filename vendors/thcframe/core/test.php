@@ -3,9 +3,7 @@
 namespace THCFrame\Core;
 
 /**
- * Description of Test
- *
- * @author Tomy
+ * Test class
  */
 class Test
 {

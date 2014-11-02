@@ -3,9 +3,7 @@
 namespace THCFrame\Core;
 
 /**
- * Description of ArrayMethods
- *
- * @author Tomy
+ * ArrayMethods class
  */
 class ArrayMethods
 {
@@ -27,10 +25,10 @@ class ArrayMethods
     }
 
     /**
-     * Method removes all values considered empty() and returns the resultant array
+     * Remove all values considered empty() and returns the resultant array
      * 
-     * @param type $array
-     * @return type
+     * @param array $array
+     * @return array
      */
     public static function clean($array)
     {
@@ -43,8 +41,8 @@ class ArrayMethods
      * Method returns an array, which contains all the items of the initial array, 
      * after they have been trimmed of all whitespace
      * 
-     * @param type $array
-     * @return type
+     * @param array $array
+     * @return array
      */
     public static function trim($array)
     {
@@ -54,9 +52,10 @@ class ArrayMethods
     }
 
     /**
+     * Return first value of an array
      * 
-     * @param type $array
-     * @return null
+     * @param array $array
+     * @return mixed
      */
     public static function first($array)
     {
@@ -69,9 +68,10 @@ class ArrayMethods
     }
 
     /**
+     * Return last value of an array
      * 
-     * @param type $array
-     * @return null
+     * @param array $array
+     * @return mixed
      */
     public static function last($array)
     {
@@ -84,8 +84,9 @@ class ArrayMethods
     }
 
     /**
+     * Convert array to object
      * 
-     * @param type $array
+     * @param array $array
      * @return \stdClass
      */
     public static function toObject($array)
@@ -105,9 +106,9 @@ class ArrayMethods
 
     /**
      * 
-     * @param type $array
-     * @param type $return
-     * @return type
+     * @param array $array
+     * @param array $return
+     * @return array
      */
     public static function flatten($array, $return = array())
     {
@@ -123,9 +124,10 @@ class ArrayMethods
     }
 
     /**
+     * Create query string form array
      * 
-     * @param type $array
-     * @return type
+     * @param array $array
+     * @return string
      */
     public static function toQueryString($array)
     {

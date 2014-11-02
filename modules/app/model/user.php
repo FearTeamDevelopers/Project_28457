@@ -1,28 +1,14 @@
 <?php
 
-use THCFrame\Model\Model;
-use THCFrame\Security\UserInterface;
+use THCFrame\Security\Model\BasicUser;
 
 /**
  * Description of App_Model_User
  *
  * @author Tomy
  */
-class App_Model_User extends Model implements UserInterface
+class App_Model_User extends BasicUser
 {
-
-    /**
-     * @readwrite
-     */
-    protected $_alias = 'us';
-
-    /**
-     * @column
-     * @readwrite
-     * @primary
-     * @type auto_increment
-     */
-    protected $_id;
 
     /**
      * @column
@@ -32,76 +18,7 @@ class App_Model_User extends Model implements UserInterface
      * @validate numeric, max(8)
      */
     protected $_clientId;
-
-    /**
-     * @column
-     * @readwrite
-     * @type text
-     * @length 60
-     * @index
-     * @unique
-     *
-     * @validate required, email, max(60)
-     * @label email address
-     */
-    protected $_email;
-
-    /**
-     * @column
-     * @readwrite
-     * @type text
-     * @length 250
-     * @index
-     *
-     * @validate required, min(5), max(250)
-     * @label password
-     */
-    protected $_password;
-
-    /**
-     * @column
-     * @readwrite
-     * @type text
-     * @length 40
-     * @unique
-     *
-     * @validate min(30), max(40)
-     */
-    protected $_salt;
-
-    /**
-     * @column
-     * @readwrite
-     * @type boolean
-     * @index
-     * 
-     * @validate max(3)
-     * @label active
-     */
-    protected $_active;
-
-    /**
-     * @column
-     * @readwrite
-     * @type text
-     * @length 30
-     *
-     * @validate alphanumeric, max(30)
-     * @label username
-     */
-    protected $_username;
-
-    /**
-     * @column
-     * @readwrite
-     * @type text
-     * @length 25
-     * 
-     * @validate required, alpha, max(25)
-     * @label user role
-     */
-    protected $_role;
-
+   
     /**
      * @column
      * @readwrite
@@ -139,39 +56,6 @@ class App_Model_User extends Model implements UserInterface
      * @column
      * @readwrite
      * @type text
-     * @length 25
-     *
-     * @validate datetime, max(25)
-     * @label password expiration
-     */
-    protected $_pwdExpire;
-
-    /**
-     * @column
-     * @readwrite
-     * @type text
-     * @length 50
-     *
-     * @validate alphanumeric, max(50)
-     * @label password reset key
-     */
-    protected $_pwdResetKey;
-
-    /**
-     * @column
-     * @readwrite
-     * @type text
-     * @length 25
-     * 
-     * @validate datetime, max(25)
-     * @label password reset key expiration
-     */
-    protected $_pwdResetKeyExpire;
-
-    /**
-     * @column
-     * @readwrite
-     * @type text
      * @length 256
      */
     protected $_projectStateFilter;
@@ -203,53 +87,11 @@ class App_Model_User extends Model implements UserInterface
     /**
      * @column
      * @readwrite
-     * @type datetime
-     */
-    protected $_lastLogin;
-
-    /**
-     * @column
-     * @readwrite
-     * @type text
-     * @length 30
-     *
-     * @validate numeric, max(30)
-     * @label account lockdown time
-     */
-    protected $_loginLockdownTime;
-
-    /**
-     * @column
-     * @readwrite
-     * @type tinyint
-     *
-     * @validate numeric, max(2)
-     * @label login attemp counter
-     */
-    protected $_loginAttempCounter;
-    
-    /**
-     * @column
-     * @readwrite
      * @type boolean
      * 
      * @validate max(3)
      */
     protected $_deleted;
-
-    /**
-     * @column
-     * @readwrite
-     * @type datetime
-     */
-    protected $_created;
-
-    /**
-     * @column
-     * @readwrite
-     * @type datetime
-     */
-    protected $_modified;
 
     /**
      * 
@@ -263,32 +105,12 @@ class App_Model_User extends Model implements UserInterface
             $this->setCreated(date('Y-m-d H:i:s'));
             $this->setActive(true);
             $this->setDeleted(false);
+            $this->setLastLogin(0);
+            $this->setTotalLoginAttempts(0);
+            $this->setLastLoginAttempt(0);
+            $this->setFirstLoginAttempt(0);
         }
         $this->setModified(date('Y-m-d H:i:s'));
-    }
-
-    /**
-     * 
-     * @param type $datetime
-     */
-    public function setLastLogin($datetime)
-    {
-        $this->_lastLogin = $datetime;
-    }
-    
-    /**
-     * 
-     * @param type $value
-     * @throws \THCFrame\Security\Exception\Role
-     */
-    public function setRole($value)
-    {
-        $role = strtolower(substr($value, 0, 5));
-        if ($role != 'role_') {
-            throw new \THCFrame\Security\Exception\Role(sprintf('Role %s is not valid', $value));
-        } else {
-            $this->_role = $value;
-        }
     }
 
     /**
@@ -298,14 +120,6 @@ class App_Model_User extends Model implements UserInterface
     public function getRoleFormated()
     {
         return ucfirst(str_replace('role_', '', $this->_role));
-    }
-
-    /**
-     * 
-     */
-    public function isActive()
-    {
-        return (boolean) $this->_active;
     }
 
     /**
@@ -550,8 +364,8 @@ class App_Model_User extends Model implements UserInterface
                 ->join('tb_project', 'tk.projectId = pr.id', 'pr',
                         array('pr.id' => 'pid', 'pr.title' => 'prTitle', 'pr.urlKey' => 'prUrlKey'))
                 ->where('pr.deleted = ?', false)
-                ->where('tt.logDate > ?', $firstDay)
-                ->where('tt.logDate < ?', $lastDay)
+                ->where('tt.logDate >= ?', $firstDay)
+                ->where('tt.logDate <= ?', $lastDay)
                 ->where('tt.userId = ?', $this->getId())
                 ->groupby('pr.urlKey');
         $projectTitles = App_Model_TaskTime::initialize($projectQuery);
@@ -565,8 +379,8 @@ class App_Model_User extends Model implements UserInterface
                                 array('tk.title', 'tk.urlKey', 'tk.id' => 'tId'))
                         ->where('tk.deleted = ?', false)
                         ->where('tk.projectId = ?', $project->pid)
-                        ->where('tt.logDate > ?', $firstDay)
-                        ->where('tt.logDate < ?', $lastDay)
+                        ->where('tt.logDate >= ?', $firstDay)
+                        ->where('tt.logDate <= ?', $lastDay)
                         ->where('tt.userId = ?', $this->getId())
                         ->groupby('tk.title');
                 $taskTitles = App_Model_TaskTime::initialize($taskQuery);
@@ -574,8 +388,8 @@ class App_Model_User extends Model implements UserInterface
                 foreach ($taskTitles as $task) {
                     $time = App_Model_TaskTime::all(array(
                                 'tt.taskId = ?' => $task->tId,
-                                'tt.logDate > ?' => $firstDay,
-                                'tt.logDate < ?' => $lastDay,
+                                'tt.logDate >= ?' => $firstDay,
+                                'tt.logDate <= ?' => $lastDay,
                                 'tt.userId = ?' => $this->getId()
                                     ),
                             array('*'), 

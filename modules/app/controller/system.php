@@ -96,7 +96,7 @@ class App_Controller_System extends Controller
         $view->set('config', $config);
         
         if(RequestMethods::post('submitEditSet')){
-            if($this->checkToken() !== true){
+            if($this->checkCSRFToken() !== true){
                 self::redirect('/system');
             }
             

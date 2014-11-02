@@ -8,9 +8,7 @@ use THCFrame\Module\Exception;
 use THCFrame\Events\SubscriberInterface;
 
 /**
- * Description of Module
- *
- * @author Tomy
+ * Application module class
  */
 class Module extends Base
 {
@@ -26,8 +24,9 @@ class Module extends Base
     protected $_observerClass;
 
     /**
+     * Object constructor
      * 
-     * @param type $options
+     * @param array $options
      */
     public function __construct($options = array())
     {
@@ -45,7 +44,7 @@ class Module extends Base
     }
 
     /**
-     * 
+     * Create module-specific events
      */
     private function addModuleEvents()
     {
@@ -83,8 +82,9 @@ class Module extends Base
     }
 
     /**
+     * Get module-specific routes
      * 
-     * @return type
+     * @return array
      */
     public function getModuleRoutes()
     {

@@ -8,9 +8,7 @@ use THCFrame\Core\StringMethods;
 use THCFrame\Template\Exception as Exception;
 
 /**
- * Description of Template
- *
- * @author Tomy
+ * Template processing class
  */
 class Template extends Base
 {
@@ -88,7 +86,8 @@ class Template extends Base
 
     /**
      * The _tag() method calls the implementation’s match() method.
-     * The _tag() method will generate a $node array, which contains a bit of metadata about the tag
+     * The _tag() method will generate a $node array, 
+     * which contains a bit of metadata about the tag
      * 
      * @param string $source
      * @return array

@@ -60,7 +60,7 @@ class App_Controller_Task extends Controller
                 ->set('submstoken', $this->mutliSubmissionProtectionToken());
 
         if (RequestMethods::post('submitAddTask')) {
-            if ($this->checkToken() !== true &&
+            if ($this->checkCSRFToken() !== true &&
                     $this->checkMutliSubmissionProtectionToken(RequestMethods::post('submstoken')) !== true) {
                 self::redirect('/project');
             }
@@ -172,7 +172,7 @@ class App_Controller_Task extends Controller
         $task = App_Model_Task::fetchTaskByIdBasicInfo($id);
 
         if ($task === null) {
-            $view->warningMessage('Task not found');
+            $view->warningMessage(self::ERROR_MESSAGE_2);
             self::redirect('/project');
         }
 
@@ -191,7 +191,7 @@ class App_Controller_Task extends Controller
                 ->set('users', $users);
 
         if (RequestMethods::post('submitEditTask')) {
-            if($this->checkToken() !== true){
+            if($this->checkCSRFToken() !== true){
                 self::redirect('/project');
             }
 
@@ -207,7 +207,7 @@ class App_Controller_Task extends Controller
                 $task->save();
 
                 Event::fire('app.log', array('success', 'Task id: ' . $task->getId()));
-                $view->successMessage('All changes were successfully saved');
+                $view->successMessage(self::SUCCESS_MESSAGE_2);
                 self::redirect('/task/' . $task->getUrlKey() . '/');
             } else {
                 Event::fire('app.log', array('fail', 'Task id: ' . $task->getId()));
@@ -227,7 +227,7 @@ class App_Controller_Task extends Controller
         $task = App_Model_Task::fetchTaskById($id);
 
         if ($task === null) {
-            $view->warningMessage('Task not found');
+            $view->warningMessage(self::ERROR_MESSAGE_2);
             self::redirect('/project');
         }
 
@@ -252,7 +252,7 @@ class App_Controller_Task extends Controller
                 ->set('nextstates', $nextStates);
 
         if (RequestMethods::post('submitSendMess')) {
-            if($this->checkToken() !== true){
+            if($this->checkCSRFToken() !== true){
                 self::redirect('/project');
             }
             
@@ -294,12 +294,12 @@ class App_Controller_Task extends Controller
                         array('id', 'firstname', 'lastname'));
 
         if ($task === null) {
-            $view->warningMessage('Task not found');
+            $view->warningMessage(self::ERROR_MESSAGE_2);
             self::redirect('/');
         }
 
         if ($users === null) {
-            $view->warningMessage('No user found');
+            $view->warningMessage(self::ERROR_MESSAGE_2);
             self::redirect('/');
         }
 
@@ -307,7 +307,7 @@ class App_Controller_Task extends Controller
                 ->set('users', $users);
 
         if (RequestMethods::post('assigntouser')) {
-            if($this->checkToken() !== true){
+            if($this->checkCSRFToken() !== true){
                 self::redirect('/project');
             }
             
@@ -317,11 +317,11 @@ class App_Controller_Task extends Controller
                 $task->save();
 
                 Event::fire('app.log', array('success', 'Task id: ' . $task->getId() . ' - Assign to: ' . $task->assignedTo));
-                $view->successMessage('Task has been reassigned successfully');
+                $view->successMessage(self::SUCCESS_MESSAGE_2);
                 self::redirect('/task/' . $task->getUrlKey() . '/');
             } else {
                 Event::fire('app.log', array('fail', 'Task id: ' . $task->getId()));
-                $view->errorMessage('An error occured while assigning the task');
+                $view->errorMessage(self::ERROR_MESSAGE_1);
                 self::redirect('/project/detail/' . $task->getProjectId());
             }
         }
@@ -348,11 +348,11 @@ class App_Controller_Task extends Controller
             $task->save();
 
             Event::fire('app.log', array('success', 'Task id: ' . $task->getId()));
-            $view->successMessage('Task has been reassigned successfully');
+            $view->successMessage(self::SUCCESS_MESSAGE_2);
             self::redirect('/task/' . $task->getUrlKey() . '/');
         } else {
             Event::fire('app.log', array('fail', 'Task id: ' . $task->getId()));
-            $view->errorMessage('An error occured while assigning the task');
+            $view->errorMessage(self::ERROR_MESSAGE_1);
             self::redirect('/project/detail/' . $task->getProjectId());
         }
     }
@@ -368,7 +368,7 @@ class App_Controller_Task extends Controller
         $task = App_Model_Task::first(array('id = ?' => (int) $taskId));
 
         if ($task === null) {
-            $view->warningMessage('Task not found');
+            $view->warningMessage(self::ERROR_MESSAGE_2);
             self::redirect('/project');
         }
 
@@ -391,11 +391,11 @@ class App_Controller_Task extends Controller
             $task->save();
 
             Event::fire('app.log', array('success', 'Task id: ' . $task->getId() . ' - new state: ' . $task->stateId));
-            $view->successMessage('Task state has been updated');
+            $view->successMessage(self::SUCCESS_MESSAGE_2);
             self::redirect('/task/' . $task->getUrlKey() . '/');
         } else {
             Event::fire('app.log', array('fail', 'Task id: ' . $task->getId()));
-            $view->warningMessage('Task state could not be updated');
+            $view->warningMessage(self::ERROR_MESSAGE_1);
             self::redirect('/task/' . $task->getUrlKey() . '/');
         }
     }
@@ -412,14 +412,14 @@ class App_Controller_Task extends Controller
                         array('deleted = ?' => false, 'id = ?' => (int) $id));
 
         if ($task === null) {
-            $view->warningMessage('Task not found');
+            $view->warningMessage(self::ERROR_MESSAGE_2);
             self::redirect('/');
         }
 
         $view->set('task', $task);
 
         if (RequestMethods::post('submitDeleteTask')) {
-            if($this->checkToken() !== true){
+            if($this->checkCSRFToken() !== true){
                 self::redirect('/project');
             }
             $task->deleted = true;
@@ -432,7 +432,7 @@ class App_Controller_Task extends Controller
                 self::redirect('/project/detail/' . $task->getProjectId());
             } else {
                 Event::fire('app.log', array('fail', 'Task id: ' . $task->getId()));
-                $view->errorMessage('An error occured while deleting the task');
+                $view->errorMessage(self::ERROR_MESSAGE_1);
                 self::redirect('/project/detail/' . $task->getProjectId());
             }
         }
@@ -446,11 +446,11 @@ class App_Controller_Task extends Controller
         $this->willRenderActionView = false;
         $this->willRenderLayoutView = false;
 
-        if ($this->checkToken()) {
+        if ($this->checkCSRFToken()) {
             $task = App_Model_Task::first(array('id = ?' => (int) $id));
 
             if ($task === null) {
-                echo 'Task not found';
+                echo self::ERROR_MESSAGE_2;
             }
 
             $task->deleted = false;
@@ -462,10 +462,10 @@ class App_Controller_Task extends Controller
                 echo 'success';
             } else {
                 Event::fire('app.log', array('fail', 'Task id: ' . $task->getId()));
-                echo 'An error occured while undeleting the task';
+                echo self::ERROR_MESSAGE_1;
             }
         } else {
-            echo 'Oops, something went wrong';
+            echo self::ERROR_MESSAGE_1;
         }
     }
 
@@ -480,7 +480,7 @@ class App_Controller_Task extends Controller
                         array('active = ?' => true, 'deleted = ?' => false, 'id = ?' => (int) $id));
 
         if ($task === null) {
-            $view->warningMessage('Task not found');
+            $view->warningMessage(self::ERROR_MESSAGE_2);
             self::redirect('/project');
         }
 
@@ -488,7 +488,7 @@ class App_Controller_Task extends Controller
                 ->set('submstoken', $this->mutliSubmissionProtectionToken());
 
         if (RequestMethods::post('uploadFile')) {
-            if ($this->checkToken() !== true &&
+            if ($this->checkCSRFToken() !== true &&
                     $this->checkMutliSubmissionProtectionToken(RequestMethods::post('submstoken')) !== true) {
                 self::redirect('/project');
             }
@@ -554,14 +554,14 @@ class App_Controller_Task extends Controller
         $this->willRenderLayoutView = false;
         $this->willRenderActionView = false;
 
-        if ($this->checkToken()) {
+        if ($this->checkCSRFToken()) {
             $subTask = App_Model_TaskSubTask::first(array(
                         'taskId = ?' => (int) $taskId,
                         'subTaskId = ?' => (int) $subTaskId
             ));
 
             if ($subTask === null) {
-                echo 'Subtask not found';
+                echo self::ERROR_MESSAGE_2;
             }
 
             if ($subTask->delete()) {
@@ -569,10 +569,10 @@ class App_Controller_Task extends Controller
                 echo 'success';
             } else {
                 Event::fire('app.log', array('fail', 'Task id: ' . $taskId . ' - subtask id: ' . $subTaskId));
-                echo 'An error occured while deleting the subtask';
+                echo self::ERROR_MESSAGE_1;
             }
         } else {
-            echo 'Oops, something went wrong';
+            echo self::ERROR_MESSAGE_1;
         }
     }
 
@@ -586,7 +586,7 @@ class App_Controller_Task extends Controller
         $this->willRenderLayoutView = false;
         $this->willRenderActionView = false;
 
-        if ($this->checkToken()) {
+        if ($this->checkCSRFToken()) {
             $relTask1 = App_Model_TaskSubTask::first(array(
                         'taskId = ?' => (int) $taskId,
                         'subTaskId = ?' => (int) $relTaskId
@@ -598,7 +598,7 @@ class App_Controller_Task extends Controller
             ));
 
             if ($relTask1 === null || $relTask2 === null) {
-                echo 'Related task not found';
+                echo self::ERROR_MESSAGE_2;
             }
 
             if ($relTask1->delete() && $relTask2->delete()) {
@@ -606,10 +606,10 @@ class App_Controller_Task extends Controller
                 echo 'success';
             } else {
                 Event::fire('app.log', array('fail', 'Task id: ' . $taskId . ' - related task id: ' . $relTaskId));
-                echo 'An error occured while deleting the related task';
+                echo self::ERROR_MESSAGE_1;
             }
         } else {
-            echo 'Oops, something went wrong';
+            echo self::ERROR_MESSAGE_1;
         }
     }
 
@@ -640,7 +640,7 @@ class App_Controller_Task extends Controller
                 ->set('taskid', $task->getId());
 
         if (RequestMethods::post('submitAddSubtask')) {
-            if($this->checkToken() !== true){
+            if($this->checkCSRFToken() !== true){
                 self::redirect('/project');
             }
 
@@ -669,7 +669,7 @@ class App_Controller_Task extends Controller
                         array('active = ?' => true, 'deleted = ?' => false, 'id = ?' => (int) $id));
 
         if ($task === null) {
-            $view->warningMessage('Task not found');
+            $view->warningMessage(self::ERROR_MESSAGE_2);
             self::redirect('/');
         }
 
@@ -683,7 +683,7 @@ class App_Controller_Task extends Controller
                 ->set('taskid', $task->getId());
 
         if (RequestMethods::post('submitAddReltask')) {
-            if($this->checkToken() !== true){
+            if($this->checkCSRFToken() !== true){
                 self::redirect('/project');
             }
 
@@ -720,13 +720,13 @@ class App_Controller_Task extends Controller
                     array('id', 'urlKey'));
 
         if ($task === null) {
-            $view->warningMessage('Task not found');
+            $view->warningMessage(self::ERROR_MESSAGE_2);
         }
 
         $view->set('task', $task);
 
         if (RequestMethods::post('submitLogTime')) {
-            if($this->checkToken() !== true){
+            if($this->checkCSRFToken() !== true){
                 self::redirect('/project');
             }
 
@@ -777,12 +777,12 @@ class App_Controller_Task extends Controller
         $this->willRenderActionView = false;
         $this->willRenderLayoutView = false;
 
-        if ($this->checkToken()) {
+        if ($this->checkCSRFToken()) {
             $timelog = App_Model_TaskTime::first(
                             array('id = ?' => (int) $id, 'userId = ?' => $this->getUser()->getId()));
 
             if ($timelog === null) {
-                echo 'Time log not found';
+                echo self::ERROR_MESSAGE_2;
             }
 
             if ($timelog->delete()) {
@@ -790,10 +790,10 @@ class App_Controller_Task extends Controller
                 echo 'success';
             } else {
                 Event::fire('app.log', array('fail', 'Time log for task: ' . $timelog->getTaskId()));
-                echo 'An error occured while deleting the time log';
+                echo self::ERROR_MESSAGE_1;
             }
         } else {
-            echo 'Oops, something went wrong';
+            echo self::ERROR_MESSAGE_1;
         }
     }
 

@@ -2,38 +2,46 @@
 
 namespace THCFrame\View;
 
-use THCFrame\Core\Base as Base;
+use THCFrame\Core\Base;
 use THCFrame\Events\Events as Event;
-use THCFrame\Template as Template;
+use THCFrame\Template;
 use THCFrame\View\Exception as Exception;
+use THCFrame\Request\RequestMethods;
+use THCFrame\Registry\Registry;
 
 /**
- * Description of View
- *
- * @author Tomy
+ * View class
  */
 class View extends Base
 {
 
     /**
+     * View file
+     * 
      * @readwrite
      */
     protected $_file;
 
     /**
+     * Storage for view data
+     * 
      * @readwrite
      */
     protected $_data;
 
     /**
-     * @readwrite
-     */
-    protected $_flashMessage;
-
-    /**
+     * Template instance
+     * 
      * @read
      */
     protected $_template;
+    
+    /**
+     * Session object
+     * 
+     * @var \THCFrame\Session\Session
+     */
+    private $_session;
 
     /**
      * 
@@ -44,6 +52,8 @@ class View extends Base
         parent::__construct($options);
 
         Event::fire('framework.view.construct.before', array($this->file));
+
+        $this->_session = Registry::get('session');
 
         $this->_template = new Template\Template(array(
             'implementation' => new Template\Implementation\Extended()
@@ -69,37 +79,37 @@ class View extends Base
      */
     private function _checkMessage()
     {
-        if (isset($_SESSION['infoMessage'])) {
-            $this->set('infoMessage', $_SESSION['infoMessage']);
-            unset($_SESSION['infoMessage']);
+        if ($this->_session->get('infoMessage') !== null) {
+            $this->set('infoMessage', $this->_session->get('infoMessage'));
+            $this->_session->erase('infoMessage');
         } else {
             $this->set('infoMessage', '');
         }
 
-        if (isset($_SESSION['warningMessage'])) {
-            $this->set('warningMessage', $_SESSION['warningMessage']);
-            unset($_SESSION['warningMessage']);
+        if ($this->_session->get('warningMessage') !== null) {
+            $this->set('warningMessage', $this->_session->get('warningMessage'));
+            $this->_session->erase('warningMessage');
         } else {
             $this->set('warningMessage', '');
         }
 
-        if (isset($_SESSION['successMessage'])) {
-            $this->set('successMessage', $_SESSION['successMessage']);
-            unset($_SESSION['successMessage']);
+        if ($this->_session->get('successMessage') !== null) {
+            $this->set('successMessage', $this->_session->get('successMessage'));
+            $this->_session->erase('successMessage');
         } else {
             $this->set('successMessage', '');
         }
 
-        if (isset($_SESSION['errorMessage'])) {
-            $this->set('errorMessage', $_SESSION['errorMessage']);
-            unset($_SESSION['errorMessage']);
+        if ($this->_session->get('errorMessage') !== null) {
+            $this->set('errorMessage', $this->_session->get('errorMessage'));
+            $this->_session->erase('errorMessage');
         } else {
             $this->set('errorMessage', '');
         }
 
-        if (isset($_SESSION['longFlashMessage'])) {
-            $this->set('longFlashMessage', $_SESSION['longFlashMessage']);
-            unset($_SESSION['longFlashMessage']);
+        if ($this->_session->get('longFlashMessage') !== null) {
+            $this->set('longFlashMessage', $this->_session->get('longFlashMessage'));
+            $this->_session->erase('longFlashMessage');
         } else {
             $this->set('longFlashMessage', '');
         }
@@ -128,10 +138,10 @@ class View extends Base
      */
     public function getHttpReferer()
     {
-        if (empty($_SERVER['HTTP_REFERER'])) {
+        if (RequestMethods::server('HTTP_REFERER') === false) {
             return null;
         } else {
-            return $_SERVER['HTTP_REFERER'];
+            return RequestMethods::server('HTTP_REFERER');
         }
     }
 
@@ -209,7 +219,7 @@ class View extends Base
     public function infoMessage($msg = '')
     {
         if (!empty($msg)) {
-            $_SESSION['infoMessage'] = $msg;
+            $this->_session->set('infoMessage', $msg);
         } else {
             return $this->get('infoMessage');
         }
@@ -223,7 +233,7 @@ class View extends Base
     public function warningMessage($msg = '')
     {
         if (!empty($msg)) {
-            $_SESSION['warningMessage'] = $msg;
+            $this->_session->set('warningMessage', $msg);
         } else {
             return $this->get('warningMessage');
         }
@@ -237,7 +247,7 @@ class View extends Base
     public function successMessage($msg = '')
     {
         if (!empty($msg)) {
-            $_SESSION['successMessage'] = $msg;
+            $this->_session->set('successMessage', $msg);
         } else {
             return $this->get('successMessage');
         }
@@ -251,7 +261,7 @@ class View extends Base
     public function errorMessage($msg = '')
     {
         if (!empty($msg)) {
-            $_SESSION['errorMessage'] = $msg;
+            $this->_session->set('errorMessage', $msg);
         } else {
             return $this->get('errorMessage');
         }
@@ -265,9 +275,10 @@ class View extends Base
     public function longFlashMessage($msg = '')
     {
         if (!empty($msg)) {
-            $_SESSION['longFlashMessage'] = $msg;
+            $this->_session->set('longFlashMessage', $msg);
         } else {
             return $this->get('longFlashMessage');
         }
     }
+
 }

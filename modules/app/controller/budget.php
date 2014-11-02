@@ -25,7 +25,7 @@ class App_Controller_Budget extends Controller
         );
         
         if($budget === null){
-            $view->warningMessage('Budget record not found');
+            $view->warningMessage(self::ERROR_MESSAGE_2);
             self::redirect('/');
         }
         
@@ -44,14 +44,14 @@ class App_Controller_Budget extends Controller
                         array('active = ?' => true, 'deleted = ?' => false, 'id = ?' => (int) $id));
 
         if($project === null){
-            $view->warningMessage('Project not found');
+            $view->warningMessage(self::ERROR_MESSAGE_2);
             self::redirect('/project');
         }
         
         $view->set('projectid', $project->getId());
 
         if(RequestMethods::post('submitAddBudget')){
-            if($this->checkToken() !== true){
+            if($this->checkCSRFToken() !== true){
                 self::redirect('/project');
             }
             
@@ -91,14 +91,14 @@ class App_Controller_Budget extends Controller
                         array('deleted = ?' => false, 'id = ?' => (int) $id));
 
         if($budgetRec === null){
-            $view->warningMessage('Record not found');
+            $view->warningMessage(self::ERROR_MESSAGE_2);
             self::redirect('/project');
         }
         
         $view->set('budget', $budgetRec);
         
         if(RequestMethods::post('submitEditBudget')){
-            if($this->checkToken() !== true){
+            if($this->checkCSRFToken() !== true){
                 self::redirect('/project');
             }
             
@@ -113,7 +113,7 @@ class App_Controller_Budget extends Controller
                 $budgetRec->save();
                 
                 Event::fire('app.log', array('success', 'Project budget item id: ' . $id));
-                $view->successMessage('All changes were successfully saved');
+                $view->successMessage(self::SUCCESS_MESSAGE_2);
                 self::redirect('/project/detail/'.$budgetRec->getProjectId().'#financial');
             }else{
                 Event::fire('app.log', array('fail', 'Project budget item id: ' . $id));
@@ -134,14 +134,14 @@ class App_Controller_Budget extends Controller
                 array('deleted = ?' => false, 'id = ?' => (int) $id));
         
         if($budget === null){
-            $view->warningMessage('Recored not found');
+            $view->warningMessage(self::ERROR_MESSAGE_2);
             self::redirect('/project');
         }
         
         $view->set('budget', $budget);
         
         if(RequestMethods::post('submitDeleteBudget')){
-            if($this->checkToken() !== true){
+            if($this->checkCSRFToken() !== true){
                 self::redirect('/project');
             }
             
@@ -169,12 +169,12 @@ class App_Controller_Budget extends Controller
         $this->willRenderActionView = false;
         $this->willRenderLayoutView = false;
 
-        if ($this->checkToken()) {
+        if ($this->checkCSRFToken()) {
             $budget = App_Model_ProjectBudget::first(
                             array('deleted = ?' => true, 'id = ?' => (int) $id));
 
             if ($budget === null) {
-                echo 'Record not found';
+                echo self::ERROR_MESSAGE_2;
             }
 
             $budget->deleted = false;
@@ -186,10 +186,10 @@ class App_Controller_Budget extends Controller
                 echo 'success';
             } else {
                 Event::fire('app.log', array('fail', 'Record id: ' . $budget->getId()));
-                echo 'An error occured while undeleting the record';
+                echo self::ERROR_MESSAGE_1;
             }
         } else {
-            echo 'Oops, something went wrong';
+            echo self::ERROR_MESSAGE_1;
         }
     }
 

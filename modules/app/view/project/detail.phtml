@@ -9,7 +9,7 @@
         </span>
     </div>
     <div class="clear-both"></div>
-    <input type="hidden" id="tk" name="tk" value="{echo $token}" />
+    <input type="hidden" id="csrf" name="csrf" value="{echo $token}" />
 
     {if $project->getStateId() == 1}
         <div class="ad-notif-warn grid_12"><p>Project has not been approved yet</p></div>
@@ -143,7 +143,7 @@
             <div class="box-content">
                 {if !in_array($project->getStateId(), array(1,2,7))}
                     <form class="projectMessageForm" action="#" method="post">
-                        <input type="hidden" name="tk" value="{echo $token}" />
+                        <input type="hidden" name="csrf" value="{echo $token}" />
                         <div class="form-row">
                             <p class="form-label">Message title</p>
                             <div class="form-item">
@@ -240,7 +240,7 @@
             <div class="box-head-nohide"><h2>Assigned users</h2></div>
             <div class="box-content no-pad">
                 <form method="post" action="/project/assignusers/{echo $project->getId()}">
-                    <input type="hidden" name="tk" value="{echo $token}" />
+                    <input type="hidden" name="csrf" value="{echo $token}" />
                     <table class="stdtable display">
                         <thead>
                             <tr>

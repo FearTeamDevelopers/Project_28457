@@ -8,9 +8,7 @@ use THCFrame\Router\Exception;
 use THCFrame\Router\Route;
 
 /**
- * Description of Router
- *
- * @author Tomy
+ * Router class
  */
 class Router extends Base
 {
@@ -31,6 +29,12 @@ class Router extends Base
      * @var Route
      */
     protected $_lastRoute;
+    
+    /**
+     * Application default routes
+     * 
+     * @var array
+     */
     private static $_defaultRoutes = array(
         array(
             'pattern' => '/:module/:controller/:action/:id',
@@ -85,7 +89,7 @@ class Router extends Base
     );
 
     /**
-     * Class constructor
+     * Object constructor
      * 
      * @param array $options
      */
@@ -113,7 +117,7 @@ class Router extends Base
     }
 
     /**
-     * Method creates routes based on Module routes variable
+     * Create routes
      */
     private function _createRoutes(array $routes)
     {
@@ -224,6 +228,7 @@ class Router extends Base
     }
 
     /**
+     * Public method for _createRoutes method
      * 
      * @param array $routes
      */

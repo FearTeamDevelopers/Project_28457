@@ -6,7 +6,6 @@ use THCFrame\Core\ArrayMethods;
 use THCFrame\Core\StringMethods;
 
 /**
- * Description of Inspector
  * The first few methods of our Inspector class use built-in PHP reflection 
  * classes to get the string values of Doc Comments, 
  * and to get a list of the properties and methods of a class.

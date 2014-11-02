@@ -5,8 +5,7 @@ namespace THCFrame\Router\Route;
 use THCFrame\Router as Router;
 
 /**
- * Description of Dynamic
- *
+ * Dynamic route class
  */
 class Dynamic extends Router\Route
 {

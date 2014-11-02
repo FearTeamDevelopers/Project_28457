@@ -12,8 +12,6 @@ use THCFrame\Request\Exception;
  * Class represents the different types of request methods, but ultimately they all call the
  * same request() method. Other things to note are that the constructor sets the user agent, and the 
  * get method turns a provided parameter array into a valid querystring.
- *
- * @author Tomy
  */
 class Request extends Base
 {

@@ -6,12 +6,15 @@ namespace THCFrame\Registry;
  * Registry is a Singleton, used to store instance of other 'normal' classes.
  * Instances of non-Singleton classes are given a key (identifier) and 
  * are 'kept' inside the Registry’s private storage
- * 
- * @author Tomy
  */
 class Registry
 {
 
+    /**
+     * Object instances and variables
+     * 
+     * @var array
+     */
     private static $_instances = array();
 
     private function __construct()

@@ -15,7 +15,7 @@
     <div class="box-head"><h2>System settings</h2></div>
     <div class="box-content">
         <form class="form" method="post" action="#" >
-            <input type="hidden" name="tk" value="{echo $token}" />
+            <input type="hidden" name="csrf" value="{echo $token}" />
 
             {if !empty($config)}
                 {foreach $conf in $config}

@@ -1,6 +1,6 @@
 <div class="box-content">
     <form class="form" action="/task/addrelatedtask/{echo $taskid}" method="post">
-        <input type="hidden" name="tk" value="{echo $token}" />
+        <input type="hidden" name="csrf" value="{echo $token}" />
         {if !empty($tasks)}
         <div class="form-row">
             <p class="form-label">Related to</p>

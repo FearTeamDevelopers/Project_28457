@@ -9,6 +9,7 @@ use THCFrame\Security as Security;
  *
  * @author Tomy
  */
-class HashAlgorithm extends Security\Exception {
+class HashAlgorithm extends Security\Exception
+{
     
 }

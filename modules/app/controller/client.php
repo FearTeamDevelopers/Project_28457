@@ -51,7 +51,7 @@ class App_Controller_Client extends Controller
                 array('active = ?' => true, 'id = ?' => (int)$id));
         
         if($client === null){
-            $view->warningMessage('Client not found');
+            $view->warningMessage(self::ERROR_MESSAGE_2);
             self::redirect('/');
         }
         
@@ -69,7 +69,7 @@ class App_Controller_Client extends Controller
         $view = $this->getActionView();
         
         if(RequestMethods::post('submitAddClient')){
-            if($this->checkToken() !== true){
+            if($this->checkCSRFToken() !== true){
                 self::redirect('/client');
             }
             
@@ -106,14 +106,14 @@ class App_Controller_Client extends Controller
         $client = App_Model_Client::first(array('id = ?'=> (int)$id));
         
         if($client === null){
-            $view->warningMessage('Client not found');
+            $view->warningMessage(self::ERROR_MESSAGE_2);
             self::redirect('/client');
         }
         
         $view->set('client', $client);
         
         if(RequestMethods::post('submitEditClient')){
-            if($this->checkToken() !== true){
+            if($this->checkCSRFToken() !== true){
                 self::redirect('/client');
             }
             
@@ -128,7 +128,7 @@ class App_Controller_Client extends Controller
                 $client->save();
                 
                 Event::fire('app.log', array('success', 'Client id: ' . $client->getId()));
-                $view->successMessage('All changes were successfully saved');
+                $view->successMessage(self::SUCCESS_MESSAGE_2);
                 self::redirect('/client');
             }else{
                 Event::fire('app.log', array('fail', 'Client id: ' . $client->getId()));
@@ -148,14 +148,14 @@ class App_Controller_Client extends Controller
         $client = App_Model_Client::first(array('id = ?' => (int) $id));
 
         if ($client === null) {
-            $view->warningMessage('Client not found');
+            $view->warningMessage(self::ERROR_MESSAGE_2);
             self::redirect('/client');
         }
 
         $view->set('client', $client);
 
         if (RequestMethods::post('submitDeleteClient')) {
-            if($this->checkToken() !== true){
+            if($this->checkCSRFToken() !== true){
                 self::redirect('/client');
             }
 
@@ -165,7 +165,7 @@ class App_Controller_Client extends Controller
                 self::redirect('/client');
             } else {
                 Event::fire('app.log', array('fail', 'Client id: ' . $client->getId()));
-                $view->errorMessage('An error occured while deleting the client');
+                $view->errorMessage(self::ERROR_MESSAGE_1);
                 self::redirect('/client');
             }
         }
@@ -184,7 +184,7 @@ class App_Controller_Client extends Controller
                 ->set('submstoken', $this->mutliSubmissionProtectionToken());
 
         if (RequestMethods::post('submitReportIssue')) {
-            if ($this->checkToken() !== true) {
+            if ($this->checkCSRFToken() !== true) {
                 self::redirect('/client');
             }
             $errors = array();
@@ -201,7 +201,7 @@ class App_Controller_Client extends Controller
                     array('active = ?' => true, 'deleted = ?' => false, 'id = ?' => (int) RequestMethods::post('project')));
             
             if ($project === null) {
-                $view->warningMessage('Project not found');
+                $view->warningMessage(self::ERROR_MESSAGE_2);
                 self::redirect('/client');
             }
 

@@ -5,9 +5,7 @@ namespace THCFrame\Template\Implementation;
 use THCFrame\Template;
 
 /**
- * Description of Standard
- *
- * @author Tomy
+ * Standard template language class
  */
 class Standard extends Template\Implementation
 {

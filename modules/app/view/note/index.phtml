@@ -1,7 +1,7 @@
 <div class="box grid_6">
     <div class="box-head"><h2>Notes</h2></div>
     <div class="box-content no-pad ">
-        <input type="hidden" id="tk" name="tk" value="{echo $token}" />
+        <input type="hidden" id="csrf" name="csrf" value="{echo $token}" />
         <table class="stdtable display note">
             <thead>
                 <tr>
@@ -32,7 +32,7 @@
     <div class="box-head"><h2>Create new</h2></div>
     <div class="box-content">
         <form class="form" action="#" method="post">
-            <input type="hidden" name="tk" value="{echo $token}" />
+            <input type="hidden" name="csrf" value="{echo $token}" />
             <div class="form-row">
                 <p class="form-label">Note title</p>
                 <div class="form-item">

@@ -7,13 +7,10 @@ use THCFrame\Core\StringMethods;
 use THCFrame\Template\Exception as Exception;
 
 /**
- * Description of Implementation
  * In order for our template parser to remain flexible, the structure of our 
  * template dialect needs to be in a separate class to the parser. 
  * This allows us to swap out different implementation classes for the same parser. 
  * All of our implementation classes should also inherit from a base implementation class.
- *
- * @author Tomy
  */
 class Implementation extends Base
 {

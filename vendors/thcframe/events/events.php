@@ -23,9 +23,10 @@ class Events
     }
 
     /**
+     * Add new event and callback function
      * 
-     * @param type $type
-     * @param type $callback
+     * @param string $type
+     * @param function $callback
      */
     public static function add($type, $callback)
     {
@@ -36,9 +37,10 @@ class Events
     }
 
     /**
+     * Call specific event callback function with provided parameters
      * 
-     * @param type $type
-     * @param type $parameters
+     * @param string $type
+     * @param mixed $parameters
      */
     public static function fire($type, $parameters = null)
     {
@@ -50,9 +52,10 @@ class Events
     }
 
     /**
+     * Remove event from _callbacks array
      * 
-     * @param type $type
-     * @param type $callback
+     * @param string $type
+     * @param string $callback
      */
     public static function remove($type, $callback)
     {

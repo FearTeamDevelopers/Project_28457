@@ -4,6 +4,7 @@ use App\Etc\Controller;
 use THCFrame\Registry\Registry;
 use THCFrame\Request\RequestMethods;
 use THCFrame\Events\Events as Event;
+use THCFrame\Security\PasswordManager;
 
 /**
  * Description of App_Controller_User
@@ -81,8 +82,10 @@ class App_Controller_User extends Controller
         $users = App_Model_User::all(
                         array(
                     'deleted = ?' => false,
-                    'role <> ?' => 'role_superadmin'), array('id', 'firstname', 'lastname', 'email', 'role',
-                    'active', 'created', 'pwdExpire', 'lastLogin'), array('id' => 'asc')
+                    'role <> ?' => 'role_superadmin'), 
+                array('id', 'firstname', 'lastname', 'email', 
+                    'role', 'active', 'created', 'lastLogin'), 
+                array('id' => 'asc')
         );
 
         $view->set('users', $users)
@@ -107,7 +110,7 @@ class App_Controller_User extends Controller
                 ->set('roles', $roles);
 
         if (RequestMethods::post('submitAddUser')) {
-            if ($this->checkToken() !== true) {
+            if ($this->checkCSRFToken() !== true) {
                 self::redirect('/user');
             }
 
@@ -121,8 +124,8 @@ class App_Controller_User extends Controller
                 $errors['email'] = array('Email is already used');
             }
 
-            $salt = $security->createSalt();
-            $hash = $security->getSaltedHash(RequestMethods::post('password'), $salt);
+            $salt = PasswordManager::createSalt();
+            $hash = PasswordManager::_hashPassword(RequestMethods::post('password'), $salt);
 
             $user = new App_Model_User(array(
                 'firstname' => RequestMethods::post('firstname'),
@@ -133,13 +136,10 @@ class App_Controller_User extends Controller
                 'salt' => $salt,
                 'role' => RequestMethods::post('role', 'role_client'),
                 'phone' => RequestMethods::post('phone'),
-                'pwdExpire' => date('Y-m-d H:i:s', time() + 12 * 30 * 24 * 60 * 60),
                 'taskStateFilter' => RequestMethods::post('taskStateFilter', 'a:0:{}'),
                 'taskPriorityFilter' => RequestMethods::post('taskPriorityFilter', 'a:0:{}'),
                 'projectStateFilter' => RequestMethods::post('projectStateFilter', 'a:7:{i:0;i:1;i:1;i:2;i:2;i:3;i:3;i:4;i:4;i:5;i:5;i:6;i:6;i:7;}'),
                 'projectPriorityFilter' => RequestMethods::post('projectPriorityFilter', 'a:5:{i:0;i:1;i:1;i:2;i:2;i:3;i:3;i:4;i:4;i:5;}'),
-                'loginLockdownTime' => '',
-                'loginAttempCounter' => 0
             ));
 
             if (empty($errors) && $user->validate()) {
@@ -169,7 +169,7 @@ class App_Controller_User extends Controller
         }
 
         if (NULL === $user) {
-            $view->warningMessage('User not found');
+            $view->warningMessage(self::ERROR_MESSAGE_2);
             self::redirect('/user');
         }
 
@@ -214,7 +214,7 @@ class App_Controller_User extends Controller
                         array('active = ?' => true, 'deleted = ?' => false, 'id = ?' => $this->getUser()->getId()));
 
         if (NULL === $user) {
-            $view->warningMessage('User not found');
+            $view->warningMessage(self::ERROR_MESSAGE_2);
             self::redirect('/user');
         }
 
@@ -230,7 +230,7 @@ class App_Controller_User extends Controller
         $view->set('user', $user);
 
         if (RequestMethods::post('submitUpdateProfile')) {
-            if ($this->checkToken() !== true) {
+            if ($this->checkCSRFToken() !== true) {
                 self::redirect('/user');
             }
 
@@ -254,8 +254,8 @@ class App_Controller_User extends Controller
                 $salt = $user->getSalt();
                 $hash = $user->getPassword();
             } else {
-                $salt = $security->createSalt();
-                $hash = $security->getSaltedHash($pass, $salt);
+                $salt = PasswordManager::createSalt();
+                $hash = PasswordManager::_hashPassword($pass, $salt);
             }
 
             $user->firstname = RequestMethods::post('firstname');
@@ -286,7 +286,7 @@ class App_Controller_User extends Controller
                 $user->save();
 
                 Event::fire('app.log', array('success', 'User id: ' . $user->getId()));
-                $view->successMessage('All changes were successfully saved');
+                $view->successMessage(self::SUCCESS_MESSAGE_2);
                 self::redirect('/user');
             } else {
                 Event::fire('app.log', array('fail', 'User id: ' . $user->getId()));
@@ -308,7 +308,7 @@ class App_Controller_User extends Controller
         }
 
         if (NULL === $user) {
-            $view->warningMessage('User not found');
+            $view->warningMessage(self::ERROR_MESSAGE_2);
             self::redirect('/user');
         }
 
@@ -353,10 +353,10 @@ class App_Controller_User extends Controller
                         array('deleted = ?' => false, 'id = ?' => $id));
 
         if (NULL === $user) {
-            $view->warningMessage('User not found');
+            $view->warningMessage(self::ERROR_MESSAGE_2);
             self::redirect('/user');
         } elseif ($user->role == 'role_superadmin' && $this->getUser()->getRole() != 'role_superadmin') {
-            $view->warningMessage('You dont have permissions to update this user');
+            $view->warningMessage(self::ERROR_MESSAGE_4);
             self::redirect('/user');
         }
 
@@ -368,7 +368,7 @@ class App_Controller_User extends Controller
                 ->set('roles', $roles);
 
         if (RequestMethods::post('submitEditUser')) {
-            if ($this->checkToken() !== true) {
+            if ($this->checkCSRFToken() !== true) {
                 self::redirect('/user');
             }
 
@@ -392,8 +392,8 @@ class App_Controller_User extends Controller
                 $salt = $user->getSalt();
                 $hash = $user->getPassword();
             } else {
-                $salt = $security->createSalt();
-                $hash = $security->getSaltedHash($pass, $salt);
+                $salt = PasswordManager::createSalt();
+                $hash = PasswordManager::_hashPassword($pass, $salt);
             }
 
             $user->firstname = RequestMethods::post('firstname');
@@ -410,7 +410,7 @@ class App_Controller_User extends Controller
                 $user->save();
 
                 Event::fire('app.log', array('success', 'User id: ' . $id));
-                $view->successMessage('All changes were successfully saved');
+                $view->successMessage(self::SUCCESS_MESSAGE_2);
                 self::redirect('/user');
             } else {
                 Event::fire('app.log', array('fail', 'User id: ' . $id));
@@ -431,14 +431,14 @@ class App_Controller_User extends Controller
                         array('deleted = ?' => false, 'id = ?' => (int) $id));
 
         if ($user === null) {
-            $view->warningMessage('User not found');
+            $view->warningMessage(self::ERROR_MESSAGE_2);
             self::redirect('/user');
         }
 
         $view->set('user', $user);
 
         if (RequestMethods::post('submitDeleteUser')) {
-            if ($this->checkToken() !== true) {
+            if ($this->checkCSRFToken() !== true) {
                 self::redirect('/user');
             }
 
@@ -460,7 +460,7 @@ class App_Controller_User extends Controller
                 self::redirect('/user');
             } else {
                 Event::fire('app.log', array('fail', 'Project id: ' . $user->getId()));
-                $view->errorMessage('An error occured while deleting the user');
+                $view->errorMessage(self::ERROR_MESSAGE_1);
                 self::redirect('/user');
             }
         }
@@ -474,11 +474,11 @@ class App_Controller_User extends Controller
         $this->willRenderActionView = false;
         $this->willRenderLayoutView = false;
 
-        if ($this->checkToken()) {
+        if ($this->checkCSRFToken()) {
             $user = App_Model_User::first(array('id = ?' => (int) $id));
 
             if ($user === null) {
-                echo 'User not found';
+                echo self::ERROR_MESSAGE_2;
             }
 
             $user->deleted = false;
@@ -490,10 +490,10 @@ class App_Controller_User extends Controller
                 echo 'success';
             } else {
                 Event::fire('app.log', array('fail', 'User id: ' . $user->getId()));
-                echo 'An error occured while undeleting the user';
+                echo self::ERROR_MESSAGE_1;
             }
         } else {
-            echo 'Oops, something went wrong';
+            echo self::ERROR_MESSAGE_1;
         }
     }
 

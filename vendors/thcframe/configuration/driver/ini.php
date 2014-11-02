@@ -8,9 +8,7 @@ use THCFrame\Core\ArrayMethods;
 use THCFrame\Registry\Registry;
 
 /**
- * Description of Ini
- *
- * @author Tomy
+ * Ini configuration class
  */
 class Ini extends Configuration\Driver
 {
@@ -59,7 +57,7 @@ class Ini extends Configuration\Driver
 
     /**
      * Method used to merge configuration of specific environment into 
-     * default configuration.
+     * default configuration
      * 
      * @return type
      */
@@ -70,7 +68,7 @@ class Ini extends Configuration\Driver
 
     /**
      * Method is same as parse() method. This one is preparing default
-     * configuration.
+     * configuration
      * 
      * @param string $path
      */
@@ -142,7 +140,7 @@ class Ini extends Configuration\Driver
      * finally converting the associative array to an object and caching/returning the configuration
      * file data.
      * 
-     * @param type $path
+     * @param string $path
      * @return object
      * @throws Exception\Argument
      * @throws Exception\Syntax

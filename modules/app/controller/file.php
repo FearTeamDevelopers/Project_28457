@@ -25,7 +25,7 @@ class App_Controller_File extends Controller
                 array('active = ?' => true, 'id = ?'=> (int)$id));
         
         if($attachment === null){
-            $view->warningMessage('File not found');
+            $view->warningMessage(self::ERROR_MESSAGE_2);
             self::redirect('/');
         }
         
@@ -51,7 +51,7 @@ class App_Controller_File extends Controller
         $this->willRenderLayoutView = false;
         $this->willRenderActionView = false;
 
-        if ($this->checkToken()) {
+        if ($this->checkCSRFToken()) {
             $security = Registry::get('security');
 
             if ($security->isGranted('role_admin')) {
@@ -62,7 +62,7 @@ class App_Controller_File extends Controller
             }
 
             if ($attachment === null) {
-                echo 'File not found or you dont have permission to delete it';
+                echo self::ERROR_MESSAGE_2.' or '.self::ERROR_MESSAGE_4;
             }
             
             $status1 = App_Model_ProjectAttachment::deleteAll(array('attachmentId = ?' => $attachment->getId()));
@@ -74,10 +74,10 @@ class App_Controller_File extends Controller
                 echo 'success';
             } else {
                 Event::fire('app.log', array('fail', 'File id: ' . $attachment->getId()));
-                echo 'An error occured while deleting the file';
+                echo self::ERROR_MESSAGE_1;
             }
         } else {
-            echo 'Oops, something went wrong';
+            echo self::ERROR_MESSAGE_1;
         }
     }
 

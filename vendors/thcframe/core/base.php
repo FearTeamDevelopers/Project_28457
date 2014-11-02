@@ -9,20 +9,28 @@ use THCFrame\Registry\Registry;
 use THCFrame\Configuration\Model\Config as Config;
 
 /**
- * Description of Base
  * Base class can create getters/setters simply by adding comments around the
  * protected properties.
  * 
  * In order for us to achieve this sort of thing, we would need to determine the name of the property that must
  * be read/modified, and also determine whether we are allowed to read/modify it, 
  * based on the @read/@write/@readwrite flags in the comments.
- *
- * @author Tomy
  */
 class Base
 {
 
+    /**
+     * Inspector instance
+     * 
+     * @var THCFrame\Core\Inspector 
+     */
     private $_inspector;
+    
+    /**
+     * Storage for dynamicly created variables mainly from database joins
+     * 
+     * @var array 
+     */
     protected $_dataStore = array();
 
     /**
@@ -65,8 +73,9 @@ class Base
     }
 
     /**
+     * Object constructor
      * 
-     * @param string $options
+     * @param $options $options
      */
     public function __construct($options = array())
     {
@@ -91,7 +100,6 @@ class Base
      * @param string $arguments
      * @return null|\THCFrame\Core\Base
      * @throws Exception
-     * @throws type
      */
     public function __call($name, $arguments)
     {
@@ -138,6 +146,7 @@ class Base
                 $this->$property = $arguments[0];
                 return $this;
             } else {
+                //if variable is not class property its stored into _dataStore array
                 $this->_dataStore[$normalized] = $arguments[0];
                 return $this;
             }

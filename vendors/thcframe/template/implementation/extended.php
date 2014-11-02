@@ -9,9 +9,7 @@ use THCFrame\Core\StringMethods;
 use THCFrame\Request\RequestMethods;
 
 /**
- * Description of Extended
- *
- * @author Tomy
+ * Extended template language class
  */
 class Extended extends Standard
 {

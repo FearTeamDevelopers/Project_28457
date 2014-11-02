@@ -3,20 +3,40 @@
 namespace THCFrame\Core;
 
 /**
- * Description of autoloader
- *
- * @author Tomy
+ * Autoloade class
  */
 class Autoloader
 {
 
+    /**
+     * Path prefixes
+     * 
+     * @var array 
+     */
     private $_prefixes = array();
+    
+    /**
+     * Fallback dirs
+     * 
+     * @var array 
+     */
     private $_fallbackDirs = array();
+    
+    /**
+     * 
+     * @var boolean 
+     */
     private $_useIncludePath = false;
+    
+    /**
+     * Already loaded classes
+     * 
+     * @var array 
+     */
     private $_loadedClass = array();
 
     /**
-     * Adds prefixes.
+     * Adds prefixes
      *
      * @param array $prefixes Prefixes to add
      */
@@ -52,7 +72,7 @@ class Autoloader
     }
 
     /**
-     * Registers this instance as an autoloader.
+     * Registers this instance as an autoloader
      *
      * @param Boolean $prepend Whether to prepend the autoloader or not
      */
@@ -62,7 +82,7 @@ class Autoloader
     }
 
     /**
-     * Unregisters this instance as an autoloader.
+     * Unregisters this instance as an autoloader
      */
     public function unregister()
     {
@@ -70,10 +90,9 @@ class Autoloader
     }
 
     /**
-     * Loads the given class or interface.
+     * Loads the given class or interface
      *
      * @param string $class The name of the class
-     *
      * @return Boolean|null True, if loaded
      */
     public function loadClass($class)
@@ -88,10 +107,9 @@ class Autoloader
     }
 
     /**
-     * Finds the path to the file where the class is defined.
+     * Finds the path to the file where the class is defined
      *
      * @param string $class The name of the class
-     *
      * @return string|null The path, if found
      */
     public function findFile($class)

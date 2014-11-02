@@ -9,19 +9,17 @@ use THCFrame\Core\Inspector;
 use THCFrame\Router\Exception;
 
 /**
- * Description of Dispatcher
  * Dispatcher class will use the requested URL, as well as the controller/action metadata, 
  * to determine the correct controller/action to execute. 
  * It needs to handle multiple defined routes and inferred routes if no defined routes
  * are matched.
- *
- * @author Tomy
  */
 final class Dispatcher extends Base
 {
 
     /**
-     * Module active for last reques
+     * Module active for last request
+     * 
      * @var type 
      * @read
      */
@@ -29,6 +27,7 @@ final class Dispatcher extends Base
 
     /**
      * The suffix used to append to the class name
+     * 
      * @var string
      * @read
      */
@@ -36,6 +35,7 @@ final class Dispatcher extends Base
 
     /**
      * The path to look for classes (or controllers)
+     * 
      * @var string
      * @read
      */
@@ -65,8 +65,9 @@ final class Dispatcher extends Base
     }
 
     /**
+     * Get class name suffix
      * 
-     * @return type
+     * @return string
      */
     protected function _getSuffix()
     {
@@ -87,7 +88,7 @@ final class Dispatcher extends Base
     }
 
     /**
-     * 
+     * Initialisation method
      */
     public function initialize()
     {
@@ -107,7 +108,7 @@ final class Dispatcher extends Base
     }
 
     /**
-     * Attempts to dispatch the supplied Route object. 
+     * Attempts to dispatch the supplied Route object
      * 
      * @param \THCFrame\Router\Route $route
      * @throws Exception\Module

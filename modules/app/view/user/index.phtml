@@ -9,7 +9,7 @@
                 <tr>
                     <th>Firstname</th><th>Lastname</th><th>E-mail</th>
                     <th>Role</th><th>Created</th><th>Last login</th>
-                    <th>Pass expire</th><th>Manage</th>
+                    <th>Manage</th>
                 </tr>
             </thead>
             <tbody>
@@ -27,7 +27,6 @@
                         <td>{echo $user->role}</td>
                         <td>{echo $user->created}</td>
                         <td>{echo $user->lastLogin}</td>
-                        <td>{echo $user->pwdExpire}</td>
                         <td><a class="button-detail" href="/user/detail/{echo $user->id}">Detail</a>
                         {if $isAdmin}
                         <a class="button-edit" href="/user/edit/{echo $user->id}">Edit</a>

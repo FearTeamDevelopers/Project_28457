@@ -9,8 +9,6 @@ use THCFrame\Request\Exception;
  * Class accepts a response constructor option, which is the result of an HTTP request. 
  * It splits this response string into headers and a body, which are available through getter
  * methods
- *
- * @author Tomy
  */
 class Response extends Base
 {
@@ -38,8 +36,9 @@ class Response extends Base
     }
 
     /**
+     * Object constructor
      * 
-     * @param type $options
+     * @param array $options
      */
     public function __construct($options = array())
     {

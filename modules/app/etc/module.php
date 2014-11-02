@@ -111,17 +111,17 @@ class App_Etc_Module extends Module
             'args' => array(':taskId', ':state')
         ),
         array(
-            'pattern' => '/task/removeSubTask/:taskId/:subTaskId',
+            'pattern' => '/task/removesubtask/:taskId/:subTaskId',
             'module' => 'app',
             'controller' => 'task',
             'action' => 'removeSubTask',
             'args' => array(':taskId', ':subTaskId')
         ),
         array(
-            'pattern' => '/task/removeRelTask/:taskId/:relTaskId',
+            'pattern' => '/task/removereltask/:taskId/:relTaskId',
             'module' => 'app',
             'controller' => 'task',
-            'action' => 'removeRelTask',
+            'action' => 'removeReletedTask',
             'args' => array(':taskId', ':relTaskId')
         )
     );

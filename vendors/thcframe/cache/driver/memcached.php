@@ -134,7 +134,7 @@ class Memcached extends Cache\Driver
     }
 
     /**
-     * Erase values from keys
+     * Erase value based on key param
      * 
      * @param string $key
      * @return \THCFrame\Cache\Driver\Memcached
@@ -167,7 +167,7 @@ class Memcached extends Cache\Driver
     }
 
     /**
-     * 
+     * Same as clearCache method
      */
     public function invalidate()
     {

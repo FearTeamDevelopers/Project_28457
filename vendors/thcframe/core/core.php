@@ -5,16 +5,40 @@ namespace THCFrame\Core;
 use THCFrame\Core\Exception as Exception;
 use THCFrame\Registry\Registry;
 use THCFrame\Core\Autoloader;
+use THCFrame\Logger\Logger;
 
 /**
- * 
+ * THCFrame core class
  */
 class Core
 {
 
+    /**
+     * Logger instance
+     * 
+     * @var THCFrame\Logger\Logger
+     */
     private static $_logger;
+    
+    /**
+     * Autoloader instance
+     * 
+     * @var THCFrame\Core\Autoloader 
+     */
     private static $_autoloader;
+    
+    /**
+     * Registered modules
+     * 
+     * @var array 
+     */
     private static $_modules = array();
+    
+    /**
+     * Main application paths
+     * 
+     * @var array 
+     */
     private static $_relPaths = array(
         '/vendors',
         './vendors',
@@ -24,13 +48,23 @@ class Core
         './modules',
         '.'
     );
+    
+    /**
+     * List of exceptions
+     * 
+     * @var array 
+     */
     private static $_exceptions = array(
         '401' => array(
             'THCFrame\Security\Exception\Role',
             'THCFrame\Security\Exception\Unauthorized',
             'THCFrame\Security\Exception\UserExpired',
             'THCFrame\Security\Exception\UserInactive',
-            'THCFrame\Security\Exception\UserPassExpired'
+            'THCFrame\Security\Exception\UserPassExpired',
+            'THCFrame\Security\Exception\CSRF',
+            'THCFrame\Security\Exception\WrongPassword',
+            'THCFrame\Security\Exception\UserNotExists',
+            'THCFrame\Security\Exception\BruteForceAttack'
         ),
         '404' => array(
             'THCFrame\Router\Exception\Module',
@@ -129,204 +163,10 @@ class Core
         if (is_array($array)) {
             return array_map(__CLASS__ . '::_clean', $array);
         }
-        return stripslashes(trim($array));
+        return htmlspecialchars(trim($array), ENT_QUOTES, 'UTF-8');
     }
 
-    /**
-     * 
-     * @return string
-     */
-    public static function generateSecret()
-    {
-        if (ENV == 'dev') {
-            return substr(rtrim(base64_encode(md5(microtime())), "="), 5, 25);
-        } else {
-            return null;
-        }
-    }
-
-    /**
-     * 
-     * @return type
-     */
-    public static function getLogger()
-    {
-        return self::$_logger;
-    }
-
-    /**
-     * 
-     * @return type
-     * @throws Exception
-     */
-    public static function initialize()
-    {
-        if (!defined('APP_PATH')) {
-            throw new Exception('APP_PATH not defined');
-        }
-
-        // fix extra backslashes in $_POST/$_GET
-        if (get_magic_quotes_gpc()) {
-            $globals = array('_POST', '_GET', '_COOKIE', '_REQUEST', '_SESSION');
-
-            foreach ($globals as $global) {
-                if (isset($GLOBALS[$global])) {
-                    $GLOBALS[$global] = self::_clean($GLOBALS[$global]);
-                }
-            }
-        }
-
-        // Autoloader
-        require_once './vendors/thcframe/core/autoloader.php';
-        self::$_autoloader = new Autoloader();
-        self::$_autoloader->addPrefixes(self::$_relPaths);
-        self::$_autoloader->register();
-
-        // Logger
-        $logger = new \THCFrame\Logger\Logger();
-        self::$_logger = $logger->initialize();
-
-        // error and exception handlers
-        set_error_handler(__CLASS__ . '::_errorHandler');
-        set_exception_handler(__CLASS__ . '::_exceptionHandler');
-
-        try {
-            // configuration
-            $configuration = new \THCFrame\Configuration\Configuration(
-                    array('type' => 'ini', 'options' => array('env' => ENV))
-            );
-            Registry::set('config', $configuration->initialize());
-
-            // database
-            $database = new \THCFrame\Database\Database();
-            $initializedDb = $database->initialize();
-            Registry::set('database', $initializedDb);
-            $initializedDb->connect();
-
-            // cache
-            $cache = new \THCFrame\Cache\Cache();
-            Registry::set('cache', $cache->initialize());
-
-            // session
-            $session = new \THCFrame\Session\Session();
-            Registry::set('session', $session->initialize());
-
-            // security
-            $security = new \THCFrame\Security\Security();
-            Registry::set('security', $security->initialize());
-
-            // unset globals
-            unset($configuration);
-            unset($database);
-            unset($cache);
-            unset($session);
-            unset($security);
-        } catch (\Exception $e) {
-            $exception = get_class($e);
-
-            // attempt to find the approapriate error template, and render
-            foreach (self::$_exceptions as $template => $classes) {
-                foreach ($classes as $class) {
-                    if ($class == $exception) {
-                        $defaultErrorFile = APP_PATH . "/modules/app/view/errors/{$template}.phtml";
-                        header('Content-type: text/html');
-                        include($defaultErrorFile);
-                        exit();
-                    }
-                }
-            }
-
-            // render fallback template
-            header('Content-type: text/html');
-            echo 'An error occurred.';
-            if (ENV == 'dev') {
-                print_r($e);
-            }
-            exit();
-        }
-    }
-
-    /**
-     * 
-     * @param type $moduleArray
-     */
-    public static function registerModules(array $moduleArray)
-    {
-        foreach ($moduleArray as $moduleName) {
-            self::registerModule($moduleName);
-        }
-    }
-
-    /**
-     * 
-     * @throws \THCFrame\Module\Exception\Multiload
-     */
-    public static function registerModule($moduleName)
-    {
-        if (array_key_exists(ucfirst($moduleName), self::$_modules)) {
-            throw new \THCFrame\Module\Exception\Multiload(sprintf('Module %s has been alerady loaded', ucfirst($moduleName)));
-        } else {
-            $moduleClass = ucfirst($moduleName) . '_Etc_Module';
-
-            try {
-                $moduleObject = new $moduleClass();
-                $moduleObjectName = ucfirst($moduleObject->getModuleName());
-                self::$_modules[$moduleObjectName] = $moduleObject;
-            } catch (Exception $e) {
-                
-            }
-        }
-    }
-
-    /**
-     * 
-     * @param type $moduleName
-     * @return null
-     */
-    public static function getModule($moduleName)
-    {
-        $moduleName = ucfirst($moduleName);
-
-        if (array_key_exists($moduleName, self::$_modules)) {
-            return self::$_modules[$moduleName];
-        } else {
-            return null;
-        }
-    }
-
-    /**
-     * 
-     * @return type
-     */
-    public static function getModules()
-    {
-        if (empty(self::$_modules)) {
-            return null;
-        } else {
-            return self::$_modules;
-        }
-    }
-
-    /**
-     * 
-     * @return null
-     */
-    public static function getModuleNames()
-    {
-        if (empty(self::$_modules)) {
-            return null;
-        } else {
-            $moduleNames = array();
-
-            foreach (self::$_modules as $module) {
-                $moduleNames[] = $module->getModuleName();
-            }
-
-            return $moduleNames;
-        }
-    }
-
-    /**
+        /**
      * Error handler
      * 
      * @param type $number
@@ -379,14 +219,225 @@ class Core
             file_put_contents('./application/logs/error.log', $message . PHP_EOL);
         }
     }
+    
+    /**
+     * Generates new application secret which is used is hashing
+     * functions. Can be used only in dev env
+     * 
+     * @return string
+     */
+    public static function generateSecret()
+    {
+        if (ENV == 'dev') {
+            return substr(rtrim(base64_encode(md5(microtime())), "="), 5, 25);
+        } else {
+            return null;
+        }
+    }
 
     /**
+     * Return logger instance
      * 
+     * @return THCFrame\Logger\Logger
+     */
+    public static function getLogger()
+    {
+        return self::$_logger;
+    }
+
+    /**
+     * Main framework initialization method
+     * 
+     * @return type
+     * @throws Exception
+     */
+    public static function initialize()
+    {
+        if (!defined('APP_PATH')) {
+            throw new Exception('APP_PATH not defined');
+        }
+
+        // fix extra backslashes in $_POST/$_GET
+        if (get_magic_quotes_gpc()) {
+            $globals = array('_POST', '_GET', '_COOKIE', '_REQUEST', '_SESSION');
+
+            foreach ($globals as $global) {
+                if (isset($GLOBALS[$global])) {
+                    $GLOBALS[$global] = self::_clean($GLOBALS[$global]);
+                }
+            }
+        }
+
+        // Autoloader
+        require_once './vendors/thcframe/core/autoloader.php';
+        self::$_autoloader = new Autoloader();
+        self::$_autoloader->addPrefixes(self::$_relPaths);
+        self::$_autoloader->register();
+
+        // Logger
+        $logger = new Logger();
+        self::$_logger = $logger->initialize();
+
+        // error and exception handlers
+        set_error_handler(__CLASS__ . '::_errorHandler');
+        set_exception_handler(__CLASS__ . '::_exceptionHandler');
+
+        try {
+            // configuration
+            $configuration = new \THCFrame\Configuration\Configuration(
+                    array('type' => 'ini', 'options' => array('env' => ENV))
+            );
+            Registry::set('config', $configuration->initialize());
+
+            // database
+            $database = new \THCFrame\Database\Database();
+            $initializedDb = $database->initialize();
+            Registry::set('database', $initializedDb);
+            $initializedDb->connect();
+
+            // cache
+            $cache = new \THCFrame\Cache\Cache();
+            Registry::set('cache', $cache->initialize());
+
+            // session
+            $session = new \THCFrame\Session\Session();
+            Registry::set('session', $session->initialize());
+
+            // security
+            $security = new \THCFrame\Security\Security();
+            Registry::set('security', $security->initialize());
+
+            // unset globals
+            unset($configuration);
+            unset($database);
+            unset($cache);
+            unset($session);
+            unset($security);
+        } catch (\Exception $e) {
+            $exception = get_class($e);
+
+            // attempt to find the approapriate error template, and render
+            foreach (self::$_exceptions as $template => $classes) {
+                foreach ($classes as $class) {
+                    if ($class == $exception) {
+                        $defaultErrorFile = APP_PATH . "/modules/app/view/errors/{$template}.phtml";
+                        
+                        http_response_code($template);
+                        header('Content-type: text/html');
+                        include($defaultErrorFile);
+                        exit();
+                    }
+                }
+            }
+
+            // render fallback template
+            http_response_code(500);
+            header('Content-type: text/html');
+            echo 'An error occurred.';
+            if (ENV == 'dev') {
+                print_r($e);
+            }
+            exit();
+        }
+    }
+
+    /**
+     * Register new modules within application. 
+     * As parameter is given an array with module names
+     * 
+     * @param array $moduleArray
+     */
+    public static function registerModules(array $moduleArray)
+    {
+        foreach ($moduleArray as $moduleName) {
+            self::registerModule($moduleName);
+        }
+    }
+
+    /**
+     * Register single module based on provided module name.
+     * Module instance is created and stored in _modules array
+     * 
+     * @throws \THCFrame\Module\Exception\Multiload
+     */
+    public static function registerModule($moduleName)
+    {
+        if (array_key_exists(ucfirst($moduleName), self::$_modules)) {
+            throw new \THCFrame\Module\Exception\Multiload(sprintf('Module %s has been alerady loaded', ucfirst($moduleName)));
+        } else {
+            $moduleClass = ucfirst($moduleName) . '_Etc_Module';
+
+            try {
+                $moduleObject = new $moduleClass();
+                $moduleObjectName = ucfirst($moduleObject->getModuleName());
+                self::$_modules[$moduleObjectName] = $moduleObject;
+            } catch (Exception $e) {
+                
+            }
+        }
+    }
+
+    /**
+     * Return instance of registered module based on provided module name
+     * 
+     * @param string $moduleName
+     * @return null | THCFrame\Module\Module
+     */
+    public static function getModule($moduleName)
+    {
+        $moduleName = ucfirst($moduleName);
+
+        if (array_key_exists($moduleName, self::$_modules)) {
+            return self::$_modules[$moduleName];
+        } else {
+            return null;
+        }
+    }
+
+    /**
+     * Return array with registered modules
+     * 
+     * @return null | array
+     */
+    public static function getModules()
+    {
+        if (empty(self::$_modules)) {
+            return null;
+        } else {
+            return self::$_modules;
+        }
+    }
+
+    /**
+     * Return registered module names
+     * 
+     * @return null | array
+     */
+    public static function getModuleNames()
+    {
+        if (empty(self::$_modules)) {
+            return null;
+        } else {
+            $moduleNames = array();
+
+            foreach (self::$_modules as $module) {
+                $moduleNames[] = $module->getModuleName();
+            }
+
+            return $moduleNames;
+        }
+    }
+
+
+
+    /**
+     * Initialize router and dispatcher and dispatch request.
+     * If there is some error method tries to find and render error template
      */
     public static function run()
     {
         try {
-            // router
+            //router
             $router = new \THCFrame\Router\Router(array(
                 'url' => urldecode($_SERVER['REQUEST_URI'])
             ));
@@ -409,6 +460,7 @@ class Core
                     if ($class == $exception) {
                         $defaultErrorFile = "./modules/app/view/errors/{$template}.phtml";
 
+                        http_response_code($template);
                         header('Content-type: text/html');
                         include($defaultErrorFile);
                         exit();
@@ -417,6 +469,7 @@ class Core
             }
 
             // render fallback template
+            http_response_code(500);
             header('Content-type: text/html');
             echo 'An error occurred.';
             if (ENV == 'dev') {
@@ -426,4 +479,13 @@ class Core
         }
     }
 
+    /**
+     * Return framework version
+     * 
+     * @return string
+     */
+    public static function getFrameworkVersion()
+    {
+        return '1.1.2';
+    }
 }

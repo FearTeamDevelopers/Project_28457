@@ -3,8 +3,7 @@
 namespace THCFrame\Security\Authentication;
 
 /**
- *
- * @author Tomy
+ * AuthenticationInterface ensure that every authentication class has authenticate method
  */
 interface AuthenticationInterface
 {

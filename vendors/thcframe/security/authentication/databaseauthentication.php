@@ -2,68 +2,96 @@
 
 namespace THCFrame\Security\Authentication;
 
-use THCFrame\Core\Base;
+use THCFrame\Security\Authentication\Authentication;
 use THCFrame\Security\Authentication\AuthenticationInterface;
 use THCFrame\Security\Exception;
-use THCFrame\Security\UserInterface;
+use THCFrame\Security\Model\BasicUser;
+use THCFrame\Security\Model\AdvancedUser;
+use THCFrame\Security\PasswordManager;
 
 /**
- * Description of DatabaseAuthentication
- *
- * @author Tomy
+ * DatabaseAuthentication verify user identity against database records
  */
-class DatabaseAuthentication extends Base implements AuthenticationInterface
+class DatabaseAuthentication extends Authentication implements AuthenticationInterface
 {
 
     /**
-     * @read
-     * @var type 
-     */
-    protected $_type = 'database';
-    
-    /**
      * @readwrite
      * @var type 
      */
-    protected $_name;
-    
-    /**
-     * @readwrite
-     * @var type 
-     */
-    protected $_pass;
-    
-    private $_securityContext;
+    protected $_name = 'email';
 
-    public function __construct($securityContext, $options = array())
-    {
-        parent::__construct($options);
-        $this->_securityContext = $securityContext;
-    }
+    /**
+     * @readwrite
+     * @var type 
+     */
+    protected $_pass = 'password';
+
+    /**
+     * @readwrite
+     * @var type 
+     */
+    protected $_bruteForceDetection = true;
+    
+    /**
+     * It denotes the # of maximum attempts for login using the password. 
+     * If this limit exceeds and this happens within a very short amount 
+     * of time (which is defined by $bruteForceLockAttemptTotalTime), 
+     * then it is considered as a brute force attack.
+     * 
+     * @readwrite
+     * @var int
+     */
+    protected $_bruteForceLockAttempts = 5;
+
+    /**
+     * It denotes the amount of time in seconds between which no two wrong 
+     * passwords must be entered. If this happens, then it is considered 
+     * that a bot is trying to hack the account using brute-force.
+     * 
+     * 1 SEC  - This defines the time-period after which next login attempt 
+     * must be carried out. E.g if the time is 1 sec, then time-period between 
+     * two login attempts must minimum be 1 sec. Assuming that user will take 
+     * atleast 1 sec time to type between two passwords.
+     * 
+     * @readwrite
+     * @var int
+     */
+    protected $_bruteForceLockTimePeriod = 1;
+
+    /**
+     * It denotes the amount of time in seconds within which total number of 
+     * attempts ($bruteForceLockAttempts) must not exceed its maximum value. 
+     * If this happens , then it is considered as a brute force attack.
+     * 
+     * This tells that if ($bruteForceLockAttempts) login attempts are made 
+     * within ($bruteForceLockAttemptTotalTime) time then it will be a brute force.
+     * 
+     * @readwrite
+     * @var int
+     */
+    protected $_bruteForceLockAttemptTotalTime = 25;
 
     /**
      * 
-     * @param \App_Model_User $user
-     * @param type $counter
+     * @param array $options
      */
-    private function accountLockdown(UserInterface $user, $counter)
+    public function __construct($options = array())
     {
-        $counter++;
-        $user->loginAttempCounter = $counter;
-
-        if ($counter == 6) {
-            $user->loginLockdownTime = time();
-        }
-        $user->save();
+        parent::__construct($options);
+        
+        $this->name = $options['credentials']->name;
+        $this->pass = $options['credentials']->pass;
+        
     }
-    
+
     /**
      * Main authentication method which is used for user authentication
      * based on two credentials such as username and password. These login
-     * credentials are set in configuration file.
+     * credentials are set in database.
      * 
-     * @param type $name
-     * @param type $pass
+     * @param string $name
+     * @param string $pass
      */
     public function authenticate($name, $pass)
     {
@@ -74,66 +102,124 @@ class DatabaseAuthentication extends Base implements AuthenticationInterface
         ));
 
         if ($user === null) {
-            throw new Exception($errMessage);
+            throw new Exception\UserNotExists($errMessage);
         }
-
-        $counter = $user->getLoginAttempCounter();
-
-        if ($counter > 5) {
-            $lockdownTime = $user->getLoginLockdownTime();
-
-            if (time() - $lockdownTime > 1800) {
-                $user->loginAttempCounter = 0;
-                $user->loginLockdownTime = 0;
-            } else {
-                throw new Exception($errMessage);
-            }
-        }
-
-        $hash = $this->_securityContext->getSaltedHash($pass, $user->getSalt());
-
-        if ($user->getPassword() === $hash) {
-            unset($user->_password);
-            unset($user->_salt);
-
-            if ($user instanceof AdvancedUserInterface) {
+        
+        $passVerify = PasswordManager::_validatePassword($pass, $user->getPassword(), $user->getSalt());
+        
+        if ($passVerify === true) {
+            if ($user instanceof AdvancedUser) {
                 if (!$user->isActive()) {
-                    $this->accountLockdown($user, $counter);
                     throw new Exception\UserInactive($errMessage);
-                } elseif ($user->isExpired()) {
-                    $this->accountLockdown($user, $counter);
+                } elseif ($user->isAccountExpired()) {
                     throw new Exception\UserExpired($errMessage);
-                } elseif ($user->isPassExpired()) {
-                    $this->accountLockdown($user, $counter);
+                } elseif ($user->isPasswordExpired()) {
                     throw new Exception\UserPassExpired($errMessage);
                 } else {
-                    $user->setLastLogin(date('Y-m-d H:i:s'));
-                    $user->setLoginAttempCounter(0);
-                    $user->setLoginLockdownTime(0);
+                    $user->setLastLogin();
+                    $user->setTotalLoginAttempts(0);
+                    $user->setLastLoginAttempt(0);
+                    $user->setFirstLoginAttempt(0);
                     $user->save();
 
-                    $this->_securityContext->setUser($user);
-                    return true;
+                    $user->password = null;
+                    $user->salt = null;
+                    
+                    return $user;
                 }
-            } elseif ($user instanceof UserInterface) {
+            } elseif ($user instanceof BasicUser) {
                 if (!$user->isActive()) {
-                    $this->accountLockdown($user, $counter);
                     throw new Exception\UserInactive($errMessage);
                 } else {
-                    $user->setLastLogin(date('Y-m-d H:i:s'));
-                    $user->setLoginAttempCounter(0);
-                    $user->setLoginLockdownTime(0);
+                    $user->setLastLogin();
+                    $user->setTotalLoginAttempts(0);
+                    $user->setLastLoginAttempt(0);
+                    $user->setFirstLoginAttempt(0);
                     $user->save();
                     
-                    $this->_securityContext->setUser($user);
-                    return true;
+                    $user->password = null;
+                    $user->salt = null;
+                    
+                    return $user;
                 }
             } else {
-                throw new Exception\Implementation(sprintf('%s is not implementing UserInterface', get_class($user)));
+                throw new Exception\Implementation(sprintf('%s is not implementing BasicUser', get_class($user)));
             }
         } else {
-            $this->accountLockdown($user, $counter);
-            throw new Exception($errMessage);
+            if ($this->_bruteForceDetection === true) {
+                if ($this->isBruteForce($user)) {
+                    throw new Exception\BruteForceAttack('WARNING: Brute Force Attack Detected. We Recommend you use captcha.');
+                }else{
+                    throw new Exception\WrongPassword($errMessage);
+                }
+            } else {
+                throw new Exception\WrongPassword($errMessage);
+            }
+        }
+    }
+
+    /**
+     * Function to detect brute-force attacks.
+     * 
+     * @param string $user    User object
+     * @return boolean      Returns True if brute-force is detected. False otherwise
+     */
+    protected function isBruteForce($user)
+    {
+        $currentTime = time();
+
+        //if firstLoginAttempt OR lastLoginAttempt are not set, then set them and return false.
+        if (($user->getFirstLoginAttempt() == 0) || ($user->getLastLoginAttempt() == 0)) {
+            $user->setTotalLoginAttempts($user->getTotalLoginAttempts() + 1);
+            $user->setLastLoginAttempt($currentTime);
+            $user->setFirstLoginAttempt($currentTime);
+            $user->save();
+
+            return false;
+        }
+
+        //if two failed login attempts are made within $_bruteForceLockTimePeriod 
+        //time period, then reset the counters and return true to declare this a brute force attack.
+        if (($currentTime - $user->getLastLoginAttempt()) <= $this->bruteForceLockTimePeriod) {
+            $user->setTotalLoginAttempts(0);
+            $user->setLastLoginAttempt(0);
+            $user->setFirstLoginAttempt(0);
+            $user->save();
+
+            return true;
+        }
+
+        //check if two subsequent requests are made within $_bruteForceLockAttemptTotalTime time-period.
+        if (($currentTime - $user->getFirstLoginAttempt()) <= $this->bruteForceLockAttemptTotalTime) {
+            // To check how many total failed attempts have happened. 
+            // If more than $_bruteForceLockAttempts attempts have happened, 
+            // then that is an attack. Hence we reset the counters and return TRUE.
+            if ($user->getTotalLoginAttempts() >= $this->bruteForceLockAttempts) {
+                $user->setTotalLoginAttempts(0);
+                $user->setLastLoginAttempt(0);
+                $user->setFirstLoginAttempt(0);
+                $user->save();
+
+                return true;
+            } else {
+                //since the total login attempts have not crossed $_bruteForceLockAttempts, 
+                //this is not a brute force attack. Hence we just update our counters.
+                $user->setTotalLoginAttempts($user->getTotalLoginAttempts() + 1);
+                $user->setLastLoginAttempt($currentTime);
+                $user->save();
+
+                return false;
+            }
+        } else {
+            //since difference between two failed login requests are out of 
+            //$_bruteForceLockAttemptTotalTime time period, we can safely reset 
+            //all the counters and TELL THAT THIS IS NOT A BRUTE FORCE ATTACK.
+            $user->setTotalLoginAttempts(0);
+            $user->setLastLoginAttempt(0);
+            $user->setFirstLoginAttempt(0);
+            $user->save();
+
+            return false;
         }
     }
 

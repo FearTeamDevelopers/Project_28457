@@ -8,22 +8,22 @@ use THCFrame\Events\Events as Event;
 use THCFrame\Registry\Registry;
 
 /**
- * Description of Authorization
- *
- * @author Tomy
+ * Authorization factory class
  */
 class Authorization extends Base
 {
     
     /**
+     * Authorization type
+     * 
      * @readwrite
-     * @var type 
+     * @var string
      */
     protected $_type;
     
     /**
      * @readwrite
-     * @var type 
+     * @var array
      */
     protected $_options;
     
@@ -38,7 +38,9 @@ class Authorization extends Base
     }
     
     /**
-     * 
+     * Factory method
+     * It accepts initialization options and selects the type of returned object, 
+     * based on the internal $_type property
      */
     public function initialize()
     {
