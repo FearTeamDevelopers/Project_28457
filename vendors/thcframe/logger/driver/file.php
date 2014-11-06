@@ -40,7 +40,7 @@ class File extends Logger\Driver
      */
     public function deleteOldLogs($olderThan)
     {
-        $path = '.'.DIRECTORY_SEPARATOR . trim($this->path, DIRECTORY_SEPARATOR);
+        $path = DIRECTORY_SEPARATOR . trim($this->path, DIRECTORY_SEPARATOR);
 
         if (is_dir($path)) {
             $logsPath = $path;
@@ -129,9 +129,10 @@ class File extends Logger\Driver
         }
 
         $message = $message . PHP_EOL;
-        $errorLogPath = '.' . DIRECTORY_SEPARATOR . 
+        $errorLogPath = APP_PATH. DIRECTORY_SEPARATOR .
                 str_replace('{date}', date('Y-m-d', time()), trim($this->errorlog, DIRECTORY_SEPARATOR));
 
+        
         if (!file_exists($errorLogPath)) {
             file_put_contents($errorLogPath, $message, $flag);
         } elseif (file_exists($errorLogPath) && filesize($errorLogPath) < self::MAX_FILE_SIZE) {

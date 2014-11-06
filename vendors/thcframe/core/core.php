@@ -19,21 +19,21 @@ class Core
      * @var THCFrame\Logger\Logger
      */
     private static $_logger;
-    
+
     /**
      * Autoloader instance
      * 
      * @var THCFrame\Core\Autoloader 
      */
     private static $_autoloader;
-    
+
     /**
      * Registered modules
      * 
      * @var array 
      */
     private static $_modules = array();
-    
+
     /**
      * Main application paths
      * 
@@ -48,7 +48,7 @@ class Core
         './modules',
         '.'
     );
-    
+
     /**
      * List of exceptions
      * 
@@ -166,7 +166,7 @@ class Core
         return htmlspecialchars(trim($array), ENT_QUOTES, 'UTF-8');
     }
 
-        /**
+    /**
      * Error handler
      * 
      * @param type $number
@@ -219,7 +219,7 @@ class Core
             file_put_contents('./application/logs/error.log', $message . PHP_EOL);
         }
     }
-    
+
     /**
      * Generates new application secret which is used is hashing
      * functions. Can be used only in dev env
@@ -290,10 +290,12 @@ class Core
             Registry::set('config', $configuration->initialize());
 
             // database
-            $database = new \THCFrame\Database\Database();
-            $initializedDb = $database->initialize();
-            Registry::set('database', $initializedDb);
-            $initializedDb->connect();
+            if (Registry::get('configuration')->database->host != '') {
+                $database = new \THCFrame\Database\Database();
+                $initializedDb = $database->initialize();
+                Registry::set('database', $initializedDb);
+                $initializedDb->connect();
+            }
 
             // cache
             $cache = new \THCFrame\Cache\Cache();
@@ -321,7 +323,7 @@ class Core
                 foreach ($classes as $class) {
                     if ($class == $exception) {
                         $defaultErrorFile = APP_PATH . "/modules/app/view/errors/{$template}.phtml";
-                        
+
                         http_response_code($template);
                         header('Content-type: text/html');
                         include($defaultErrorFile);
@@ -428,8 +430,6 @@ class Core
         }
     }
 
-
-
     /**
      * Initialize router and dispatcher and dispatch request.
      * If there is some error method tries to find and render error template
@@ -488,4 +488,5 @@ class Core
     {
         return '1.1.2';
     }
+
 }

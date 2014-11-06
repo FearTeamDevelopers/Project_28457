@@ -97,6 +97,10 @@ class Autoloader
      */
     public function loadClass($class)
     {
+        if(strpos($class, 'Swift_') !== false){
+            return;
+        }
+        
         if ($file = $this->findFile($class)) {
             require $file;
 
@@ -149,6 +153,8 @@ class Autoloader
         if ($this->_useIncludePath && $file = stream_resolve_include_path($classPath)) {
             return $file;
         }
+        
+        return false;
     }
 
 }
