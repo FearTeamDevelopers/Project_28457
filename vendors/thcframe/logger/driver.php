@@ -11,24 +11,6 @@ use THCFrame\Logger\Exception;
  */
 abstract class Driver extends Base
 {
-
-    /**
-     * @readwrite
-     * @var type 
-     */
-    protected $_path;
-    
-    /**
-     * @readwrite
-     * @var type 
-     */
-    protected $_syslog;
-    
-    /**
-     * @readwrite
-     * @var type 
-     */
-    protected $_errorlog;
     
     /**
      * 
@@ -50,9 +32,5 @@ abstract class Driver extends Base
     }
 
     public abstract function log($message);
-    
-    public abstract function logError($message);
-    
-    public abstract function deleteOldLogs($olderThan);
     
 }

@@ -166,13 +166,13 @@ class Mysql extends Database\Connector
             throw new Exception\Service('Not connected to a valid database service');
         }
 
-        $profiler = Profiler::getProfiler();
+        $profiler = Profiler::getInstance();
         $profiler->dbQueryStart($sql);
         $args = func_get_args();
 
         if (count($args) == 1) {
             $result = $this->_service->query($sql);
-            $profiler->dbQueryEnd($this->getAffectedRows());
+            $profiler->dbQueryStop($this->getAffectedRows());
             return $result;
         }
 
@@ -199,7 +199,7 @@ class Mysql extends Database\Connector
         $bindParamsMethod->invokeArgs($stmt, $bindParamsReferences);
 
         $stmt->execute();
-        $profiler->dbQueryEnd($stmt->affected_rows);
+        $profiler->dbQueryStop($stmt->affected_rows);
         $meta = $stmt->result_metadata();
 
         if ($meta) {

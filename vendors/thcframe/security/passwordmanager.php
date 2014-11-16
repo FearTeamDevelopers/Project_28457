@@ -59,12 +59,12 @@ class PasswordManager extends Base
      * @param string $algo          The algorithm used to calculate hash
      * @return string           final hash
      */
-    public static function _hashPassword($pass, $dynamicSalt = '', $algo = '')
+    public static function hashPassword($pass, $dynamicSalt = '', $algo = '')
     {
         $configuration = Registry::get('configuration');
             
         $pm = new static($configuration->security);
-        return $pm->hashPassword($pass, $dynamicSalt, $algo);
+        return $pm->getPasswordHash($pass, $dynamicSalt, $algo);
     }
     
     /**
@@ -75,7 +75,7 @@ class PasswordManager extends Base
      * @param string $algo          The algorithm used to calculate hash
      * @return string           final hash
      */
-    public function hashPassword($pass, $dynamicSalt = '', $algo = '')
+    public function getPasswordHash($pass, $dynamicSalt = '', $algo = '')
     {
         if ($algo == '') {
             $algo = $this->getEncoder();
@@ -98,12 +98,12 @@ class PasswordManager extends Base
      * @param type $oldSalt
      * @param type $oldAlgo
      */
-    public static function _validatePassword($newPassword, $oldHash, $oldSalt)
+    public static function validatePassword($newPassword, $oldHash, $oldSalt)
     {
         $configuration = Registry::get('configuration');
             
         $pm = new static($configuration->security);
-        return $pm->validatePassword($newPassword, $oldHash, $oldSalt);
+        return $pm->isPasswordValid($newPassword, $oldHash, $oldSalt);
     }
     
     /**
@@ -115,9 +115,9 @@ class PasswordManager extends Base
      * @param string $oldAlgo       The old algo used to create the hash
      * @return boolean          True if new hash and old hash match. False otherwise
      */
-    public function validatePassword($newPassword, $oldHash, $oldSalt)
+    public function isPasswordValid($newPassword, $oldHash, $oldSalt)
     {
-        $newHash = $this->hashPassword($newPassword, $oldSalt);
+        $newHash = $this->getPasswordHash($newPassword, $oldSalt);
 
         if ($newHash === $oldHash) {
             return true;

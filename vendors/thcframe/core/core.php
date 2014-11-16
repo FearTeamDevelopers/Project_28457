@@ -35,21 +35,6 @@ class Core
     private static $_modules = array();
 
     /**
-     * Main application paths
-     * 
-     * @var array 
-     */
-    private static $_relPaths = array(
-        '/vendors',
-        './vendors',
-        '/application',
-        './application',
-        '/modules',
-        './modules',
-        '.'
-    );
-
-    /**
      * List of exceptions
      * 
      * @var array 
@@ -163,7 +148,7 @@ class Core
         if (is_array($array)) {
             return array_map(__CLASS__ . '::_clean', $array);
         }
-        return htmlspecialchars(trim($array), ENT_QUOTES, 'UTF-8');
+        return htmlentities(trim($array), ENT_QUOTES, 'UTF-8');
     }
 
     /**
@@ -192,9 +177,9 @@ class Core
         $message = "{$type} ~ {$file} ~ {$row} ~ {$text}";
 
         if (self::$_logger instanceof \THCFrame\Logger\Driver) {
-            self::$_logger->logError($message);
+            self::$_logger->log($message);
         } else {
-            file_put_contents('./application/logs/error.log', $message . PHP_EOL);
+            file_put_contents(APP_PATH . '/application/logs/error.log', $message . PHP_EOL);
         }
     }
 
@@ -214,9 +199,9 @@ class Core
         $message .= $exception->getTraceAsString();
 
         if (self::$_logger instanceof \THCFrame\Logger\Driver) {
-            self::$_logger->logError($message);
+            self::$_logger->log($message);
         } else {
-            file_put_contents('./application/logs/error.log', $message . PHP_EOL);
+            file_put_contents(APP_PATH . '/application/logs/error.log', $message . PHP_EOL);
         }
     }
 
@@ -269,9 +254,16 @@ class Core
         }
 
         // Autoloader
-        require_once './vendors/thcframe/core/autoloader.php';
+        $prefixes = array(
+            APP_PATH . DIRECTORY_SEPARATOR . 'vendors',
+            APP_PATH . DIRECTORY_SEPARATOR . 'application',
+            APP_PATH . DIRECTORY_SEPARATOR . 'modules',
+            APP_PATH . DIRECTORY_SEPARATOR . 'public',
+        );
+
+        require_once APP_PATH . '/vendors/thcframe/core/autoloader.php';
         self::$_autoloader = new Autoloader();
-        self::$_autoloader->addPrefixes(self::$_relPaths);
+        self::$_autoloader->addPrefixes($prefixes);
         self::$_autoloader->register();
 
         // Logger
@@ -322,7 +314,7 @@ class Core
             foreach (self::$_exceptions as $template => $classes) {
                 foreach ($classes as $class) {
                     if ($class == $exception) {
-                        $defaultErrorFile = APP_PATH . "/modules/app/view/errors/{$template}.phtml";
+                        $defaultErrorFile = MODULES_PATH . "/app/view/errors/{$template}.phtml";
 
                         http_response_code($template);
                         header('Content-type: text/html');
@@ -458,7 +450,7 @@ class Core
             foreach (self::$_exceptions as $template => $classes) {
                 foreach ($classes as $class) {
                     if ($class == $exception) {
-                        $defaultErrorFile = "./modules/app/view/errors/{$template}.phtml";
+                        $defaultErrorFile = MODULES_PATH . "/app/view/errors/{$template}.phtml";
 
                         http_response_code($template);
                         header('Content-type: text/html');

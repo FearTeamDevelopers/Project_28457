@@ -365,10 +365,10 @@ class Query extends Base
 
         if ($result === false) {
             if (ENV == 'dev') {
-                Core::getLogger()->logError($sql);
+                Core::getLogger()->log($sql);
                 throw new Exception\Sql(sprintf('SQL: %s', $this->connector->getLastError()));
             } else {
-                Core::getLogger()->logError($sql);
+                Core::getLogger()->log($sql);
                 throw new Exception\Sql('There was an error with your SQL query');
             }
         }
@@ -392,10 +392,10 @@ class Query extends Base
 
         if ($result === false) {
             if (ENV == 'dev') {
-                Core::getLogger()->logError($sql);
+                Core::getLogger()->log($sql);
                 throw new Exception\Sql(sprintf('SQL: %s', $this->connector->getLastError()));
             } else {
-                Core::getLogger()->logError($sql);
+                Core::getLogger()->log($sql);
                 throw new Exception\Sql('There was an error with your SQL query');
             }
         }
@@ -415,10 +415,10 @@ class Query extends Base
 
         if ($result === false) {
             if (ENV == 'dev') {
-                Core::getLogger()->logError($sql);
+                Core::getLogger()->log($sql);
                 throw new Exception\Sql(sprintf('SQL: %s', $this->connector->getLastError()));
             } else {
-                Core::getLogger()->logError($sql);
+                Core::getLogger()->log($sql);
                 throw new Exception\Sql('There was an error with your SQL query');
             }
         }

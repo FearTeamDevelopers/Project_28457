@@ -105,7 +105,7 @@ class DatabaseAuthentication extends Authentication implements AuthenticationInt
             throw new Exception\UserNotExists($errMessage);
         }
         
-        $passVerify = PasswordManager::_validatePassword($pass, $user->getPassword(), $user->getSalt());
+        $passVerify = PasswordManager::validatePassword($pass, $user->getPassword(), $user->getSalt());
         
         if ($passVerify === true) {
             if ($user instanceof AdvancedUser) {

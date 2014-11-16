@@ -244,6 +244,7 @@ class Controller extends Base
 
         $doAction = $this->willRenderActionView && $this->actionView;
         $doLayout = $this->willRenderLayoutView && $this->layoutView;
+        $profiler = \THCFrame\Profiler\Profiler::getInstance();
 
         try {
             if ($doAction) {
@@ -259,12 +260,14 @@ class Controller extends Base
             if ($doLayout) {
                 $view = $this->layoutView;
                 $results = $view->render();
+                $profiler->stop();
                 
                 //protection against clickjacking
                 header('X-Frame-Options: deny');
                 header("Content-type: {$defaultContentType}");
                 echo $results;
-            } else if ($doAction) {
+            } elseif ($doAction) {
+                $profiler->stop();
                 
                 //protection against clickjacking
                 header('X-Frame-Options: deny');

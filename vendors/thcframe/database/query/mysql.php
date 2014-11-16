@@ -28,10 +28,10 @@ class Mysql extends Database\Query
             $error = $this->connector->lastError;
 
             if (ENV == 'dev') {
-                Core::getLogger()->logError($sql);
+                Core::getLogger()->log($sql);
                 throw new Exception\Sql(sprintf('There was an error with your SQL query: %s', $error));
             } else {
-                Core::getLogger()->logError($sql);
+                Core::getLogger()->log($sql);
                 throw new Exception\Sql('There was an error with your SQL query');
             }
         }

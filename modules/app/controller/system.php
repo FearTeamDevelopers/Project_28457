@@ -1,7 +1,6 @@
 <?php
 
 use App\Etc\Controller;
-use THCFrame\Registry\Registry;
 use THCFrame\Request\RequestMethods;
 use THCFrame\Events\Events as Event;
 use THCFrame\Filesystem\FileManager;
@@ -130,7 +129,6 @@ class App_Controller_System extends Controller
         $this->_willRenderActionView = false;
         $this->_willRenderLayoutView = false;
         
-        $profiler = Profiler::getProfiler();
-        echo $profiler->printProfilerRecord();
+        echo Profiler::display();
     }
 }

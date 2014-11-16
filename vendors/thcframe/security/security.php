@@ -276,7 +276,7 @@ class Security extends Base implements SecurityInterface
     {
         if (ENV == 'dev') {
             $salt = $this->getPasswordManager()->createSalt();
-            return $this->getPasswordManager()->hashPassword($string, $salt) . '/' . $salt;
+            return $this->getPasswordManager()->getPasswordHash($string, $salt) . '/' . $salt;
         } else {
             return null;
         }

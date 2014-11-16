@@ -125,7 +125,7 @@ class App_Controller_User extends Controller
             }
 
             $salt = PasswordManager::createSalt();
-            $hash = PasswordManager::_hashPassword(RequestMethods::post('password'), $salt);
+            $hash = PasswordManager::hashPassword(RequestMethods::post('password'), $salt);
 
             $user = new App_Model_User(array(
                 'firstname' => RequestMethods::post('firstname'),
@@ -207,7 +207,6 @@ class App_Controller_User extends Controller
     public function updateProfile()
     {
         $view = $this->getActionView();
-        $security = Registry::get('security');
 
         $errors = array();
         $user = App_Model_User::first(
@@ -255,7 +254,7 @@ class App_Controller_User extends Controller
                 $hash = $user->getPassword();
             } else {
                 $salt = PasswordManager::createSalt();
-                $hash = PasswordManager::_hashPassword($pass, $salt);
+                $hash = PasswordManager::hashPassword($pass, $salt);
             }
 
             $user->firstname = RequestMethods::post('firstname');
@@ -393,7 +392,7 @@ class App_Controller_User extends Controller
                 $hash = $user->getPassword();
             } else {
                 $salt = PasswordManager::createSalt();
-                $hash = PasswordManager::_hashPassword($pass, $salt);
+                $hash = PasswordManager::hashPassword($pass, $salt);
             }
 
             $user->firstname = RequestMethods::post('firstname');

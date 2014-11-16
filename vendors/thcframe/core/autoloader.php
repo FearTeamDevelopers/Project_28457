@@ -14,20 +14,20 @@ class Autoloader
      * @var array 
      */
     private $_prefixes = array();
-    
+
     /**
      * Fallback dirs
      * 
      * @var array 
      */
     private $_fallbackDirs = array();
-    
+
     /**
      * 
      * @var boolean 
      */
     private $_useIncludePath = false;
-    
+
     /**
      * Already loaded classes
      * 
@@ -97,15 +97,16 @@ class Autoloader
      */
     public function loadClass($class)
     {
-        if(strpos($class, 'Swift_') !== false){
+        if (strpos($class, 'Swift_') !== false) {
             return;
         }
-        
-        if ($file = $this->findFile($class)) {
+
+        $file = $this->findFile($class);
+        if ($file !== false) {
             require $file;
 
             return true;
-        }else{
+        } else {
             throw new \Exception(sprintf('%s not found', $class));
         }
     }
@@ -130,17 +131,17 @@ class Autoloader
 
         $classPath .= str_replace('_', DIRECTORY_SEPARATOR, $className) . '.php';
 
-        if(array_key_exists($class, $this->_loadedClass)){
+        if (array_key_exists($class, $this->_loadedClass)) {
             return $this->_loadedClass[$class];
         }
-        
+
         foreach ($this->_prefixes as $prefix => $dirs) {
-                foreach ($dirs as $dir) {
-                    if (file_exists(strtolower($dir . DIRECTORY_SEPARATOR . $classPath))) {
-                        $file = $this->_loadedClass[$class] = strtolower($dir . DIRECTORY_SEPARATOR . $classPath);
-                        return $file;
-                    }
+            foreach ($dirs as $dir) {
+                if (file_exists(strtolower($dir . DIRECTORY_SEPARATOR . $classPath))) {
+                    $file = $this->_loadedClass[$class] = strtolower($dir . DIRECTORY_SEPARATOR . $classPath);
+                    return $file;
                 }
+            }
         }
 
         foreach ($this->_fallbackDirs as $dir) {
@@ -153,7 +154,7 @@ class Autoloader
         if ($this->_useIncludePath && $file = stream_resolve_include_path($classPath)) {
             return $file;
         }
-        
+
         return false;
     }
 
