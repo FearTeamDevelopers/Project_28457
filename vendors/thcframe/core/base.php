@@ -242,7 +242,7 @@ class Base
                 return null;
             }
         } else {
-            throw new Exception\Argument('Connection to the database has not been initialized yet');
+            throw new Exception\Argument('Connection to the database has not been initialized');
         }
     }
 
@@ -267,7 +267,7 @@ class Base
                 return false;
             }
         } else {
-            throw new Exception\Argument('Connection to the database has not been initialized yet');
+            throw new Exception\Argument('Connection to the database has not been initialized');
         }
     }
 

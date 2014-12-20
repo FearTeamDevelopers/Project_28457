@@ -10,9 +10,7 @@ use THCFrame\Security\Model\Authtoken;
 use THCFrame\Core\Rand;
 
 /**
- * Description of user
- *
- * @author Tomy
+ * Basic user class
  */
 class BasicUser extends Model
 {
@@ -365,7 +363,7 @@ class BasicUser extends Model
     {
         if (RequestMethods::cookie('AUTHID') != '') {
             Authtoken::deleteAll(array('token = ?' => RequestMethods::cookie('AUTHID')));
-            \setcookie('AUTHID', '');
+            \setcookie('AUTHID', '', time()-1800);
         }
     }
 

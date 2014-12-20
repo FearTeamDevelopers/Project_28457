@@ -27,7 +27,7 @@ class RequestMethods
      */
     public static function get($key, $default = '')
     {
-        if (!empty($_GET[$key])) {
+        if (isset($_GET[$key]) && (!empty($_GET[$key]) || is_numeric($_GET[$key]))) {
             return $_GET[$key];
         }
         return $default;
@@ -42,7 +42,7 @@ class RequestMethods
      */
     public static function post($key, $default = '')
     {
-        if (isset($_POST[$key]) && !empty($_POST[$key])) {
+        if (isset($_POST[$key]) && (!empty($_POST[$key]) || is_numeric($_POST[$key]))) {
             return $_POST[$key];
         }
         return $default;

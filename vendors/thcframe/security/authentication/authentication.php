@@ -56,7 +56,7 @@ class Authentication extends Base
         }
         
         if (!$this->type) {
-            throw new Exception\Argument('Invalid type');
+            throw new Exception\Argument('Invalid authentication type');
         }
 
         Event::fire('framework.authentication.initialize.after', array($this->type));
@@ -72,7 +72,7 @@ class Authentication extends Base
                 break;
             }
             default:{
-                throw new Exception\Argument('Invalid type');
+                throw new Exception\Argument('Invalid authentication type');
                 break;
             }
         }

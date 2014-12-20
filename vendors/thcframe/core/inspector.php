@@ -17,8 +17,6 @@ use THCFrame\Core\StringMethods;
  * Public methods allow us to list the methods and properties of a class. They also allow us to return the key/value
  * metadata of the class, named methods, and named properties, without the methods or properties needing to be
  * public.
- *
- * @author Tomy
  */
 class Inspector
 {

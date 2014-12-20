@@ -7,13 +7,23 @@ use THCFrame\Request\RequestMethods;
 use THCFrame\Core\Rand;
 
 /**
- * 
+ * Cross-site Request Forgery protection
  */
 class CSRF
 {
 
+    /**
+     * Token name
+     * 
+     * @var string 
+     */
     protected static $_tokenname = 'csrf';
     
+    /**
+     * Session object
+     * 
+     * @var THCFrame\Session\Session 
+     */
     private $_session;
 
     /**
@@ -47,7 +57,7 @@ class CSRF
     
     /**
      * 
-     * @param type $tokenname
+     * @param string $tokenname
      */
     public function __construct($tokenname = 'csrf')
     {
@@ -79,6 +89,8 @@ class CSRF
 
     /**
      * Verifies whether the post token was set, else dies with error
+     * 
+     * @return boolean
      */
     public function verifyRequest()
     {

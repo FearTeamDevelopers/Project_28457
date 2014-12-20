@@ -327,7 +327,7 @@
                                 <tr>
                                     <td>{echo $tm->getFirstname()}</td>
                                     <td>{echo $tm->getLastname()}</td>
-                                    <td>{echo date("d H:i", mktime(0, $tm->getSptime(), 0, 0, 0, 0))}</td>
+                                    <td>{echo $tm->sptime}</td>
                                 </tr>
                             {/foreach}
                         {/if}

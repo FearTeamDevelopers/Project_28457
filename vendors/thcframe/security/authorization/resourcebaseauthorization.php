@@ -26,6 +26,11 @@ class ResourceBaseAuthorization extends Base implements AuthorizationInterface
      * @var \THCFrame\Security\Authorization\RoleManager
      */
     protected $_roleManager;
+    
+    /**
+     *
+     * @var array 
+     */
     protected $_resources = array();
     
     /**
@@ -78,7 +83,7 @@ class ResourceBaseAuthorization extends Base implements AuthorizationInterface
     /**
      * Check if logged user has permission to acces required resource
      * 
-     * @param \THCFrame\Security\UserInterface $user
+     * @param \THCFrame\Security\Model\BasicUser $user
      * @param string $requiredRole
      */
     public function isGranted($user, $requiredRole)

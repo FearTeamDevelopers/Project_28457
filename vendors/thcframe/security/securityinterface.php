@@ -4,7 +4,6 @@ namespace THCFrame\Security;
 
 /**
  *
- * @author Tomy
  */
 interface SecurityInterface
 {

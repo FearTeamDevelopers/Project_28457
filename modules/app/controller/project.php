@@ -413,11 +413,11 @@ class App_Controller_Project extends Controller
 
                 if (empty($errors)) {
                     $view->successMessage(self::SUCCESS_MESSAGE_2);
-                    Event::fire('app.log', array('success', 'Assign user: ' 
+                    Event::fire('app.log', array('success', 'Assign user: '
                         . join(', ', $assignedIds) . ' to project: ' . $id));
                     self::redirect('/project/detail/' . $id . '#assignedUsers');
                 } else {
-                    Event::fire('app.log', array('fail', 'Assign user: ' 
+                    Event::fire('app.log', array('fail', 'Assign user: '
                         . join(', ', $assignedIds) . ' to project: ' . $id));
                     $view->errorMessage(self::ERROR_MESSAGE_1);
                 }
@@ -438,27 +438,23 @@ class App_Controller_Project extends Controller
             return;
         }
 
-        if ($this->checkCSRFToken()) {
-            $projectUser = App_Model_ProjectUser::first(
-                            array(
-                                'projectId = ?' => $projectId,
-                                'userId = ?' => $userId
-            ));
+        $projectUser = App_Model_ProjectUser::first(
+                        array(
+                            'projectId = ?' => $projectId,
+                            'userId = ?' => $userId
+        ));
 
-            if ($projectUser === null) {
-                echo self::ERROR_MESSAGE_1;
-            }
+        if ($projectUser === null) {
+            echo self::ERROR_MESSAGE_1;
+        }
 
-            if ($projectUser->delete()) {
-                Event::fire('app.log', array('success', 'Unassign user: ' 
-                    . $userId . ' from project: ' . $projectId));
-                echo 'User has been unassigned from project';
-            } else {
-                Event::fire('app.log', array('fail', 'Unassign user: ' 
-                    . $userId . ' from project: ' . $projectId));
-                echo self::ERROR_MESSAGE_1;
-            }
+        if ($projectUser->delete()) {
+            Event::fire('app.log', array('success', 'Unassign user: '
+                . $userId . ' from project: ' . $projectId));
+            echo 'User has been unassigned from project';
         } else {
+            Event::fire('app.log', array('fail', 'Unassign user: '
+                . $userId . ' from project: ' . $projectId));
             echo self::ERROR_MESSAGE_1;
         }
     }
@@ -549,25 +545,21 @@ class App_Controller_Project extends Controller
         $this->willRenderActionView = false;
         $this->willRenderLayoutView = false;
 
-        if ($this->checkCSRFToken()) {
-            $project = App_Model_Project::first(array('id = ?' => (int) $id));
+        $project = App_Model_Project::first(array('id = ?' => (int) $id));
 
-            if ($project === null) {
-                echo self::ERROR_MESSAGE_2;
-            }
+        if ($project === null) {
+            echo self::ERROR_MESSAGE_2;
+        }
 
-            $project->deleted = false;
+        $project->deleted = false;
 
-            if ($project->validate()) {
-                $project->save();
+        if ($project->validate()) {
+            $project->save();
 
-                Event::fire('app.log', array('success', 'Project id: ' . $project->getId()));
-                echo 'success';
-            } else {
-                Event::fire('app.log', array('fail', 'Project id: ' . $project->getId()));
-                echo self::ERROR_MESSAGE_1;
-            }
+            Event::fire('app.log', array('success', 'Project id: ' . $project->getId()));
+            echo 'success';
         } else {
+            Event::fire('app.log', array('fail', 'Project id: ' . $project->getId()));
             echo self::ERROR_MESSAGE_1;
         }
     }

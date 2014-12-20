@@ -3,7 +3,6 @@ namespace THCFrame\Events;
 
 /**
  *
- * @author Tomy
  */
 interface SubscriberInterface
 {

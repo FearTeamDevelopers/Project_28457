@@ -11,8 +11,10 @@ use THCFrame\Security\Authentication\AuthenticationInterface;
  */
 class ConfigAuthentication extends Base implements AuthenticationInterface
 {
-
+    
     /**
+     * Authentication type
+     * 
      * @read
      * @var type 
      */

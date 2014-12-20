@@ -12,8 +12,9 @@ class RoleManager extends Base
 {
 
     /**
+     * Array of all available roles
      * @readwrite
-     * @var type 
+     * @var array 
      */
     protected $_roles;
 

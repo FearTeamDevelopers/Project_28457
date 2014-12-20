@@ -131,7 +131,7 @@ class App_Model_Attachment extends Model
      */
     public function getUnlinkPath($type = true)
     {
-        if ($type) {
+        if ($type  && !empty($this->_path)) {
             if (file_exists(APP_PATH . $this->_path)) {
                 return APP_PATH . $this->_path;
             } elseif (file_exists('.' . $this->_path)) {

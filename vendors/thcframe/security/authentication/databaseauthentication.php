@@ -8,6 +8,7 @@ use THCFrame\Security\Exception;
 use THCFrame\Security\Model\BasicUser;
 use THCFrame\Security\Model\AdvancedUser;
 use THCFrame\Security\PasswordManager;
+use THCFrame\Core\Core;
 
 /**
  * DatabaseAuthentication verify user identity against database records
@@ -16,20 +17,24 @@ class DatabaseAuthentication extends Authentication implements AuthenticationInt
 {
 
     /**
+     * First credential used for authentication
+     * 
      * @readwrite
-     * @var type 
+     * @var string   
      */
     protected $_name = 'email';
 
     /**
+     * Second credential used for authentication
+     * 
      * @readwrite
-     * @var type 
+     * @var string 
      */
     protected $_pass = 'password';
 
     /**
      * @readwrite
-     * @var type 
+     * @var boolean 
      */
     protected $_bruteForceDetection = true;
     
@@ -90,8 +95,8 @@ class DatabaseAuthentication extends Authentication implements AuthenticationInt
      * based on two credentials such as username and password. These login
      * credentials are set in database.
      * 
-     * @param string $name
-     * @param string $pass
+     * @param string $name  Username or email
+     * @param string $pass  Password
      */
     public function authenticate($name, $pass)
     {
@@ -148,6 +153,9 @@ class DatabaseAuthentication extends Authentication implements AuthenticationInt
         } else {
             if ($this->_bruteForceDetection === true) {
                 if ($this->isBruteForce($user)) {
+                    $identifier = $this->_name;
+                    Core::getLogger()->log(sprintf('Brute Force Attack Detected for account %s', $user->$identifier));
+                    
                     throw new Exception\BruteForceAttack('WARNING: Brute Force Attack Detected. We Recommend you use captcha.');
                 }else{
                     throw new Exception\WrongPassword($errMessage);

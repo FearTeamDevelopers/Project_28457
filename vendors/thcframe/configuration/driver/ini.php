@@ -6,6 +6,7 @@ use THCFrame\Configuration as Configuration;
 use THCFrame\Configuration\Exception;
 use THCFrame\Core\ArrayMethods;
 use THCFrame\Registry\Registry;
+use THCFrame\Configuration\Model\Config;
 
 /**
  * Ini configuration class
@@ -24,7 +25,13 @@ class Ini extends Configuration\Driver
      * @var type 
      */
     private $_defaultConfig;
-    
+
+    /**
+     * @readwrite
+     * @var type 
+     */
+    private $_configArrMerged;
+
     /**
      * Class constructor
      * 
@@ -51,8 +58,9 @@ class Ini extends Configuration\Driver
                 }
         }
 
-        $config = $this->_mergeConfiguration();
-        Registry::set('configuration', ArrayMethods::toObject($config));
+        $this->_configArrMerged = $this->_mergeConfiguration();
+        $this->_parsed = ArrayMethods::toObject($this->_configArrMerged);
+        Registry::set('configuration', $this->_parsed);
     }
 
     /**
@@ -170,6 +178,24 @@ class Ini extends Configuration\Driver
             }
 
             $this->_parsed = $config;
+        }
+    }
+
+    /**
+     * Extends configuration loaded from config file for configuration loaded
+     * form database
+     */
+    public function extendForDbConfig()
+    {
+        $ca = Config::all();
+
+        if ($ca !== null) {
+            foreach ($ca as $key => $value) {
+                $this->_configArrMerged[$value->xkey] = $value->value;
+            }
+
+            $this->_parsed = ArrayMethods::toObject($this->_configArrMerged);
+            Registry::set('configuration', $this->_parsed);
         }
     }
 

@@ -3,9 +3,7 @@
 namespace THCFrame\Core;
 
 /**
- * Description of Rand
- *
- * @author Tomy
+ * Class handles generation of random strings and numbers
  */
 class Rand
 {

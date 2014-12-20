@@ -9,7 +9,6 @@ if (ENV == 'dev') {
     ));
 
 // log cache events
-
     THCFrame\Events\Events::add('framework.cache.initialize.before', function($type, $options) use ($logger) {
         $logger->log(sprintf('framework.cache.initialize.before: %s', $type));
     });
@@ -19,7 +18,6 @@ if (ENV == 'dev') {
     });
 
 // log configuration events
-
     THCFrame\Events\Events::add('framework.configuration.initialize.before', function($type, $options) use ($logger) {
         $logger->log(sprintf('framework.configuration.initialize.before: %s', $type));
     });
@@ -29,7 +27,6 @@ if (ENV == 'dev') {
     });
 
 // log controller events
-
     THCFrame\Events\Events::add('framework.controller.construct.before', function($name) use ($logger) {
         $logger->log(sprintf('framework.controller.construct.before: %s', $name));
     });
@@ -55,7 +52,6 @@ if (ENV == 'dev') {
     });
 
 // log database events
-
     THCFrame\Events\Events::add('framework.database.initialize.before', function($type, $options) use ($logger) {
         $logger->log(sprintf('framework.database.initialize.before: %s', $type));
     });
@@ -64,8 +60,41 @@ if (ENV == 'dev') {
         $logger->log(sprintf('framework.database.initialize.after: %s', $type));
     });
 
-// log request events
+    THCFrame\Events\Events::add('framework.mysqldump.create.before', function($filename) use ($logger) {
+        $logger->log(sprintf('framework.mysqldump.create.before: %s', $filename));
+    });
 
+    THCFrame\Events\Events::add('framework.mysqldump.create.after', function($filename) use ($logger) {
+        $logger->log(sprintf('framework.mysqldump.create.after: %s', $filename));
+    });
+
+// log logger events
+    THCFrame\Events\Events::add('framework.logger.initialize.before', function($type, $options) use ($logger) {
+        $logger->log(sprintf('framework.logger.initialize.before: %s', $type));
+    });
+
+    THCFrame\Events\Events::add('framework.logger.initialize.after', function($type, $options) use ($logger) {
+        $logger->log(sprintf('framework.logger.initialize.after: %s', $type));
+    });
+
+// log profiler events
+    THCFrame\Events\Events::add('framework.profiler.start.before', function($identifier) use ($logger) {
+        $logger->log(sprintf('framework.profiler.start.before: %s', $identifier));
+    });
+
+    THCFrame\Events\Events::add('framework.profiler.start.after', function($identifier) use ($logger) {
+        $logger->log(sprintf('framework.profiler.start.after: %s', $identifier));
+    });
+    
+    THCFrame\Events\Events::add('framework.profiler.stop.before', function($identifier) use ($logger) {
+        $logger->log(sprintf('framework.profiler.stop.before: %s', $identifier));
+    });
+
+    THCFrame\Events\Events::add('framework.profiler.stop.after', function($identifier) use ($logger) {
+        $logger->log(sprintf('framework.profiler.stop.after: %s', $identifier));
+    });
+
+// log request events
     THCFrame\Events\Events::add('framework.request.request.before', function($method, $url, $parameters) use ($logger) {
         $logger->log(sprintf('framework.request.request.before: %s, %s', $method, $url));
     });
@@ -75,6 +104,13 @@ if (ENV == 'dev') {
     });
 
 // log router events
+    THCFrame\Events\Events::add('framework.router.findroute.checkredirect.before', function($url) use ($logger) {
+        $logger->log(sprintf('framework.router.findroute.checkredirect.before: %s', $url));
+    });
+
+    THCFrame\Events\Events::add('framework.router.findroute.checkredirect.after', function($url) use ($logger) {
+        $logger->log(sprintf('framework.router.findroute.checkredirect.after: %s', $url));
+    });
 
     THCFrame\Events\Events::add('framework.router.findroute.before', function($url) use ($logger) {
         $logger->log(sprintf('framework.router.findroute.before: %s', $url));
@@ -85,7 +121,6 @@ if (ENV == 'dev') {
     });
 
 // log session events
-
     THCFrame\Events\Events::add('framework.session.initialize.before', function($type, $options) use ($logger) {
         $logger->log(sprintf('framework.session.initialize.before: %s', $type));
     });
@@ -95,7 +130,6 @@ if (ENV == 'dev') {
     });
 
 // log module loading
-
     THCFrame\Events\Events::add('framework.module.initialize.before', function($name) use ($logger) {
         $logger->log(sprintf('framework.module.initialize.before: %s', $name));
     });
@@ -104,7 +138,6 @@ if (ENV == 'dev') {
 //            $logger->log(sprintf('framework.module.initialize.after: %s', $name));
 //        });
 // log security loading
-
     THCFrame\Events\Events::add('framework.security.initialize.before', function($type) use ($logger) {
         $logger->log(sprintf('framework.security.initialize.before: %s', $type));
     });
@@ -117,15 +150,23 @@ if (ENV == 'dev') {
         $logger->log(sprintf('framework.security.initialize.after: %s', $type));
     });
 
-    THCFrame\Events\Events::add('framework.security.authenticate.success', function($user) use ($logger) {
-        $logger->log(sprintf('framework.security.authenticate.success: %s / %s / %s', $user->getId(), $user->getWholeName(), $user->getEmail()));
+    THCFrame\Events\Events::add('framework.authentication.initialize.before', function($type) use ($logger) {
+        $logger->log(sprintf('framework.authentication.initialize.before: %s', $type));
     });
 
-    THCFrame\Events\Events::add('framework.security.authenticate.failure', function($user, $message) use ($logger) {
-        $logger->log(sprintf('framework.security.authenticate.failure: %s / %s / %s', $user->getId(), $user->getEmail(), $message));
+    THCFrame\Events\Events::add('framework.authentication.initialize.after', function($type) use ($logger) {
+        $logger->log(sprintf('framework.authentication.initialize.after: %s ', $type));
     });
+
+    THCFrame\Events\Events::add('framework.authorization.initialize.before', function($type) use ($logger) {
+        $logger->log(sprintf('framework.authorization.initialize.before: %s', $type));
+    });
+
+    THCFrame\Events\Events::add('framework.authorization.initialize.after', function($type) use ($logger) {
+        $logger->log(sprintf('framework.authorization.initialize.after: %s ', $type));
+    });
+
 // log view events
-
     THCFrame\Events\Events::add('framework.view.construct.before', function($file) use ($logger) {
         $logger->log(sprintf('framework.view.construct.before: %s', $file));
     });

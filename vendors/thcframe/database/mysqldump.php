@@ -8,9 +8,7 @@ use THCFrame\Registry\Registry;
 use THCFrame\Database\Exception;
 
 /**
- * Description of mysqldump
- *
- * @author Tomy
+ * Mysqldump
  */
 class Mysqldump extends Base
 {
@@ -83,16 +81,16 @@ class Mysqldump extends Base
      */
     private function _getTableStructure($tablename)
     {
-        $sqlResult = $this->_database->execute("SHOW CREATE TABLE `$tablename`");
+        $sqlResult = $this->_database->execute("SHOW CREATE TABLE `{$tablename}`");
 
         while ($row = $sqlResult->fetch_array(MYSQLI_ASSOC)) {
             if (isset($row['Create Table'])) {
                 $this->_write(
                         '-- -----------------------------------------------------' . PHP_EOL .
-                        "-- Table structure for table `$tablename` --" . PHP_EOL);
+                        "-- Table structure for table `{$tablename}` --" . PHP_EOL);
 
                 if ($this->_settings['add-drop-table']) {
-                    $this->_write("DROP TABLE IF EXISTS `$tablename`;" . PHP_EOL);
+                    $this->_write("DROP TABLE IF EXISTS `{$tablename}`;" . PHP_EOL);
                 }
 
                 $this->_write($row['Create Table'] . ';' . PHP_EOL);
@@ -110,22 +108,22 @@ class Mysqldump extends Base
     private function _listValues($tablename)
     {
         $this->_write('--' . PHP_EOL .
-                "-- Dumping data for table `$tablename` --" . PHP_EOL);
+                "-- Dumping data for table `{$tablename}` --" . PHP_EOL);
 
         if ($this->_settings['single-transaction']) {
             //$this->_database->query('SET GLOBAL TRANSACTION ISOLATION LEVEL REPEATABLE READ');
             $this->_database->beginTransaction();
         }
         if ($this->_settings['lock-tables']) {
-            $this->_database->execute("LOCK TABLES `$tablename` READ LOCAL");
+            $this->_database->execute("LOCK TABLES `{$tablename}` READ LOCAL");
         }
         if ($this->_settings['add-locks']) {
-            $this->_write("LOCK TABLES `$tablename` WRITE;" . PHP_EOL);
+            $this->_write("LOCK TABLES `{$tablename}` WRITE;" . PHP_EOL);
         }
 
         $onlyOnce = true;
         $lineSize = 0;
-        $sqlResult = $this->_database->execute("SELECT * FROM `$tablename`");
+        $sqlResult = $this->_database->execute("SELECT * FROM `{$tablename}`");
 
         while ($row = $sqlResult->fetch_array(MYSQLI_ASSOC)) {
             $vals = array();
@@ -135,7 +133,7 @@ class Mysqldump extends Base
 
             if ($onlyOnce || !$this->_settings['extended-insert']) {
                 $lineSize += $this->_write(html_entity_decode(
-                                "INSERT INTO `$tablename` VALUES ('" . implode("', '", $vals) . "')", ENT_QUOTES, 'UTF-8'));
+                                "INSERT INTO `{$tablename}` VALUES ('" . implode("', '", $vals) . "')", ENT_QUOTES, 'UTF-8'));
                 $onlyOnce = false;
             } else {
                 $lineSize += $this->_write(html_entity_decode(",('" . implode("', '", $vals) . "')", ENT_QUOTES, 'UTF-8'));
@@ -297,10 +295,7 @@ class Mysqldump extends Base
     }
 
     /**
-     * Extension for view:
-     * <p><span class="labeled-checkbox block">
-      <input type="checkbox" name="downloadDump" value="1">
-      Download database dump</span></p>
+     *  Download database dump
      */
     public function downloadDump()
     {

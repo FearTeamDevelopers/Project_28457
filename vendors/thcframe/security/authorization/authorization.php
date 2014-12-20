@@ -61,7 +61,7 @@ class Authorization extends Base
         }
         
         if (!$this->type) {
-            throw new Exception\Argument('Invalid type');
+            throw new Exception\Argument('Invalid authorization type');
         }
         
         Event::fire('framework.authorization.initialize.after', array($this->type));
@@ -77,7 +77,7 @@ class Authorization extends Base
                 break;
             }
             default:{
-                throw new Exception\Argument('Invalid type');
+                throw new Exception\Argument('Invalid authorization type');
                 break;
             }
         }

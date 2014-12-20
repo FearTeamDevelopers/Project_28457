@@ -7,9 +7,7 @@ use THCFrame\Events\Events as Event;
 use THCFrame\Logger\Exception;
 
 /**
- * Factory class
- * 
- * @author Tomy
+ * Logger factory class
  */
 class Logger extends Base
 {
@@ -49,7 +47,7 @@ class Logger extends Base
         $this->type = 'file';
 
         if (!$this->type) {
-            throw new Exception\Argument('Invalid type');
+            throw new Exception\Argument('Error in configuration file');
         }
 
         Event::fire('framework.logger.initialize.after', array($this->type, $this->options));
@@ -60,7 +58,7 @@ class Logger extends Base
                     break;
                 }
             default: {
-                    throw new Exception\Argument('Invalid type');
+                    throw new Exception\Argument('Invalid logger type');
                     break;
                 }
         }

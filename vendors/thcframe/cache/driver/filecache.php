@@ -8,8 +8,6 @@ use THCFrame\Filesystem\FileManager;
 
 /**
  * Class handles operations with file cache
- *
- * @author Tomy
  */
 class Filecache extends Cache\Driver
 {
@@ -50,7 +48,7 @@ class Filecache extends Cache\Driver
         parent::__construct($options);
 
         $this->_fileManager = new FileManager();
-        $this->_path = '.'.DIRECTORY_SEPARATOR.$this->_path.DIRECTORY_SEPARATOR;
+        $this->_path = APP_PATH.DIRECTORY_SEPARATOR.$this->_path.DIRECTORY_SEPARATOR;
         $this->_suffix = '.'.trim($this->_suffix, '.');
 
         if (!is_dir($this->_path)) {
@@ -146,7 +144,7 @@ class Filecache extends Cache\Driver
     }
 
     /**
-     * 
+     * Alias for clearCache
      */
     public function invalidate()
     {

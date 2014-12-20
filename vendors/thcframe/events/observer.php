@@ -3,9 +3,9 @@
 namespace THCFrame\Events;
 
 use THCFrame\Events\Observable;
+
 /**
- *
- * @author Tomy
+ *  Basic interface for observer objects
  */
 interface Observer
 {

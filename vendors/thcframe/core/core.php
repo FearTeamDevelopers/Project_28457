@@ -279,7 +279,8 @@ class Core
             $configuration = new \THCFrame\Configuration\Configuration(
                     array('type' => 'ini', 'options' => array('env' => ENV))
             );
-            Registry::set('config', $configuration->initialize());
+            $confingInitialized = $configuration->initialize();
+            Registry::set('config', $confingInitialized);
 
             // database
             if (Registry::get('configuration')->database->host != '') {
@@ -287,6 +288,9 @@ class Core
                 $initializedDb = $database->initialize();
                 Registry::set('database', $initializedDb);
                 $initializedDb->connect();
+                
+                //extend configuration for config loaded from db
+                $confingInitialized->extendForDbConfig();
             }
 
             // cache
@@ -478,7 +482,7 @@ class Core
      */
     public static function getFrameworkVersion()
     {
-        return '1.1.2';
+        return '1.1.3';
     }
 
 }

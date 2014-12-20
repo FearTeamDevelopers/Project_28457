@@ -4,11 +4,14 @@ if (!isset($_SESSION['app_devicetype'])) {
     require_once 'MobileDetect.php';
 
     $detect = new MobileDetect();
-    $isMobile = $detect->isMobile();
-    $isTablet = $detect->isTablet();
 
-    $deviceType = ($isMobile ? ($isTablet ? 'tablet' : 'phone') : 'computer');
-    
+    if ($detect->isMobile() && !$detect->isTablet()) {
+        $deviceType = 'phone';
+    } elseif ($detect->isTablet() && !$detect->isMobile()) {
+        $deviceType = 'tablet';
+    } else {
+        $deviceType = 'computer';
+    }
 
     $_SESSION['app_devicetype'] = $deviceType;
 } else {

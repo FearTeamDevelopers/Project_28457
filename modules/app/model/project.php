@@ -571,7 +571,7 @@ class App_Model_Project extends Model
         $this->_inquiries = App_Model_Task::fetchTaskByTypeByProject('inquiry', $this->getId());
         $this->_timePerUser = App_Model_TaskTime::fetchTotalUserTimeByProject($this->getId());
         $this->_totalSpentTime = App_Model_TaskTime::fetchTotalTimeByProject($this->getId());
-        
+
         $this->_progress = $this->loadProgress();
         
         return $this;

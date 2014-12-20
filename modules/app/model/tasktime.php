@@ -64,7 +64,7 @@ class App_Model_TaskTime extends Model
      * @label description
      */
     protected $_description;
-    
+
     /**
      * @column
      * @readwrite
@@ -75,7 +75,7 @@ class App_Model_TaskTime extends Model
      * @label date
      */
     protected $_logDate;
-    
+
     /**
      * @column
      * @readwrite
@@ -115,14 +115,28 @@ class App_Model_TaskTime extends Model
                         array('tk.projectId'))
                 ->join('tb_user', 'tt.userId = us.id', 'us', 
                         array('us.id' => 'usId', 'us.firstname', 'us.lastname'))
-                ->where('tk.projectId = ?', (int)$projectId)
+                ->where('tk.projectId = ?', (int) $projectId)
                 ->where('tk.deleted = ?', false)
                 ->groupby('usId');
-        
-        return self::initialize($timeQuery);
+
+        $timeArr = self::initialize($timeQuery);
+
+        if ($timeArr !== null) {
+            foreach ($timeArr as $key => $time) {
+                $zero = new DateTime('@0');
+                $offset = new DateTime('@' . (int) $time->sptime * 60);
+                $diff = $zero->diff($offset);
+                $time->sptime = $diff->format('%d days, %h:%i');
+                $timeArr[$key] = $time;
+            }
+
+            return $timeArr;
+        } else {
+            return null;
+        }
     }
-    
-        /**
+
+    /**
      * 
      * @param type $projectId
      */
@@ -131,17 +145,23 @@ class App_Model_TaskTime extends Model
         $timeQuery = self::getQuery(array("SUM(tt.spentTime)" => 'sptime'))
                 ->join('tb_task', 'tt.taskId = tk.id', 'tk', 
                         array('tk.projectId'))
-                ->where('tk.projectId = ?', (int)$projectId)
+                ->where('tk.projectId = ?', (int) $projectId)
                 ->where('tk.deleted = ?', false);
 
         $timeArr = self::initialize($timeQuery);
-        $time = array_shift($timeArr);
 
-        $zero = new DateTime('@0');
-        $offset = new DateTime('@' . (int)$time->sptime * 60);
-        $diff = $zero->diff($offset);
-        $time->sptime = $diff->format('%d days, %h:%i');
+        if ($timeArr !== null) {
+            $time = array_shift($timeArr);
 
-        return $time;
+            $zero = new DateTime('@0');
+            $offset = new DateTime('@' . (int) $time->sptime * 60);
+            $diff = $zero->diff($offset);
+            $time->sptime = $diff->format('%d days, %h:%i');
+
+            return $time;
+        } else {
+            return null;
+        }
     }
+
 }

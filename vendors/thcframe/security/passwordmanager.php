@@ -8,7 +8,7 @@ use THCFrame\Security\Exception;
 use THCFrame\Registry\Registry;
 
 /**
- * OWASP password manager
+ * Password manager based on OWASP recommendations
  */
 class PasswordManager extends Base
 {
@@ -30,13 +30,16 @@ class PasswordManager extends Base
     protected $_passwordStrength = 0.5;
 
     /**
+     * Generated string loaded from config file
+     * 
      * @readwrite
-     * @var type 
+     * @var string 
      */
     protected $_secret;
 
     /**
      * Set of supported keyboard layouts for password strength detection
+     * 
      * @var array
      */
     protected static $keyboardSets = array(
@@ -55,9 +58,9 @@ class PasswordManager extends Base
      * Static wrapper for hashPassword function
      * 
      * @param string $pass          password in plain-text
-     * @param string $dynamicSalt       dynamic salt
-     * @param string $algo          The algorithm used to calculate hash
-     * @return string           final hash
+     * @param string $dynamicSalt   dynamic salt
+     * @param string $algo          the algorithm used to calculate hash
+     * @return string               final hash
      */
     public static function hashPassword($pass, $dynamicSalt = '', $algo = '')
     {
@@ -70,10 +73,10 @@ class PasswordManager extends Base
     /**
      * To create hash of a string using dynamic and static salt
      * 
-     * @param string $pass          password in plain-text
-     * @param string $dynamicSalt       dynamic salt
-     * @param string $algo          The algorithm used to calculate hash
-     * @return string           final hash
+     * @param string $pass          assword in plain-text
+     * @param string $dynamicSalt   dynamic salt
+     * @param string $algo          the algorithm used to calculate hash
+     * @return string               final hash
      */
     public function getPasswordHash($pass, $dynamicSalt = '', $algo = '')
     {
@@ -93,10 +96,10 @@ class PasswordManager extends Base
     /**
      * Static wrapper for validatePassword function
      * 
-     * @param type $newPassword
-     * @param type $oldHash
-     * @param type $oldSalt
-     * @param type $oldAlgo
+     * @param string $newPassword   The given password in plain-text
+     * @param string $oldHash       The old hash
+     * @param string $oldSalt       The old dynamic salt used to create the old hash
+     * @return boolean              True if new hash and old hash match. False otherwise
      */
     public static function validatePassword($newPassword, $oldHash, $oldSalt)
     {
@@ -109,11 +112,10 @@ class PasswordManager extends Base
     /**
      * To calculate hash of given password and then to check its equality against the old password's hash
      * 
-     * @param string $newPassword       The given password in plain-text
+     * @param string $newPassword   The given password in plain-text
      * @param string $oldHash       The old hash
      * @param string $oldSalt       The old dynamic salt used to create the old hash
-     * @param string $oldAlgo       The old algo used to create the hash
-     * @return boolean          True if new hash and old hash match. False otherwise
+     * @return boolean              True if new hash and old hash match. False otherwise
      */
     public function isPasswordValid($newPassword, $oldHash, $oldSalt)
     {
@@ -166,7 +168,7 @@ class PasswordManager extends Base
      * To calculate entropy of a string
      * 
      * @param string $string    The string whose entropy is to be calculated
-     * @return float        The entropy of the string
+     * @return float            The entropy of the string
      */
     public static function entropy($string)
     {
@@ -194,7 +196,7 @@ class PasswordManager extends Base
      *                          the string as ordered. Thus, the string 'abcd' is an ordered 
      *                          character of length 4. Similarly 'xyz' is ordered character of 
      *                          length 3 and 'uvwxyz' is ordered character of length 6
-     * @return boolean      Returns true if ordered characters are found. False otherwise
+     * @return boolean          Returns true if ordered characters are found. False otherwise
      */
     public static function hasOrderedCharacters($string, $length)
     {

@@ -8,7 +8,7 @@ use THCFrame\Security\Model\BasicUser;
 use THCFrame\Security\Exception;
 
 /**
- * AnnotationBaseAuthorization use method annotation comments to identify minimal
+ * AnnotationBaseAuthorization use method annotations to identify minimal
  * required role
  */
 class AnnotationBaseAuthorization extends Base implements AuthorizationInterface

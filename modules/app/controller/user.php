@@ -82,10 +82,8 @@ class App_Controller_User extends Controller
         $users = App_Model_User::all(
                         array(
                     'deleted = ?' => false,
-                    'role <> ?' => 'role_superadmin'), 
-                array('id', 'firstname', 'lastname', 'email', 
-                    'role', 'active', 'created', 'lastLogin'), 
-                array('id' => 'asc')
+                    'role <> ?' => 'role_superadmin'), array('id', 'firstname', 'lastname', 'email',
+                    'role', 'active', 'created', 'lastLogin'), array('id' => 'asc')
         );
 
         $view->set('users', $users)
@@ -473,25 +471,21 @@ class App_Controller_User extends Controller
         $this->willRenderActionView = false;
         $this->willRenderLayoutView = false;
 
-        if ($this->checkCSRFToken()) {
-            $user = App_Model_User::first(array('id = ?' => (int) $id));
+        $user = App_Model_User::first(array('id = ?' => (int) $id));
 
-            if ($user === null) {
-                echo self::ERROR_MESSAGE_2;
-            }
+        if ($user === null) {
+            echo self::ERROR_MESSAGE_2;
+        }
 
-            $user->deleted = false;
+        $user->deleted = false;
 
-            if ($user->validate()) {
-                $user->save();
+        if ($user->validate()) {
+            $user->save();
 
-                Event::fire('app.log', array('success', 'User id: ' . $user->getId()));
-                echo 'success';
-            } else {
-                Event::fire('app.log', array('fail', 'User id: ' . $user->getId()));
-                echo self::ERROR_MESSAGE_1;
-            }
+            Event::fire('app.log', array('success', 'User id: ' . $user->getId()));
+            echo 'success';
         } else {
+            Event::fire('app.log', array('fail', 'User id: ' . $user->getId()));
             echo self::ERROR_MESSAGE_1;
         }
     }

@@ -6,9 +6,8 @@ use THCFrame\Core\Base;
 use THCFrame\Session\Exception;
 
 /**
- * Description of Driver
- *
- * @author Tomy
+ * Factory allows many different kinds of configuration driver classes to be used, 
+ * we need a way to share code across all driver classes.
  */
 abstract class Driver extends Base
 {

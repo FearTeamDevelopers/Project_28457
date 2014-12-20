@@ -13,7 +13,7 @@ and open the template in the editor.
 
 .icon{display: inline-block; margin-left: 10px;}
 
-.opsrc { background: url('../images/icons/open-source.png') no-repeat top left; width: 32px; height: 32px; } 
+.opsrc { background: url('../../images/icons/open-source.png') no-repeat top left; width: 32px; height: 32px; } 
 
 .opsrc.id{ background-position: 0 0;  } 
 .opsrc.scissors{ background-position: 0 -33px;  } 

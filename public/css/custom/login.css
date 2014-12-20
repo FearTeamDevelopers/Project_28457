@@ -20,12 +20,12 @@ h1 {
 .logo {
 	height: 40px;
 	width: 500px;
-	background: url(../images/logo.png) no-repeat;
+	background: url(../../images/logo.png) no-repeat;
 }
 .lg-body {
 	margin-top: 10px;
 	height: 230px;
-	background: url(../images/login-bg.jpg);
+	background: url(../../images/login-bg.jpg);
 	border-radius: 4px;
 	border: 1px solid #323232;
 	box-shadow: 0px 0px 1px 0px #000;
@@ -33,7 +33,7 @@ h1 {
 #lg-head {
 	height: 26px;
 	margin: 10px 0;
-	background: url(../images/login-sprite.png) no-repeat;
+	background: url(../../images/login-sprite.png) no-repeat;
 }
 #lg-head p {
 	padding: 6px 0 0 42px;
@@ -43,7 +43,7 @@ h1 {
 }
 .separator {
 	height: 2px;
-	background: url(../images/separator-dark-hz.png) repeat-x;
+	background: url(../../images/separator-dark-hz.png) repeat-x;
 	margin: 14px 0;
 }
 .login {
@@ -58,13 +58,13 @@ h1 {
 #usr-field {
 	width: 462px;
 	height: 32px;
-	background: url(../images/login-sprite.png);
+	background: url(../../images/login-sprite.png);
 	background-position: 0px -27px;
 }
 #psw-field {
 	width: 462px;
 	height: 32px;
-	background: url(../images/login-sprite.png);
+	background: url(../../images/login-sprite.png);
 	background-position: 0px -60px;
 }
 .input {
@@ -90,7 +90,7 @@ h1 {
 	float: none;
 }
 .submit {
-	background: url(../images/login-sprite.png) -1px -93px no-repeat;
+	background: url(../../images/login-sprite.png) -1px -93px no-repeat;
 	width: 82px;
 	height: 26px;
 	border: none;
@@ -113,7 +113,7 @@ label.error {
 	position: relative;
 	top: -25px;
 	left: 354px;
-	background: url(../images/login-sprite.png) no-repeat;
+	background: url(../../images/login-sprite.png) no-repeat;
 	background-position: -360px -111px;
 	border: none;
 	float: none;

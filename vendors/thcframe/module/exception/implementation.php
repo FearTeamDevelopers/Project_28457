@@ -2,8 +2,9 @@
 
 namespace THCFrame\Module\Exception;
 
-use THCFrame\Core as Core;
+use THCFrame\Module as Module;
 
-class Implementation extends Core\Exception\Implementation {
+class Implementation extends Module\Exception
+{
     
 }

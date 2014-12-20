@@ -5,9 +5,7 @@ namespace THCFrame\Configuration\Model;
 use THCFrame\Model\Model;
 
 /**
- * Description of Config_Model
- *
- * @author Tomy
+ * ORM Config model 
  */
 class Config extends Model
 {
@@ -48,7 +46,7 @@ class Config extends Model
      * @type text
      * @length 256
      * 
-     * @validate required, alphanumeric, max(8496)
+     * @validate required, alphanumeric, max(8192)
      * @label value
      */
     protected $_value;

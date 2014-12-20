@@ -2,10 +2,10 @@
 
 namespace THCFrame\Events;
 
+use THCFrame\Events\Exception;
+
 /**
- * Events
- * 
- * @author Tomy
+ * Event listener
  */
 class Events
 {

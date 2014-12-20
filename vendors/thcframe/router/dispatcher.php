@@ -130,22 +130,22 @@ final class Dispatcher extends Base
             throw new Exception\Action('Method Name not specified');
         }
 
-        if ($module == 'app') {
-            $status = $this->loadConfigFromDb('appstatus');
+        $status = $this->loadConfigFromDb($module.'status');
 
-            if ($status !== null && $status != 1) {
-                throw new Exception\Offline('Application is offline');
-            }
+        if ($status !== null && $status != 1) {
+            throw new Exception\Offline('Application is offline');
         }
 
         $module = str_replace('\\', '', $module);
         preg_match('/^[a-zA-Z0-9_]+$/', $module, $matches);
+        
         if (count($matches) !== 1) {
             throw new Exception\Module(sprintf('Disallowed characters in module name %s', $module));
         }
 
         $class = str_replace('\\', '', $class);
         preg_match('/^[a-zA-Z0-9_]+$/', $class, $matches);
+        
         if (count($matches) !== 1) {
             throw new Exception\Controller(sprintf('Disallowed characters in class name %s', $class));
         }
@@ -212,8 +212,8 @@ final class Dispatcher extends Base
         Event::fire('framework.dispatcher.beforehooks.after', array($action, $parameters));
         Event::fire('framework.dispatcher.action.before', array($action, $parameters));
         
-        call_user_func_array(array(
-            $instance, $action), is_array($parameters) ? $parameters : array());
+        call_user_func_array(
+                array($instance, $action), is_array($parameters) ? $parameters : array());
 
         Event::fire('framework.dispatcher.action.after', array($action, $parameters));
         Event::fire('framework.dispatcher.afterhooks.before', array($action, $parameters));

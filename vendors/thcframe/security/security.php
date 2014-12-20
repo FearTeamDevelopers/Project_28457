@@ -18,7 +18,7 @@ class Security extends Base implements SecurityInterface
 {
 
     /**
-     * Instance of authentication class
+     * Authentication object
      * 
      * @read
      * @var THCFrame\Security\Authentication\Authentication 
@@ -26,7 +26,7 @@ class Security extends Base implements SecurityInterface
     protected $_authentication;
 
     /**
-     * Instance of authorization class
+     * Authorization object
      * 
      * @read
      * @var THCFrame\Security\Authorization\Authorization 
@@ -37,19 +37,22 @@ class Security extends Base implements SecurityInterface
      * Cross-site request forgery protection
      * 
      * @read
-     * @var string
+     * @var THCFrame\Security\CSRF
      */
     protected $_csrf;
 
     /**
+     * PasswordManager object
+     * 
      * @read
-     * @var type 
+     * @var THCFrame\Security\PasswordManager 
      */
     protected $_passwordManager;
 
     /**
+     * Authenticated user object
      * @readwrite
-     * @var type 
+     * @var \THCFrame\Security\Model\BasicUser or null
      */
     protected $_user = null;
 
@@ -69,7 +72,7 @@ class Security extends Base implements SecurityInterface
      */
     public function initialize()
     {
-        Event::fire('framework.security.initialize.before', array($this->accessControll));
+        Event::fire('framework.security.initialize.before', array());
 
         $configuration = Registry::get('configuration');
 
@@ -106,7 +109,7 @@ class Security extends Base implements SecurityInterface
             });
         }
 
-        Event::fire('framework.security.initialize.after', array($this->accessControll));
+        Event::fire('framework.security.initialize.after', array());
 
         return $this;
     }
@@ -248,7 +251,7 @@ class Security extends Base implements SecurityInterface
     /**
      * Function for user to log-in forcefully i.e without providing user-credentials
      * 
-     * @param type $userId
+     * @param integer $userId
      * @return boolean
      * @throws Exception\UserNotExists
      */

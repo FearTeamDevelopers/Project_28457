@@ -48,7 +48,7 @@ try {
         */
         $compositeLog->execute($result);
         
-        echo 'Data which you have sent contains dangerous chars';
+        echo 'Data which you have sent contains dangerous chars. Please delete all cookies and try it again';
         die();
     }
 } catch (\Exception $e) {

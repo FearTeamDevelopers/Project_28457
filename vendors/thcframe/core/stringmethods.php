@@ -168,8 +168,8 @@ class StringMethods
      * Normalization of regular expression strings, so that the remaining 
      * methods can operate on them without first having to check or normalize them
      * 
-     * @param type $pattern
-     * @return type
+     * @param string $pattern
+     * @return string
      */
     private static function _normalize($pattern)
     {
@@ -204,7 +204,7 @@ class StringMethods
      * 
      * @param string $string
      * @param string $pattern
-     * @return null
+     * @return mixed
      */
     public static function match($string, $pattern)
     {
@@ -224,8 +224,8 @@ class StringMethods
     /**
      * Methods perform similarly to the preg_split() functions, but require less
      * formal structure to the regular expressions, and return a more predictable set of results. 
-     * The split() method will return the results
-     * of a call to the preg_split() function, after setting some flags and normalizing the regular expression.
+     * The split() method will return the results of a call to the preg_split() function, 
+     * after setting some flags and normalizing the regular expression.
      * 
      * @param type $string
      * @param type $pattern
@@ -242,9 +242,9 @@ class StringMethods
      * Method loops through the characters of a string, replacing them with 
      * regular expression friendly character representations
      * 
-     * @param type $string
-     * @param type $mask
-     * @return type
+     * @param string $string
+     * @param mixed $mask
+     * @return string
      */
     public static function sanitize($string, $mask)
     {
@@ -255,7 +255,7 @@ class StringMethods
         } else {
             return $string;
         }
-
+        
         foreach ($parts as $part) {
             $normalized = self::_normalize("\\{$part}");
             $string = preg_replace("{$normalized}m", "\\{$part}", $string);
@@ -267,8 +267,8 @@ class StringMethods
     /**
      * Method eliminates all duplicated characters in a string
      * 
-     * @param type $string
-     * @return type
+     * @param string $string
+     * @return string
      */
     public static function unique($string)
     {
@@ -288,10 +288,10 @@ class StringMethods
      * Method returns the position of a substring within a larger string, 
      * or -1 if the substring isn’t found
      * 
-     * @param type $string
-     * @param type $substring
+     * @param string $string
+     * @param string $substring
      * @param type $offset
-     * @return type
+     * @return int
      */
     public static function indexOf($string, $substring, $offset = null)
     {
@@ -304,10 +304,10 @@ class StringMethods
 
     /**
      * 
-     * @param type $string
-     * @param type $substring
+     * @param string $string
+     * @param string $substring
      * @param type $offset
-     * @return type
+     * @return int
      */
     public static function lastIndexOf($string, $substring, $offset = null)
     {
@@ -320,8 +320,8 @@ class StringMethods
 
     /**
      * 
-     * @param type $string
-     * @return type
+     * @param string $string
+     * @return string
      */
     public static function singular($string)
     {
@@ -341,8 +341,8 @@ class StringMethods
 
     /**
      * 
-     * @param type $string
-     * @return type
+     * @param string $string
+     * @return string
      */
     public static function plural($string)
     {
@@ -363,14 +363,36 @@ class StringMethods
     /**
      * Method remove diacritical marks form string
      * 
-     * @param type $string
-     * @return type
+     * @param string $string
+     * @return string
      */
     public static function removeDiacriticalMarks($string)
     {
         return strtr($string, self::$_diacriticalConversionTable);
     }
 
+    /**
+     * 
+     * @param string $string
+     * @param array $badChars
+     * @param string $replace
+     * @return string
+     */
+    public static function fastClean($string, $badChars = array(), $replace = '')
+    {
+        if(empty($badChars)){
+            $badChars = array('.', ',', '_', '(', ')', '[', ']', '|', ';',
+                '?', '<', '>', '/', '\\', '!', '@', '&', '*', ':', '+', '^',
+                '=', '~', '°', '´', '`', '%', "'", '"', '$', '#');
+        }
+        
+        $noDiacriticString = self::removeDiacriticalMarks($string);
+        
+        $cleanString = str_replace($badChars, $replace, $noDiacriticString);
+        
+        return $cleanString;
+    }
+    
     /**
      * truncateHtml can truncate a string up to a number of characters while preserving whole words and HTML tags
      *
@@ -584,7 +606,7 @@ class StringMethods
      */
     public static function echos($data)
     {
-        exho($data);
+        self::exho($data);
     }
 
 }

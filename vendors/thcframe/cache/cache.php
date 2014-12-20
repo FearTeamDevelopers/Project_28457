@@ -8,9 +8,7 @@ use THCFrame\Registry\Registry;
 use THCFrame\Cache\Exception;
 
 /**
- * Factory class
- * 
- * @author Tomy
+ * Cache factory class
  */
 class Cache extends Base
 {
@@ -61,10 +59,6 @@ class Cache extends Base
                     'suffix' => 'tmp',
                     'path' => 'temp/cache');
             }
-        }
-
-        if (!$this->type) {
-            throw new Exception\Argument('Invalid type');
         }
 
         Event::fire('framework.cache.initialize.after', array($this->type, $this->options));

@@ -14,8 +14,6 @@ use THCFrame\Model\Exception;
  * number of third-party data services, and provide a simple interface for use in our controllers.
  * 
  * An ORM library creates an opaque communication layer between two data-related systems
- *
- * @author Tomy
  */
 class Model extends Base
 {
@@ -130,7 +128,7 @@ class Model extends Base
      */
     protected function _validateRequired($value)
     {
-        return !empty($value) && $value !== 0;
+        return !empty($value) || is_numeric($value);
     }
 
     /**
@@ -725,7 +723,7 @@ class Model extends Base
     public function getPrimaryColumn()
     {
         if (!isset($this->_primary)) {
-            $primary;
+            $primary = null;
 
             foreach ($this->columns as $column) {
                 if ($column['primary']) {

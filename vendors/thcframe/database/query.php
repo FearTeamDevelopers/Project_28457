@@ -9,9 +9,7 @@ use THCFrame\Database\Exception as Exception;
 use THCFrame\Core\Core;
 
 /**
- * Description of Query
- *
- * @author Tomy
+ * Query class for OO query creating
  */
 class Query extends Base
 {
@@ -88,6 +86,19 @@ class Query extends Base
 
     /**
      * 
+     * @param type $error
+     * @param type $sql
+     */
+    protected function _logError($error, $sql)
+    {
+        $errMessage = sprintf('There was an error in the query %s', $error) . PHP_EOL;
+        $errMessage .= 'SQL: ' . $sql;
+
+        Core::getLogger()->log($errMessage);
+    }
+
+    /**
+     * 
      * @param type $value
      * @return string
      */
@@ -96,7 +107,6 @@ class Query extends Base
         $connector = $this->getConnector();
 
         if (is_string($value)) {
-
             $escaped = $connector->escape($value);
             return "'{$escaped}'";
         }
@@ -364,12 +374,13 @@ class Query extends Base
         $result = $this->connector->execute($sql);
 
         if ($result === false) {
+            $err = $this->connector->getLastError();
+            $this->_logError($err, $sql);
+            
             if (ENV == 'dev') {
-                Core::getLogger()->log($sql);
-                throw new Exception\Sql(sprintf('SQL: %s', $this->connector->getLastError()));
+                throw new Exception\Sql(sprintf('There was an error with your SQL query: %s', $err));
             } else {
-                Core::getLogger()->log($sql);
-                throw new Exception\Sql('There was an error with your SQL query');
+                throw new Exception\Sql('There was an error');
             }
         }
 
@@ -391,18 +402,19 @@ class Query extends Base
         $result = $this->connector->execute($sql);
 
         if ($result === false) {
+            $err = $this->connector->getLastError();
+            $this->_logError($err, $sql);
+            
             if (ENV == 'dev') {
-                Core::getLogger()->log($sql);
-                throw new Exception\Sql(sprintf('SQL: %s', $this->connector->getLastError()));
+                throw new Exception\Sql(sprintf('There was an error with your SQL query: %s', $err));
             } else {
-                Core::getLogger()->log($sql);
-                throw new Exception\Sql('There was an error with your SQL query');
+                throw new Exception\Sql('There was an error');
             }
         }
 
         return $this->connector->getAffectedRows();
     }
-    
+
     /**
      * 
      * @return type
@@ -414,12 +426,13 @@ class Query extends Base
         $result = $this->connector->execute($sql);
 
         if ($result === false) {
+            $err = $this->connector->getLastError();
+            $this->_logError($err, $sql);
+            
             if (ENV == 'dev') {
-                Core::getLogger()->log($sql);
-                throw new Exception\Sql(sprintf('SQL: %s', $this->connector->getLastError()));
+                throw new Exception\Sql(sprintf('There was an error with your SQL query: %s', $err));
             } else {
-                Core::getLogger()->log($sql);
-                throw new Exception\Sql('There was an error with your SQL query');
+                throw new Exception\Sql('There was an error');
             }
         }
 
@@ -522,7 +535,7 @@ class Query extends Base
 
         return $this;
     }
-    
+
     /**
      * 
      * @param type $limit
@@ -535,9 +548,9 @@ class Query extends Base
         if (empty($limit)) {
             throw new Exception\Argument('Invalid argument');
         }
-        
+
         $this->_limit = $this->_quote($limit);
-        $page = (int)$this->_quote($page);
+        $page = (int) $this->_quote($page);
 
         if ($page - 1 <= 0) {
             $this->_offset = 0;
@@ -604,7 +617,7 @@ class Query extends Base
         if (!empty($this->_where)) {
             throw new Exception\Sql('You can use only one of the where methods');
         }
-        
+
         $arguments = func_get_args();
 
         if (count($arguments) < 1) {

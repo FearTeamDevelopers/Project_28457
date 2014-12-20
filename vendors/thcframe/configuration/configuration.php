@@ -7,9 +7,7 @@ use THCFrame\Events\Events as Event;
 use THCFrame\Configuration\Exception;
 
 /**
- * Factory class
- * 
- * @author Tomy
+ * Configuration factory class
  */
 class Configuration extends Base
 {

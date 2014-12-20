@@ -20,16 +20,27 @@ class Router extends Base
 
     /**
      * Stores the Route objects
+     * 
+     * @readwrite
      * @var array
      */
     protected $_routes = array();
+
+    /**
+     * Stores route redirects. 
+     * Key represent from path and value is to path
+     * 
+     * @readwrite
+     * @var array
+     */
+    protected $_redirects = array();
 
     /**
      * @readwrite 
      * @var Route
      */
     protected $_lastRoute;
-    
+
     /**
      * Application default routes
      * 
@@ -97,13 +108,13 @@ class Router extends Base
     {
         parent::__construct($options);
 
-        Event::fire('framework.router.construct.before');
+        Event::fire('framework.router.construct.before', array());
 
         $this->_createRoutes(self::$_defaultRoutes);
 
         Event::fire('framework.router.construct.after', array($this));
-        
-        $this->_findRoute($this->_url);
+
+        $this->_findRoute($this->url);
     }
 
     /**
@@ -165,6 +176,15 @@ class Router extends Base
      */
     private function _findRoute($path)
     {
+        Event::fire('framework.router.findroute.checkredirect.before', array($path));
+
+        if (!empty($this->_redirects)) {
+            if (array_key_exists($path, $this->_redirects)) {
+                $path = $this->_redirects[$path];
+            }
+        }
+
+        Event::fire('framework.router.findroute.checkredirect.after', array($path));
         Event::fire('framework.router.findroute.before', array($path));
 
         foreach ($this->_routes as $route) {
@@ -212,7 +232,7 @@ class Router extends Base
     }
 
     /**
-     * Return list of all routes in collection
+     * Return list of all routes in routes array
      * 
      * @return array $list
      */
@@ -228,11 +248,34 @@ class Router extends Base
     }
 
     /**
+     * 
+     * @param array $redirects
+     */
+    public function addRedirects(array $redirects)
+    {
+        if (!empty($redirects)) {
+            foreach ($redirects as $redirect) {
+                $this->_redirects[$redirect['from']] = $redirect['to'];
+            }
+        }
+    }
+
+    /**
+     * Return all stored redirects
+     * 
+     * @return type
+     */
+    public function getRedirects()
+    {
+        return $this->_redirects;
+    }
+
+    /**
      * Public method for _createRoutes method
      * 
      * @param array $routes
      */
-    public function createRoutes(array $routes)
+    public function addRoutes(array $routes)
     {
         $this->_createRoutes($routes);
     }

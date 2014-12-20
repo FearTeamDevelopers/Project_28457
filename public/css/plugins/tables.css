@@ -223,7 +223,7 @@ table.dataTable th:active {
 /* GENERAL */
 
 table thead tr {
-	background-image: url(../images/grad-overlay.png);
+	background-image: url(../../images/grad-overlay.png);
 	height: 30px; 
 }
 table thead th {
@@ -247,14 +247,14 @@ table tbody tr:hover { background-color: #ddd; }
 /* TOOLBAR */
 
 .fg-toolbar {
-	background: url(../images/grad-overlay.png) #eee;
+	background: url(../../images/grad-overlay.png) #eee;
 	border: none;
 	border-radius: 0 0 2px 2px;
 }
 .table-toolbar {
 	height: 30px;
 	border-bottom: 1px solid #ccc;
-	background: url(../images/grad-overlay.png) #eee;
+	background: url(../../images/grad-overlay.png) #eee;
 }
 .table-toolbar li {
 	height: 30px;
@@ -331,7 +331,7 @@ table tbody tr:hover { background-color: #ddd; }
 }
 
 .dataTables_paginate .fg-button {
-	background: url(../images/grad-overlay-s.png) #ddd;
+	background: url(../../images/grad-overlay-s.png) #ddd;
 	padding: 5px 7px;
 	font-weight: 400;
 	font-size: 12px;
@@ -340,7 +340,7 @@ table tbody tr:hover { background-color: #ddd; }
 }
 .dataTables_paginate.paging_two_button { border: none !important; }
 .paging_two_button .fg-button {
-	background: url(../images/grad-overlay-s.png) #ddd;
+	background: url(../../images/grad-overlay-s.png) #ddd;
 	padding: 2px 4px;
 	border: 1px solid #bbb;
 }
