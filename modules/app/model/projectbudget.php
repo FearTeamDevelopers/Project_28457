@@ -160,13 +160,17 @@ class App_Model_ProjectBudget extends Model
     public static function countProjectBudget($id)
     {
         $budget = self::all(
-                array('projectId = ?'=>(int)$id, 'active = ?' => true, 'deleted = ?' => false), 
-                array('totalPrice'));
-        $sum = 0;
-        foreach($budget as $rec){
-            $sum += $rec->getTotalPrice();
-        }
+                        array('projectId = ?' => (int) $id, 'active = ?' => true, 'deleted = ?' => false), 
+                        array('totalPrice')
+        );
         
+        $sum = 0;
+        if (null !== $budget) {
+            foreach ($budget as $rec) {
+                $sum += $rec->getTotalPrice();
+            }
+        }
+
         return $sum;
     }
 
