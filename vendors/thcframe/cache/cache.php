@@ -4,7 +4,6 @@ namespace THCFrame\Cache;
 
 use THCFrame\Core\Base;
 use THCFrame\Events\Events as Event;
-use THCFrame\Registry\Registry;
 use THCFrame\Cache\Exception;
 
 /**
@@ -41,13 +40,11 @@ class Cache extends Base
      * @return \THCFrame\Cache\Cache\Driver\Memcached
      * @throws Exception\Argument
      */
-    public function initialize()
+    public function initialize($configuration)
     {
         Event::fire('framework.cache.initialize.before', array($this->type, $this->options));
 
         if (!$this->type) {
-            $configuration = Registry::get('configuration');
-
             if (!empty($configuration->cache) && !empty($configuration->cache->type)) {
                 $this->type = $configuration->cache->type;
                 $this->options = (array) $configuration->cache;

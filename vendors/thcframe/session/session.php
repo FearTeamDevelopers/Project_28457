@@ -4,7 +4,6 @@ namespace THCFrame\Session;
 
 use THCFrame\Core\Base;
 use THCFrame\Events\Events as Event;
-use THCFrame\Registry\Registry;
 use THCFrame\Session\Exception;
 
 /**
@@ -34,17 +33,18 @@ class Session extends Base
     }
 
     /**
+     * Factory method
+     * It accepts initialization options and selects the type of returned object, 
+     * based on the internal $_type property.
      * 
      * @return \THCFrame\Session\Session\Driver\Server
      * @throws Exception\Argument
      */
-    public function initialize()
+    public function initialize($configuration)
     {
         Event::fire('framework.session.initialize.before', array($this->type, $this->options));
 
         if (!$this->type) {
-            $configuration = Registry::get('configuration');
-
             if (!empty($configuration->session) && !empty($configuration->session->type)) {
                 $this->type = $configuration->session->type;
                 $this->options = (array) $configuration->session;

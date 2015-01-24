@@ -101,6 +101,7 @@ class DatabaseAuthentication extends Authentication implements AuthenticationInt
     public function authenticate($name, $pass)
     {
         $errMessage = sprintf('%s and/or password are incorrect', ucfirst($this->_name));
+        $errMessageNotActive = 'Account is not active';
 
         $user = \App_Model_User::first(array(
                     "{$this->_name} = ?" => $name
@@ -115,7 +116,7 @@ class DatabaseAuthentication extends Authentication implements AuthenticationInt
         if ($passVerify === true) {
             if ($user instanceof AdvancedUser) {
                 if (!$user->isActive()) {
-                    throw new Exception\UserInactive($errMessage);
+                    throw new Exception\UserInactive($errMessageNotActive);
                 } elseif ($user->isAccountExpired()) {
                     throw new Exception\UserExpired($errMessage);
                 } elseif ($user->isPasswordExpired()) {
@@ -134,7 +135,7 @@ class DatabaseAuthentication extends Authentication implements AuthenticationInt
                 }
             } elseif ($user instanceof BasicUser) {
                 if (!$user->isActive()) {
-                    throw new Exception\UserInactive($errMessage);
+                    throw new Exception\UserInactive($errMessageNotActive);
                 } else {
                     $user->setLastLogin();
                     $user->setTotalLoginAttempts(0);

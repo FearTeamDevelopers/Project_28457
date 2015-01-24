@@ -4,7 +4,6 @@ namespace THCFrame\Database;
 
 use THCFrame\Core\Base;
 use THCFrame\Events\Events as Event;
-use THCFrame\Registry\Registry;
 use THCFrame\Database\Exception;
 
 /**
@@ -43,13 +42,11 @@ class Database extends Base
      * @return \THCFrame\Database\Database\Connector
      * @throws Exception\Argument
      */
-    public function initialize()
+    public function initialize($configuration)
     {
         Event::fire('framework.database.initialize.before', array($this->type, $this->options));
 
         if (!$this->type) {
-            $configuration = Registry::get('configuration');
-
             if (!empty($configuration->database) && !empty($configuration->database->type)) {
                 $this->type = $configuration->database->type;
                 $this->options = (array) $configuration->database;

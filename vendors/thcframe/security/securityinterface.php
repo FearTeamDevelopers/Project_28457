@@ -8,7 +8,7 @@ namespace THCFrame\Security;
 interface SecurityInterface
 {
     
-    public function initialize();
+    public function initialize($configuration);
     
     public function isGranted($requiredRole);
     

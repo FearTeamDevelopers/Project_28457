@@ -106,6 +106,11 @@ class Query extends Base
     {
         $connector = $this->getConnector();
 
+        if (is_numeric($value)) {
+            $escaped = $connector->escape($value);
+            return $escaped;
+        }
+
         if (is_string($value)) {
             $escaped = $connector->escape($value);
             return "'{$escaped}'";
@@ -376,7 +381,7 @@ class Query extends Base
         if ($result === false) {
             $err = $this->connector->getLastError();
             $this->_logError($err, $sql);
-            
+
             if (ENV == 'dev') {
                 throw new Exception\Sql(sprintf('There was an error with your SQL query: %s', $err));
             } else {
@@ -404,7 +409,7 @@ class Query extends Base
         if ($result === false) {
             $err = $this->connector->getLastError();
             $this->_logError($err, $sql);
-            
+
             if (ENV == 'dev') {
                 throw new Exception\Sql(sprintf('There was an error with your SQL query: %s', $err));
             } else {
@@ -428,7 +433,7 @@ class Query extends Base
         if ($result === false) {
             $err = $this->connector->getLastError();
             $this->_logError($err, $sql);
-            
+
             if (ENV == 'dev') {
                 throw new Exception\Sql(sprintf('There was an error with your SQL query: %s', $err));
             } else {

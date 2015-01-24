@@ -261,6 +261,7 @@ class StringMethods
             $string = preg_replace("{$normalized}m", "\\{$part}", $string);
         }
 
+        unset($normalized);
         return $string;
     }
 
@@ -390,6 +391,7 @@ class StringMethods
         
         $cleanString = str_replace($badChars, $replace, $noDiacriticString);
         
+        unset($noDiacriticString);
         return $cleanString;
     }
     

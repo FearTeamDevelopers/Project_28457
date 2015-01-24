@@ -17,7 +17,7 @@ class FileManager extends Base
 
     const DIR_CHMOD = 0755;
     const FILE_CHMOD = 0644;
-    const MAX_FILE_UPLOAD_SIZE = 5000000;
+    const MAX_FILE_UPLOAD_SIZE = 15000000;
 
     /**
      * @read

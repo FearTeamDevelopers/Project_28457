@@ -64,7 +64,7 @@ class BasicUser extends Model
      * @length 200
      * @index
      *
-     * @validate required, min(5), max(200)
+     * @validate required, max(200)
      * @label password
      */
     protected $_password;
@@ -144,14 +144,20 @@ class BasicUser extends Model
     /**
      * @column
      * @readwrite
-     * @type datetime
+     * @type text
+     * @length 22
+     * 
+     * @validate datetime, max(22)
      */
     protected $_created;
 
     /**
      * @column
      * @readwrite
-     * @type datetime
+     * @type text
+     * @length 22
+     * 
+     * @validate datetime, max(22)
      */
     protected $_modified;
     

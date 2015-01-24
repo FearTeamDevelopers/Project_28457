@@ -30,7 +30,7 @@ class App_Controller_System extends Controller
     public function showAdminLog()
     {
         $view = $this->getActionView();
-        $log = App_Model_AdminLog::all(array(), array('*'), array('created' => 'DESC'));
+        $log = App_Model_AdminLog::all(array(), array('*'), array('created' => 'DESC'), 250);
         $view->set('adminlog', $log);
     }
 

@@ -52,55 +52,68 @@ class Model extends Base
     protected $_validators = array(
         'required' => array(
             'handler' => '_validateRequired',
-            'message' => 'The {0} field is required'
+            'message_en' => 'The {0} field is required',
+            'message_cs' => 'Pole {0} je povinné'
         ),
         'alpha' => array(
             'handler' => '_validateAlpha',
-            'message' => 'The {0} field can only contain letters'
+            'message_en' => 'The {0} field can only contain letters',
+            'message_cs' => 'Pole {0} může obsahovat pouze písmena'
         ),
         'numeric' => array(
             'handler' => '_validateNumeric',
-            'message' => 'The {0} field can only contain numbers'
+            'message_en' => 'The {0} field can only contain numbers',
+            'message_cs' => 'Pole {0} může obsahovat pouze číslice'
         ),
         'alphanumeric' => array(
             'handler' => '_validateAlphaNumeric',
-            'message' => 'The {0} field can only contain letters and numbers'
+            'message_en' => 'The {0} field can only contain letters and numbers',
+            'message_cs' => 'Pole {0} může obsahovat pouze písmena a čísla'
         ),
         'max' => array(
             'handler' => '_validateMax',
-            'message' => 'The {0} field must contain less than {2} characters'
+            'message_en' => 'The {0} field must contain less than {2} characters',
+            'message_cs' => 'Pole {0} musí obsahovat méně než {2} znaků'
         ),
         'min' => array(
             'handler' => '_validateMin',
-            'message' => 'The {0} field must contain more than {2} characters'
+            'message_en' => 'The {0} field must contain more than {2} characters',
+            'message_cs' => 'Pole {0} musí obsahovat více než {2} znaků'
         ),
         'email' => array(
             'handler' => '_validateEmail',
-            'message' => 'The {0} field must contain valid email address'
+            'message_en' => 'The {0} field must contain valid email address',
+            'message_cs' => 'Pole {0} musí obsahovat validní emailovou adresu'
         ),
         'url' => array(
             'handler' => '_validateUrl',
-            'message' => 'The {0} field must contain valid url'
+            'message_en' => 'The {0} field must contain valid url',
+            'message_cs' => 'Pole {0} musí obsahovat validní url adresu'
         ),
         'datetime' => array(
             'handler' => '_validateDatetime',
-            'message' => 'The {0} field must contain valid date and time (yyyy-mm-dd hh:mm)'
+            'message_en' => 'The {0} field must contain valid date and time (yyyy-mm-dd hh:mm)',
+            'message_cs' => 'Pole {0} musí obsahovat datum a čas ve formátu (yyyy-mm-dd hh:mm)'
         ),
         'date' => array(
             'handler' => '_validateDate',
-            'message' => 'The {0} field must contain valid date (yyyy-mm-dd)'
+            'message_en' => 'The {0} field must contain valid date (yyyy-mm-dd)',
+            'message_cs' => 'Pole {0} musí obsahovat datum ve formátu (yyyy-mm-dd)'
         ),
         'time' => array(
             'handler' => '_validateTime',
-            'message' => 'The {0} field must contain valid time (hh:mm / hh:mm:ss)'
+            'message_en' => 'The {0} field must contain valid time (hh:mm / hh:mm:ss)',
+            'message_cs' => 'Pole {0} musí obsahovat čas ve formátu (hh:mm / hh:mm:ss)'
         ),
         'html' => array(
             'handler' => '_validateHtml',
-            'message' => 'The {0} field can contain these tags only (span,strong,em,s,p,div,a,ol,ul,li,img,table,caption,thead,tbody,tr,td)'
+            'message_en' => 'The {0} field can contain these tags only (span,strong,em,s,p,div,a,ol,ul,li,img,table,caption,thead,tbody,tr,td)',
+            'message_cs' => 'Pole {0} může obsahovat následující html tagy (span,strong,em,s,p,div,a,ol,ul,li,img,table,caption,thead,tbody,tr,td)'
         ),
         'path' => array(
             'handler' => '_validatePath',
-            'message' => 'The {0} field must contain filesystem path'
+            'message_en' => 'The {0} field must contain filesystem path',
+            'message_cs' => 'Pole {0} musí obsahovat validní cestu',
         )
     );
 
@@ -346,6 +359,14 @@ class Model extends Base
     }
 
     /**
+     * Object destructor
+     */
+    public function __destruct()
+    {
+        unset($this->_connector);
+    }
+    
+    /**
      * Method simplifies record retrieval for us. 
      * It determines the model’s primary column and checks to see whether 
      * it is not empty. This tells us whether the primary key has been provided, 
@@ -409,12 +430,15 @@ class Model extends Base
         if (!empty($this->$raw)) {
             $this->connector->beginTransaction();
 
-            $state = $this->connector
+            $query = $this->connector
                     ->query()
                     ->from($this->table)
-                    ->where("{$name} = ?", $this->$raw)
-                    ->delete();
+                    ->where("{$name} = ?", $this->$raw);
 
+            $state = $query->delete();
+            
+            unset($query);
+            
             if ($state != -1) {
                 $this->connector->commitTransaction();
                 return $state;
@@ -447,6 +471,8 @@ class Model extends Base
 
         $state = $query->delete();
 
+        unset($query);
+        
         if ($state != -1) {
             $instance->connector->commitTransaction();
             return $state;
@@ -478,6 +504,8 @@ class Model extends Base
 
         $state = $query->update($data);
 
+        unset($query);
+        
         if ($state != -1) {
             $instance->connector->commitTransaction();
             return $state;
@@ -541,6 +569,8 @@ class Model extends Base
         }
 
         $result = $query->save($data);
+        
+        unset($query);
 
         if ($result > 0) {
             $this->$raw = $result;
@@ -782,6 +812,8 @@ class Model extends Base
         $first = $query->first();
         $class = get_class($this);
 
+        unset($query);
+        
         if ($first) {
             return new $class($first);
         }
@@ -859,7 +891,14 @@ class Model extends Base
             $rows[] = new $class($row);
         }
 
-        return $rows;
+        unset($query);
+        
+        if(empty($rows)){
+            return null;
+        }else{
+            return $rows;
+        }
+        
     }
 
     /**
@@ -901,6 +940,8 @@ class Model extends Base
             $rows[] = new $class($row);
         }
 
+        unset($query);
+        
         if (empty($rows)) {
             return null;
         } else {
@@ -955,10 +996,12 @@ class Model extends Base
     public function validate()
     {
         $this->_errors = array();
+        $config = Registry::get('configuration');
+        $errLang = $config->system->lang;
 
         foreach ($this->columns as $column) {
             if ($column['validate']) {
-                $pattern = '#[a-z]+\(([a-zA-Z0-9, ]+)\)#';
+                $pattern = '#[a-z]+\(([a-zá-žA-ZÁ-Ž0-9, ]+)\)#';
 
                 $raw = $column['raw'];
                 $name = $column['name'];
@@ -993,7 +1036,7 @@ class Model extends Base
                             $label ? $label : $raw
                                 ), $arguments);
 
-                        $message = $template['message'];
+                        $message = $template['message_'.$errLang];
 
                         foreach ($replacements as $i => $replacement) {
                             $message = str_replace("{{$i}}", $replacement, $message);

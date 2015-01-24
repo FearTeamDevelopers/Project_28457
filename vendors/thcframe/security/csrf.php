@@ -94,13 +94,14 @@ class CSRF
      */
     public function verifyRequest()
     {
-        $check = !RequestMethods::issetpost(self::$_tokenname) || !$this->isValidToken(RequestMethods::post(self::$_tokenname));
+        $checkPost = RequestMethods::issetpost(self::$_tokenname) && $this->isValidToken(RequestMethods::post(self::$_tokenname));
+        $checkGet = RequestMethods::issetget(self::$_tokenname) && $this->isValidToken(RequestMethods::get(self::$_tokenname));
         $this->refreshToken();
 
-        if ($check) {
-            return false;
-        } else {
+        if ($checkGet || $checkPost) {
             return true;
+        } else {
+            return false;
         }
     }
 

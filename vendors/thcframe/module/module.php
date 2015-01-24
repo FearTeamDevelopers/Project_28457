@@ -6,6 +6,8 @@ use THCFrame\Core\Base;
 use THCFrame\Events\Events as Event;
 use THCFrame\Module\Exception;
 use THCFrame\Events\SubscriberInterface;
+use THCFrame\Router\Model\Redirect;
+use THCFrame\Registry\Registry;
 
 /**
  * Application module class
@@ -22,6 +24,11 @@ class Module extends Base
      * @read
      */
     protected $_redirects = array();
+
+    /**
+     * @readwrite
+     */
+    protected $_checkForRedirects = false;
 
     /**
      * @read
@@ -106,7 +113,27 @@ class Module extends Base
      */
     public function getRedirects()
     {
-        return $this->_redirects;
+        if ($this->checkForRedirects) {
+            $cache = Registry::get('cache');
+            
+            $cachedRedirects = $cache->get('core_redirects_'.$this->getModuleName());
+            
+            if (null !== $cachedRedirects) {
+                $redirects = $cachedRedirects;
+            } else {
+                $redirects = Redirect::all(array('module = ?' => strtolower($this->getModuleName())));
+
+                if (null === $redirects) {
+                    $redirects = array();
+                }
+                
+                $cache->set('core_redirects_'.$this->getModuleName(), $redirects);
+            }
+
+            return $redirects;
+        } else {
+            return array();
+        }
     }
 
 }

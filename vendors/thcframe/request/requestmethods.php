@@ -34,6 +34,20 @@ class RequestMethods
     }
 
     /**
+     * Check if key is in $_GET array
+     * 
+     * @param mixed $key
+     * @return boolean
+     */
+    public static function issetget($key)
+    {
+        if (isset($_GET[$key])) {
+            return true;
+        }
+        return false;
+    }
+    
+    /**
      * Get value from $_POST array
      * 
      * @param mixed $key

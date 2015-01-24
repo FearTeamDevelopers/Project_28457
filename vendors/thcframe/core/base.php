@@ -89,7 +89,7 @@ class Base
             }
         }
     }
-
+    
     /**
      * There are four basic parts to our __call() method: 
      * checking to see that the inspector is set, 
@@ -119,6 +119,8 @@ class Base
                     throw $this->_getWriteonlyException($normalized);
                 }
 
+                unset($meta);
+                
                 if (isset($this->$property)) {
                     return $this->$property;
                 } else {
@@ -130,6 +132,8 @@ class Base
                 return null;
             }
         }
+        
+        unset($getMatches);
 
         $setMatches = StringMethods::match($name, '#^set([a-zA-Z0-9_]+)$#');
         if (count($setMatches) > 0) {
@@ -142,6 +146,8 @@ class Base
                 if (empty($meta['@readwrite']) && empty($meta['@write'])) {
                     throw $this->_getReadonlyException($normalized);
                 }
+                
+                unset($meta);
 
                 $this->$property = $arguments[0];
                 return $this;
@@ -151,6 +157,8 @@ class Base
                 return $this;
             }
         }
+        
+        unset($setMatches);
 
         $unsetMatches = StringMethods::match($name, '#^uns([a-zA-Z0-9_]+)$#');
         if (count($unsetMatches) > 0) {
@@ -164,6 +172,8 @@ class Base
                     throw $this->_getReadonlyException($normalized);
                 }
 
+                unset($meta);
+                
                 unset($this->$property);
                 return $this;
             } else {
@@ -171,6 +181,8 @@ class Base
                 return $this;
             }
         }
+        
+        unset($unsetMatches);
 
         throw $this->_getImplementationException($name);
     }

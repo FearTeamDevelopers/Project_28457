@@ -1,24 +1,26 @@
 <?php
 
-namespace THCFrame\Configuration\Model;
+namespace THCFrame\Router\Model;
 
 use THCFrame\Model\Model;
 
 /**
- * ORM Config model 
+ * ORM Redirect model 
  * 
- * SQL code:
- * CREATE TABLE `tb_config` (
+ * SQL code: 
+ * CREATE TABLE `tb_redirect` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
-  `title` varchar(150) NOT NULL DEFAULT '',
-  `xkey` varchar(200) NOT NULL DEFAULT '',
-  `value` varchar(250) NOT NULL DEFAULT '',
+  `fromPath` varchar(250) NOT NULL DEFAULT '',
+  `toPath` varchar(250) NOT NULL DEFAULT '',
+  `module` varchar(30) NOT NULL DEFAULT '',
   `created` datetime DEFAULT NULL,
   `modified` datetime DEFAULT NULL,
-  PRIMARY KEY (`id`)
+  PRIMARY KEY (`id`),
+  UNIQUE KEY (`fromPath`, `toPath`, `module`),
+  KEY `ix_redirect` (`fromPath`, `module`)
   ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
  */
-class Config extends Model
+class Redirect extends Model
 {
 
     /**
@@ -33,34 +35,37 @@ class Config extends Model
      * @column
      * @readwrite
      * @type text
-     * @length 150
+     * @length 250
+     * @unique
      * 
-     * @validate required, alphanumeric, max(150)
-     * @label title
+     * @validate required, alphanumeric, max(250)
+     * @label from
      */
-    protected $_title;
+    protected $_fromPath;
 
     /**
      * @column
      * @readwrite
      * @type text
-     * @length 150
+     * @length 250
+     * @unique
      * 
-     * @validate required, alphanumeric, max(150)
-     * @label key
+     * @validate required, alphanumeric, max(250)
+     * @label to
      */
-    protected $_xkey;
+    protected $_toPath;
 
     /**
      * @column
      * @readwrite
      * @type text
-     * @length 256
+     * @length 30
+     * @unique
      * 
-     * @validate required, alphanumeric, max(8192)
-     * @label value
+     * @validate required, alphanumeric, max(30)
+     * @label module
      */
-    protected $_value;
+    protected $_module;
 
     /**
      * @column

@@ -293,7 +293,8 @@ class Profiler
 
                 foreach ($profile['sessionArr'] as $key => $value) {
                     if (is_array($value)) {
-                        $str .= "<tr><td>{$key}</td><td>{$value[0]}</td></tr>";
+                        $arrKey = array_keys($value);
+                        $str .= "<tr><td>{$key}</td><td>{$arrKey[0]}</td></tr>";
                     } else {
                         $str .= "<tr><td>{$key}</td><td>{$value}</td></tr>";
                     }
@@ -304,7 +305,8 @@ class Profiler
 
                 foreach ($profile['postArr'] as $key => $value) {
                     if (is_array($value)) {
-                        $str .= "<tr><td>{$key}</td><td>{$value[0]}</td></tr>";
+                        $arrKey = array_keys($value);
+                        $str .= "<tr><td>{$key}</td><td>{$arrKey[0]}</td></tr>";
                     } else {
                         $str .= "<tr><td>{$key}</td><td>{$value}</td></tr>";
                     }
@@ -315,7 +317,8 @@ class Profiler
 
                 foreach ($profile['getArr'] as $key => $value) {
                     if (is_array($value)) {
-                        $str .= "<tr><td>{$key}</td><td>{$value[0]}</td></tr>";
+                        $arrKey = array_keys($value);
+                        $str .= "<tr><td>{$key}</td><td>{$arrKey[0]}</td></tr>";
                     } else {
                         $str .= "<tr><td>{$key}</td><td>{$value}</td></tr>";
                     }

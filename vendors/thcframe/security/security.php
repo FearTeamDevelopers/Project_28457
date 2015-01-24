@@ -70,11 +70,9 @@ class Security extends Base implements SecurityInterface
      * Method initialize security context. Check session for user token and
      * initialize authentication and authorization classes
      */
-    public function initialize()
+    public function initialize($configuration)
     {
         Event::fire('framework.security.initialize.before', array());
-
-        $configuration = Registry::get('configuration');
 
         if (!empty($configuration->security)) {
             $this->_csrf = new CSRF();
@@ -87,10 +85,10 @@ class Security extends Base implements SecurityInterface
         $user = $session->get('authUser');
 
         $authentication = new Authentication\Authentication();
-        $this->_authentication = $authentication->initialize();
+        $this->_authentication = $authentication->initialize($configuration);
 
         $authorization = new Authorization\Authorization();
-        $this->_authorization = $authorization->initialize();
+        $this->_authorization = $authorization->initialize($configuration);
 
         if ($user instanceof BasicUser) {
             $this->_user = $user;

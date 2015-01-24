@@ -6,6 +6,7 @@ use THCFrame\Core\Base;
 use THCFrame\Events\Events as Event;
 use THCFrame\Router\Exception;
 use THCFrame\Router\Route;
+use THCFrame\Registry\Registry;
 
 /**
  * Router class
@@ -39,7 +40,7 @@ class Router extends Base
      * @readwrite 
      * @var Route
      */
-    protected $_lastRoute;
+    protected $_lastRoute = null;
 
     /**
      * Application default routes
@@ -194,6 +195,10 @@ class Router extends Base
             }
         }
 
+        if ($this->_lastRoute === null) {
+            throw new Exception\Module('Not found');
+        }
+
         Event::fire('framework.router.findroute.after', array(
             $path,
             $this->_lastRoute->getModule(),
@@ -255,7 +260,7 @@ class Router extends Base
     {
         if (!empty($redirects)) {
             foreach ($redirects as $redirect) {
-                $this->_redirects[$redirect['from']] = $redirect['to'];
+                $this->_redirects[$redirect->fromPath] = $redirect->toPath;
             }
         }
     }

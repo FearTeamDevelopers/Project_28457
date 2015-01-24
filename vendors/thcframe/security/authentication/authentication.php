@@ -5,7 +5,6 @@ namespace THCFrame\Security\Authentication;
 use THCFrame\Core\Base;
 use THCFrame\Security\Exception;
 use THCFrame\Events\Events as Event;
-use THCFrame\Registry\Registry;
 
 /**
  * Authentication factory class
@@ -40,11 +39,9 @@ class Authentication extends Base
      * It accepts initialization options and selects the type of returned object, 
      * based on the internal $_type property
      */
-    public function initialize()
+    public function initialize($configuration)
     {
         Event::fire('framework.authentication.initialize.before', array($this->type));
-        
-        $configuration = Registry::get('configuration');
         
         if (!$this->type) {
             if(!empty($configuration->security->authentication)){

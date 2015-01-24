@@ -101,7 +101,7 @@ class Inspector
     protected function _parse($comment)
     {
         $meta = array();
-        $pattern = '(@[a-zA-Z]+\s*[a-zA-Z0-9, ()_]*)';
+        $pattern = '(@[a-zá-žA-ZÁ-Ž]+\s*[a-zá-žA-ZÁ-Ž0-9, ()_]*)';
         $matches = StringMethods::match($comment, $pattern);
 
         if ($matches != null) {

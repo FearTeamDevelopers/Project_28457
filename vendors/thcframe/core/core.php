@@ -281,11 +281,12 @@ class Core
             );
             $confingInitialized = $configuration->initialize();
             Registry::set('config', $confingInitialized);
+            $parsedConfig = $confingInitialized->getParsed();
 
             // database
-            if (Registry::get('configuration')->database->host != '') {
+            if ($parsedConfig->database->host != '') {
                 $database = new \THCFrame\Database\Database();
-                $initializedDb = $database->initialize();
+                $initializedDb = $database->initialize($parsedConfig);
                 Registry::set('database', $initializedDb);
                 $initializedDb->connect();
                 
@@ -295,18 +296,19 @@ class Core
 
             // cache
             $cache = new \THCFrame\Cache\Cache();
-            Registry::set('cache', $cache->initialize());
+            Registry::set('cache', $cache->initialize($parsedConfig));
 
             // session
             $session = new \THCFrame\Session\Session();
-            Registry::set('session', $session->initialize());
+            Registry::set('session', $session->initialize($parsedConfig));
 
             // security
             $security = new \THCFrame\Security\Security();
-            Registry::set('security', $security->initialize());
+            Registry::set('security', $security->initialize($parsedConfig));
 
             // unset globals
             unset($configuration);
+            unset($parsedConfig);
             unset($database);
             unset($cache);
             unset($session);
@@ -482,7 +484,7 @@ class Core
      */
     public static function getFrameworkVersion()
     {
-        return '1.1.3';
+        return '1.2.2';
     }
 
 }

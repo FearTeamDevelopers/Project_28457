@@ -199,4 +199,12 @@ class Ini extends Configuration\Driver
         }
     }
 
+    /**
+     * 
+     * @return type
+     */
+    public function getParsed()
+    {
+        return $this->_parsed;
+    }
 }
